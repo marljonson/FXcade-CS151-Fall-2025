@@ -1,0 +1,1 @@
+for shared helper classes that don't belong to manager, blackjack, snake
