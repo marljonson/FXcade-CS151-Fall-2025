@@ -8,7 +8,7 @@ public enum Suit {
     Suit(char suitChar){ this.suitChar = suitChar; }
     public char getSuitChar(){ return suitChar; }
 
-    public static Suit fromSuitChar(char c){
+    public static Suit fromChar(char c){
         switch (c) {
             case 'C': return CLUBS;
             case 'D': return DIAMONDS;
