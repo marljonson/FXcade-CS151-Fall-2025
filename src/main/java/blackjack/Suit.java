@@ -14,7 +14,7 @@ public enum Suit {
             case 'D': return DIAMONDS;
             case 'H': return HEARTS;
             case 'S': return SPADES;
-            default: throw new IllegalAccessException("Invalid suit character: " + c)
+            default: throw new IllegalArgumentException("Invalid suit character: " + c);
                 
         }
     }
