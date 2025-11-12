@@ -36,4 +36,46 @@ public class Hand {
         Collections.sort(sorted);
         return sorted;
     }
+
+    // Return best total <= 21 or lowest total if all > 21 (bust lol)
+    public int getBestTotal(){
+        int best = Integer.MIN_VALUE;
+        for (int total : getTotals()){
+            if (total <= 21) best = Math.max(best, total);
+        }
+        return best == Integer.MIN_VALUE ? Collections.min(getTotals()) : best;
+    }
+
+    // All totals over 21 = bust
+    public boolean isBust(){ return getTotals().get(0) > 21;}
+
+    // Natural blackjack = 10 value + Ace card (11) = 21
+    public boolean isBlackjack(){ return size() == 2 && getBestTotal() == 21;}
+
+    // Soft total: true if hand has an Ace that counts as 11 WITHOUT busting
+    public boolean isSoft(){
+        if(!containsAce()) return false;
+        int hard = getHardTotal();
+        
+        // if any total <= 21 equals (hard total + 10), it's soft
+        for(int total : getTotals()){
+            if(total <= 21 && total == hard + 10) return true;
+        }
+        return false;
+    }
+
+    private boolean containsAce() {
+        return cards.stream().anyMatch(card -> card.getRank() == Rank.ACE);
+    }
+
+    // count Ace as 1 in a hard hand
+    private int getHardTotal(){
+        int sum = 0;
+        for (Card card : cards){
+            sum += (card.getValue() == 11) ? 1 : card.getValue();
+        }
+        return sum;
+    }
+
+
 }
