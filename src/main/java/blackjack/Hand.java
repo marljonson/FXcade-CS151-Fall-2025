@@ -77,5 +77,29 @@ public class Hand {
         return sum;
     }
 
+    // Separate hands using - (ie AH-TC-7S)
+    public String toChars(){
+        return String.join("-", cards.stream()
+                .map(Card::toString)
+                .toArray(String[]::new));
+    }
+
+    // Parse a hand using the str produced in toChars(), empty is a blank, Remember str is a denote for the card hand you have
+    public static Hand fromChars(String str){
+        Hand hand = new Hand();
+        if(str == null || str.isBlank()) return hand;
+        for(String part : str.split("-")){
+            if(!part.isBlank()) hand.add(Card.fromChars(part.trim()));
+        }
+        return hand;
+    }
+
+    @Override
+    public String toString() {
+        return cards.toString(); // Solely for debugging: [AH, TC, 7S]
+    }
+
+    
+
 
 }
