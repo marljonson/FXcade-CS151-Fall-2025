@@ -75,8 +75,25 @@ public class Deck {
         }
     }
 
+    // Serialize to allow for save states, so we can resume from where we left off
+    public String toChars(){
+        return String.join(",", cards.stream()
+                .map(Card::toString)
+                .toArray(String[]::new));          
+    }
     
-
+    // Rebuild deck from comma separated list (AH, TC, 7S)
+    public static Deck fromChars(String csv){
+        Deck deck = new Deck(1);
+        deck.cards.clear();
+        if(csv != null && !csv.isBlank()){
+            for(String token : csv.split(",")){
+                String t = token.trim();
+                if(!t.isBlank()) deck.cards.addLast(Card.fromChars(t));
+            }
+        }
+        return deck;
+    }
     
 
     
