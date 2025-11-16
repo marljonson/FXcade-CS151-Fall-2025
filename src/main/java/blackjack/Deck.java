@@ -62,7 +62,18 @@ public class Deck {
         return cards.removeFirst();
     }
 
+    // Deal next card face down (ie: dealer's hole card)
+    public Card dealFaceDown(){
+        Card up = deal();
+        return new Card(up.getRank(), up.getSuit(), false); 
+    }
 
+    // Return cards to bottom of pile (like when reshuffling in between rounds)
+    public void returnToBottom(Collection<Card> returned){
+        for(Card card : returned){
+            cards.addLast(new Card(card.getRank(), card.getSuit(), true));
+        }
+    }
 
     
 
