@@ -27,6 +27,7 @@ public class Participant {
     public void setBet(int amount) { this.bet = amount; }
     public void win(int amount){ bankroll += amount; }
     public void lose(int amount){ bankroll -= amount; }
+    public void push() {} // no change in case of tie
 
     public void clearForNextRound(){
         hand.clear();
