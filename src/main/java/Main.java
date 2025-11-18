@@ -19,7 +19,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Login scene
-        Label welcomeMessage = new Label("Welcome to FxCade!");
+        Label welcomeMessage = new Label("Welcome to FXcade!");
 
         TextField loginUsernameField = new TextField();
         loginUsernameField.setPromptText("Username");
@@ -39,7 +39,7 @@ public class Main extends Application {
         Scene loginScene = new Scene(signInlayout, 700, 500);
 
         primaryStage.setScene(loginScene);
-        primaryStage.setTitle("FXCade Game Manager");
+        primaryStage.setTitle("FXcade Game Manager");
         primaryStage.show();
 
 
