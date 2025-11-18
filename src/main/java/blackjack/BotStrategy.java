@@ -1,4 +1,4 @@
-package main.java.blackjack;
+package blackjack;
 
 public interface BotStrategy {
     enum Action{ HIT, STAND }

@@ -1,4 +1,4 @@
-package main.java.blackjack;
+package blackjack;
 
 public class Participant {
     private final String name;

@@ -1,4 +1,4 @@
-package main.java.blackjack;
+package blackjack;
 
 public enum Rank {
     TWO(2, '2'),
