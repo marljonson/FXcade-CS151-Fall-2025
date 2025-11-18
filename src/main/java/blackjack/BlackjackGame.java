@@ -63,8 +63,9 @@ public class BlackjackGame {
         boolean anyNatural = players.stream().anyMatch(p -> p.getHand().isBlackjack())
                               || dealer.getHand().isBlackjack();
         if (anyNatural){
-            // TODO:finish round call
             revealDealerHole();
+            finishRound();
+            return;
         }
     }
 
@@ -111,7 +112,9 @@ public class BlackjackGame {
 
     private Card dealerUpCard() {
         // first card is up
-        return dealer.getHand().getCards().get(0);
+        List<Card> dealerCard = dealer.getHand().getCards();
+        if (dealerCard.isEmpty()) throw new IllegalStateException("Dealer has no cards yet");
+        return dealerCard.get(0);
     }
 
     private void revealDealerHole(){
@@ -181,14 +184,10 @@ public class BlackjackGame {
                 }
 
             }
-            
+            resultBanner = sb.toString().trim();
 
         }
     }
-
-
-
-
     // UI getters
     public Participant getHuman() { return players.get(0); }
     public Participant getBot1()  { return players.get(1); }
