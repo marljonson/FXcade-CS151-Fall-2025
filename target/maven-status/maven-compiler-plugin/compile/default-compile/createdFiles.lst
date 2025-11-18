@@ -11,7 +11,6 @@ manager\AccountManager$signUpStatus.class
 main\java\blackjack\BotStrategy.class
 manager\AccountManager$loginStatus.class
 main\java\blackjack\Deck.class
-GameManager.class
 main\java\blackjack\BlackjackGame.class
 main\java\blackjack\Suit.class
 main\java\blackjack\BotStrategy$Action.class
