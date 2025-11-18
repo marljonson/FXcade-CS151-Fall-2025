@@ -48,15 +48,17 @@ public class BlackjackGame {
             participant.clearForNextRound();
         }
         dealer.clearForNextRound();
-        players.get(0).setBet(humanBet);
-        players.get(1).setBet(bot1Bet);
-        players.get(2).setBet(bot2Bet);
+        players.get(0).setBet(clampNonNegative(humanBet));
+        players.get(1).setBet(clampNonNegative(bot1Bet));
+        players.get(2).setBet(clampNonNegative(bot2Bet));
 
         // initial deal, 2 to everyone, dealer's second is face dwn
         for (int i = 0; i < 2; i++){
-            for(Participant participant : players) participant.getHand().add(deck.deal());
-            if (i == 0){ dealer.getHand().add(deck.deal()); }
-            else       { dealer.getHand().add(deck.dealFaceDown()); }
+            for(Participant player : players) {
+                if (!tryDealUp(player.getHand())) return;
+            }
+            if (i == 0){ if (!tryDealUp(dealer.getHand())) return; }
+            else       { if (!tryDealFaceDownToDealer()) return; }
         }
 
         // natural blackjack shortcut (rare edge case with this many players)
@@ -72,8 +74,9 @@ public class BlackjackGame {
     // Human action when it's player's turn while round ongoing
     public void humanHit(){
         if (roundOver || turnIndex != 0) return;
-        players.get(0).getHand().add(deck.deal());
-        if (players.get(0).getHand().isBust()) {
+        if (!tryDealUp(players.get(0).getHand())) return;
+        int best = players.get(0).getHand().getBestTotal();
+        if (best >= 21) { // 21 or bust
             advanceToNextTurn();
         }
     }
@@ -105,20 +108,22 @@ public class BlackjackGame {
         while(true){
             if(bot.getHand().isBust()) break;
             BotStrategy.Action action = brain.decide(bot.getHand(), dealerUpCard());
-            if (action == BotStrategy.Action.HIT) bot.getHand().add(deck.deal());
+            if (action == BotStrategy.Action.HIT) {
+                if (!tryDealUp(bot.getHand())) return; // stops on empty deck
+            } 
             else { break; }
         }
     }
 
     private Card dealerUpCard() {
         // first card is up
-        List<Card> dealerCard = dealer.getHand().getCards();
-        if (dealerCard.isEmpty()) throw new IllegalStateException("Dealer has no cards yet");
-        return dealerCard.get(0);
+        List<Card> dealerCards = dealer.getHand().getCards();
+        if (dealerCards.isEmpty()) throw new IllegalStateException("Dealer has no cards yet");
+        return dealerCards.get(0);
     }
 
     private void revealDealerHole(){
-        // flip first card face-down 
+        // reveal (flip) the first face-down dealer card
         Hand src = dealer.getHand();
         Hand temp = new Hand();
         boolean flipped = false;
@@ -140,8 +145,8 @@ public class BlackjackGame {
             boolean soft = hand.isSoft();
             if(best > 21) break;
             if(best > 17) break;
-            if(best < 17){ hand.add(deck.deal()); continue; }
-            if(best == 17 && DEALER_HITS_SOFT_17 && soft) { hand.add(deck.deal()); continue; } 
+            if(best < 17){ if (!tryDealUp(hand)) break; continue;  }
+            if(best == 17 && DEALER_HITS_SOFT_17 && soft) { if (!tryDealUp(hand)) break; continue; } 
             break;
         }
     }
@@ -182,10 +187,33 @@ public class BlackjackGame {
                     player.push();
                     sb.append(player.getName()).append(": Push ").append(playerBest).append("\n");
                 }
-
             }
-            resultBanner = sb.toString().trim();
+        }
+        resultBanner = sb.toString().trim();
+    }
 
+    // These helpers encase deal() calls in a try-catch block for more error proofing
+    // Deal one face-up card into a hand. If deck is empty, end the round gracefully. 
+    private boolean tryDealUp(Hand hand) {
+        try {
+            hand.add(deck.deal());
+            return true;
+        } catch (NoSuchElementException ex) {
+            resultBanner = "Deck is empty. Round ended.";
+            roundOver = true;
+            return false;
+        }
+    }
+
+    // Deal a single face-down card into dealer's hand. 
+    private boolean tryDealFaceDownToDealer() {
+        try {
+            dealer.getHand().add(deck.dealFaceDown());
+            return true;
+        } catch (NoSuchElementException ex) {
+            resultBanner = "Deck is empty. Round ended.";
+            roundOver = true;
+            return false;
         }
     }
     // UI getters
@@ -195,6 +223,9 @@ public class BlackjackGame {
     public Participant getDealer(){ return dealer; }
     public List<Participant> getPlayers() { return Collections.unmodifiableList(players); }
 
+
+    public boolean isHumansTurn() { return !roundOver && turnIndex == 0; }
+    private static int clampNonNegative(int betAmount){ return Math.max(0, betAmount); } // validate bet
     public boolean isRoundOver() { return roundOver; }
     public String getResultBanner() { return resultBanner; }
     public int getTurnIndex() { return turnIndex; } // 0 = human, 1 = bot1, 2 = bot2, 3 = dealer/done
