@@ -54,7 +54,11 @@ public class Main extends Application {
 
         Button signUpButton = new Button("Sign up");
 
-        VBox signupLayout = new VBox(signUpMessage, signupUsernameField, signupPasswordField, signUpButton);
+        Label signUpMessageLabel = new Label();
+
+        Button signUpBackButton = new Button("Back");
+
+        VBox signupLayout = new VBox(signUpMessage, signupUsernameField, signupPasswordField, signUpButton, signUpMessageLabel,signUpBackButton);
         Scene singupScene = new Scene(signupLayout, 700, 500);
 
 
@@ -75,16 +79,16 @@ public class Main extends Application {
 
 
         // Button actions
-        // 1 - Sign in
+        // 1 - Login Scene: Sign in button clicked
         loginButton.setOnAction(event -> {
-            String username = loginUsernameField.getText();
-            String password = loginPasswordField.getText();
+            String loginUsername = loginUsernameField.getText();
+            String loginPassword = loginPasswordField.getText();
 
-            if (username.isEmpty() || password.isEmpty()) {
+            if (loginUsername.isEmpty() || loginPassword.isEmpty()) {
                 loginMessageLabel.setText("Please enter both username and password.");
             }
             else {
-                AccountManager.loginStatus signInStatus = accountManager.signIn(username, password);
+                AccountManager.loginStatus signInStatus = accountManager.signIn(loginUsername, loginPassword);
                 switch (signInStatus) {
                     case SUCCESS:
                         // Change scene to main menu
@@ -100,9 +104,43 @@ public class Main extends Application {
             }
         });
 
-        // 2 - Sign Up
+        // 2 - Login Scene: Sign up button clicked
         createAccountButton.setOnAction(e -> {
             primaryStage.setScene(singupScene);
+        });
+
+        // 3 - Sign up scene: Sign up button clicked
+        signUpButton.setOnAction(e -> {
+            String signupUsername = signupUsernameField.getText();
+            String signupPassword = signupPasswordField.getText();
+
+            if (signupUsername.isEmpty() || signupPassword.isEmpty()) {
+                signUpMessageLabel.setText("Please enter both username and password.");
+            }
+            else {
+                AccountManager.signUpStatus signUpStatus = accountManager.createUser(signupUsername, signupPassword);
+                switch (signUpStatus) {
+                    case SUCCESS:
+                        break;
+                    case USER_TAKEN:
+                        signUpMessageLabel.setText("Username taken. Please try again.");
+                        break;
+                    case PASSWORD_LENGTH:
+                        signUpMessageLabel.setText("Password length must be longer than 8. Please try again.");
+                        break;
+                    case COLON_SYMBOL:
+                        signUpMessageLabel.setText("Username and password cannot contain colon. Please try again.");
+                        break;
+                    case FILE_ERROR:
+                        signUpMessageLabel.setText("File error. Please try again.");
+                        break;
+                }
+            }
+        });
+
+        // 4 - Sign Up scene: Back button clicked
+        signUpBackButton.setOnAction(e -> {
+            primaryStage.setScene(loginScene);
         });
 
         // 3 - Main menu button

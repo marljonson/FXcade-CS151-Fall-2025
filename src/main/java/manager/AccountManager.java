@@ -19,6 +19,13 @@ public class AccountManager {
         USER_NOT_FOUND,
         WRONG_PASSWORD
     }
+    public enum signUpStatus {
+        SUCCESS,
+        USER_TAKEN,
+        PASSWORD_LENGTH,
+        COLON_SYMBOL,
+        FILE_ERROR
+    }
 
     // Constructor
     public AccountManager() {
@@ -90,23 +97,23 @@ public class AccountManager {
     }
 
     // Create Account
-    public boolean createUser(String username, String password) {
+    public signUpStatus createUser(String username, String password) {
         // Check if username already exists
         if (users.containsKey(username)) {
             System.out.println("Username is taken. Please try again with another username.");
-            return false;
+            return signUpStatus.USER_TAKEN;
         }
 
         // Check if username/password contains character ':'
         if (username.contains(":") || password.contains(":")) {
             System.out.println("Username and password cannot contain ':' characters.");
-            return false;
+            return signUpStatus.COLON_SYMBOL;
         }
 
         // Password length check
         if (password.length() < 8) {
             System.out.println("Password must be at least 8 characters.");
-            return false;
+            return signUpStatus.PASSWORD_LENGTH;
         }
 
         // Create new user with default high score of 0
@@ -126,10 +133,10 @@ public class AccountManager {
             writer.write(savedOutput);
             writer.newLine();
             writer.close();
-            return true;
+            return signUpStatus.SUCCESS;
         } catch (IOException e) {
             System.out.println("Error saving new user to file: user_accounts.txt");
-            return false;
+            return signUpStatus.FILE_ERROR;
         }
     }
 }
