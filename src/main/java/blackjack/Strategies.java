@@ -1,4 +1,4 @@
-package main.java.blackjack;
+package blackjack;
 
 public final class Strategies {
     private Strategies(){}

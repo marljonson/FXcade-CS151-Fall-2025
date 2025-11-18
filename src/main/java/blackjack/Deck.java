@@ -1,4 +1,4 @@
-package main.java.blackjack;
+package blackjack;
 
 // we use secure random as it is more unpredictable in shuffling
 import java.security.SecureRandom;
