@@ -14,6 +14,11 @@ public class AccountManager {
 
     private Map<String, User> users = new HashMap<>();
     private User activeUser;
+    public enum loginStatus {
+        SUCCESS,
+        USER_NOT_FOUND,
+        WRONG_PASSWORD
+    }
 
     // Constructor
     public AccountManager() {
@@ -64,12 +69,12 @@ public class AccountManager {
     }
 
     // Login
-    public boolean signIn(String username, String password) {
+    public loginStatus signIn(String username, String password) {
         // Check if user exists
         if (!users.containsKey(username)) {
             System.out.println("User " + username + " not found");
             System.out.println("Please try again or create an account.");
-            return false;
+            return loginStatus.USER_NOT_FOUND;
         }
 
         User signInUser = users.get(username);
@@ -77,10 +82,10 @@ public class AccountManager {
         if (signInUser.getPassword().equals(password)) {
             System.out.println("User " + username + " successfully logged in.");
             setActiveUser(signInUser);
-            return true;
+            return loginStatus.SUCCESS;
         } else {
             System.out.println("Password does not match. Please try again.");
-            return false;
+            return loginStatus.WRONG_PASSWORD;
         }
     }
 
