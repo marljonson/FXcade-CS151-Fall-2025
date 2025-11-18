@@ -6,6 +6,7 @@ import java.util.*;
 public class BlackjackGame {
     // related to soft total added to 17 when ace is 11
     private static final boolean DEALER_HITS_SOFT_17 = true;
+    private static final double WIN_MULTIPLIER = 1.5;
 
     private final Deck deck;
     private final List<Participant> players = new ArrayList<>(3); // 1 human, 2 bot players
@@ -36,4 +37,166 @@ public class BlackjackGame {
     }
 
     // Round life cycle, each player makes a bet
+    public void startNewRound(int humanBet, int bot1Bet, int bot2Bet){
+        deck.resetAndShuffle();
+        resultBanner = "";
+        roundOver = false;
+        turnIndex = 0;
+
+        // clear and set bets
+        for(Participant participant : players){
+            participant.clearForNextRound();
+        }
+        dealer.clearForNextRound();
+        players.get(0).setBet(humanBet);
+        players.get(1).setBet(bot1Bet);
+        players.get(2).setBet(bot2Bet);
+
+        // initial deal, 2 to everyone, dealer's second is face dwn
+        for (int i = 0; i < 2; i++){
+            for(Participant participant : players) participant.getHand().add(deck.deal());
+            if (i == 0){ dealer.getHand().add(deck.deal()); }
+            else       { dealer.getHand().add(deck.dealFaceDown()); }
+        }
+
+        // natural blackjack shortcut (rare edge case with this many players)
+        boolean anyNatural = players.stream().anyMatch(p -> p.getHand().isBlackjack())
+                              || dealer.getHand().isBlackjack();
+        if (anyNatural){
+            // TODO:finish round call
+            revealDealerHole();
+        }
+    }
+
+    // Human action when it's player's turn while round ongoing
+    public void humanHit(){
+        if (roundOver || turnIndex != 0) return;
+        players.get(0).getHand().add(deck.deal());
+        if (players.get(0).getHand().isBust()) {
+            advanceToNextTurn();
+        }
+    }
+
+    public void humanStand(){
+        if (roundOver || turnIndex != 0) return;
+        advanceToNextTurn();
+    }
+
+    private void advanceToNextTurn(){
+        turnIndex++;
+        // play bots
+        while (!roundOver && turnIndex < players.size()){
+            Participant bot = players.get(turnIndex);
+            playBotTurn(bot);
+            turnIndex++;
+        }
+        // dealer turn
+        if (!roundOver) {
+            revealDealerHole();
+            dealerTurn();
+            finishRound();
+        }
+    }
+
+    private void playBotTurn(Participant bot){
+        BotStrategy brain = botBrains.get(bot);
+        if (brain == null) return;
+        while(true){
+            if(bot.getHand().isBust()) break;
+            BotStrategy.Action action = brain.decide(bot.getHand(), dealerUpCard());
+            if (action == BotStrategy.Action.HIT) bot.getHand().add(deck.deal());
+            else { break; }
+        }
+    }
+
+    private Card dealerUpCard() {
+        // first card is up
+        return dealer.getHand().getCards().get(0);
+    }
+
+    private void revealDealerHole(){
+        // flip first card face-down 
+        Hand src = dealer.getHand();
+        Hand temp = new Hand();
+        boolean flipped = false;
+        for (Card card : src.getCards()){
+            if (!flipped && !card.isFaceUp()) { 
+                temp.add(card.flipped()); 
+                flipped = true;
+            }
+            else { temp.add(card); }
+        }
+        src.clear();
+        for (Card card : temp.getCards()) src.add(card);
+    
+    }
+    private void dealerTurn(){
+        Hand hand = dealer.getHand();
+        while (true) {
+            int best = hand.getBestTotal();
+            boolean soft = hand.isSoft();
+            if(best > 21) break;
+            if(best > 17) break;
+            if(best < 17){ hand.add(deck.deal()); continue; }
+            if(best == 17 && DEALER_HITS_SOFT_17 && soft) { hand.add(deck.deal()); continue; } 
+            break;
+        }
+    }
+
+    private void finishRound(){
+        roundOver = true;
+
+        // Simple banner summary with stringbuilder
+        StringBuilder sb = new StringBuilder();
+        int dealerBest = dealer.getHand().getBestTotal();
+        boolean dealerBust = dealer.getHand().isBust();
+
+        for (Participant player : players){
+            int bet = player.getBet();
+            int playerBest = player.getHand().getBestTotal();
+            boolean playerBust = player.getHand().isBust();
+
+            if(player.getHand().isBlackjack() && !dealer.getHand().isBlackjack()) {
+                player.win((int)Math.round(bet * WIN_MULTIPLIER));
+                sb.append(player.getName()).append(": Blackjack! +").append((int)Math.round(bet * WIN_MULTIPLIER)).append("\n");
+            } else if (dealer.getHand().isBlackjack() && !player.getHand().isBlackjack()) {
+                player.lose(bet);
+                sb.append(player.getName()).append(": Dealer blackjack. -").append(bet).append("\n");
+            } else if (playerBust) {
+                player.lose(bet);
+                sb.append(player.getName()).append(": Bust ").append(playerBest).append(". -").append(bet).append("\n");
+            } else if (dealerBust) {
+                player.win(bet);
+                sb.append(player.getName()).append(": Dealer busts ").append(dealerBest).append(". +").append(bet).append("\n");
+            } else {
+                if (playerBest > dealerBest) { 
+                    player.win(bet);  
+                    sb.append(player.getName()).append(": ").append(playerBest).append(" > ").append(dealerBest).append(" +").append(bet).append("\n");
+                } else if (playerBest < dealerBest) {
+                    player.lose(bet);
+                    sb.append(player.getName()).append(": ").append(playerBest).append(" < ").append(dealerBest).append(" -").append(bet).append("\n");
+                } else { // tie, just follow logic as push has no operation
+                    player.push();
+                    sb.append(player.getName()).append(": Push ").append(playerBest).append("\n");
+                }
+
+            }
+            
+
+        }
+    }
+
+
+
+
+    // UI getters
+    public Participant getHuman() { return players.get(0); }
+    public Participant getBot1()  { return players.get(1); }
+    public Participant getBot2()  { return players.get(2); }
+    public Participant getDealer(){ return dealer; }
+    public List<Participant> getPlayers() { return Collections.unmodifiableList(players); }
+
+    public boolean isRoundOver() { return roundOver; }
+    public String getResultBanner() { return resultBanner; }
+    public int getTurnIndex() { return turnIndex; } // 0 = human, 1 = bot1, 2 = bot2, 3 = dealer/done
 }
