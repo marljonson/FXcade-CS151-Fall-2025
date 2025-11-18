@@ -5,6 +5,8 @@
 - **Semester:** Fall 2025
 - **Team members:** Marl Jonson, Sajid Kaiser, Toey Lui, Bush Nguyen
 
+[YouTube video: Key Design Decisions](https://www.youtube.com/watch?v=jNQXAC9IVRw)
+
 ## Overview
 FXcade is an offline console application the popular games blackjack and snake. It is built on a JavaFX frontend and a Java backend.
 
@@ -19,6 +21,7 @@ FXcade is an offline console application the popular games blackjack and snake. 
 ## Contributions
 **Marl Jonson (`marljonson`):**
 - Initialized GitHub repository
+- Wrote unit tests for folder `manager`
 
 **Sajid Kaiser (`Hazelette`):**
 - Wrote backend of blackjack game
