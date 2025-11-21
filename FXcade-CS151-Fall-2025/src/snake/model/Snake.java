@@ -11,9 +11,9 @@ public class Snake {
     public Snake(int startX, int startY, Direction d) {
         this.dir = d;
 
-        body.add(new SnakeSegment(startX, startY));
-        body.add(new SnakeSegment(startX, startY));
-        body.add(new SnakeSegment(startX, startY));
+        body.add(new SnakeSegment(startX, startY));      
+        body.add(new SnakeSegment(startX + 1, startY));   
+        body.add(new SnakeSegment(startX + 2, startY));  
     }
 
     public List<SnakeSegment> getBody() {

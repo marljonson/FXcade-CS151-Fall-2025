@@ -6,9 +6,6 @@ import snake.ui.SnakeGameView;
 
 import java.util.Random;
 
-// ===== COMMIT 7: SnakeController =====
-// commit: "Added SnakeController with main game loop + collision logic"
-
 public class SnakeController {
 
     private Snake snake;
@@ -19,7 +16,6 @@ public class SnakeController {
 
     private SnakeGameView view;
 
-    // kinda arbitrary but same idea as your original game
     private int speed = 5;
     private int cellSize = 25;
 
@@ -44,9 +40,8 @@ public class SnakeController {
     private void makeFood() {
         int x = rand.nextInt(grid.getW());
         int y = rand.nextInt(grid.getH());
-        int type = rand.nextInt(5);
 
-        food = new Food(x, y, type);
+        food = new Food(x, y);
     }
 
     public void start() {
@@ -77,20 +72,18 @@ public class SnakeController {
         boolean grow = (head.getX() == food.getX() && head.getY() == food.getY());
         if (grow) {
             makeFood();
-            speed++; // like your old code
+            speed++; 
         }
 
         snake.move(grow);
         SnakeSegment newHead = snake.getHead();
 
-        // hit wall
         if (grid.outOfBounds(newHead.getX(), newHead.getY())) {
             gameOver = true;
             view.showGameOver();
             return;
         }
 
-        // hit itself
         for (int i = 1; i < snake.getBody().size(); i++) {
             SnakeSegment seg = snake.getBody().get(i);
             if (seg.getX() == newHead.getX() && seg.getY() == newHead.getY()) {

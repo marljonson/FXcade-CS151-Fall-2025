@@ -30,7 +30,6 @@ public class SnakeGameView {
         SnakeController controller = new SnakeController(this, w, h);
         controller.start();
 
-        // WASD like your original
         scene.setOnKeyPressed(e -> {
             switch (e.getCode()) {
                 case W -> controller.setDir(Direction.UP);
@@ -43,6 +42,7 @@ public class SnakeGameView {
         stage.setScene(scene);
         stage.setTitle("Snake Game");
         stage.show();
+
     }
 
     public void draw(Snake snake, Food food) {
