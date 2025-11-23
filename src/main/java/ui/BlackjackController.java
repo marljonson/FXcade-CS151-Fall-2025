@@ -19,27 +19,16 @@ public class BlackjackController {
     private static final int DEFAULT_BET = 50;
 
     // wire these fx ids in blackjack.fxml
-    @FXML private HBox dealerCards;
-    @FXML private HBox playerCards;
-    @FXML private HBox bot1Cards;
-    @FXML private HBox bot2Cards;
+    @FXML private HBox dealerCards, playerCards, bot1Cards, bot2Cards;
 
-    @FXML private Label statusLabel;
-    @FXML private Label bankrollLabel;
-    @FXML private Label playerTotalLabel;
-    @FXML private Label dealerTotalLabel;
-    @FXML private Label bot1BankLabel;
-    @FXML private Label bot2BankLabel;
-    @FXML private Label turnLabel;
+    @FXML private Label statusLabel, bankrollLabel, playerTotalLabel, dealerTotalLabel;
+    @FXML private Label bot1BankLabel, bot2BankLabel, turnLabel;
 
 
     @FXML private TextField betField;
 
-    @FXML private Button hitButton;
-    @FXML private Button standButton;
-    @FXML private Button newRoundButton;
-    @FXML private Button saveButton;
-    @FXML private Button loadButton;
+    @FXML private Button hitButton, standButton, newRoundButton, saveButton, loadButton;
+
 
     private BlackjackGame game;
     private String username = "Player"; // we set it in Main/App using init
@@ -73,7 +62,7 @@ public class BlackjackController {
         refresh();
     }
 
-    // Safely parse bet testfield and prevent negative input
+    // Safely parse bet textfield and prevent negative input
     private int parseBetOrDefault(int fallback){
         try {
             int n = Integer.parseInt(betField.getText().trim());
@@ -102,12 +91,26 @@ public class BlackjackController {
         renderHand(dealerCards, game.getDealer().getHand());
 
         bankrollLabel.setText("Bankroll: $" + game.getHuman().getBankroll());
+        bot1BankLabel.setText("Bot 1: $" + game.getBot1().getBankroll());
+        bot2BankLabel.setText("Bot 2: $" + game.getBot2().getBankroll());
         statusLabel.setText(game.getResultBanner());
 
         // totals 
         playerTotalLabel.setText(String.valueOf(game.getHuman().getHand().getBestTotal()));
         dealerTotalLabel.setText(game.getDealer().getHand().isBust()
             ? "BUST" : String.valueOf(game.getDealer().getHand().getBestTotal()));
+
+
+        // turn indicator
+        String turnText = switch (game.getTurnIndex()) {
+            case 0 -> "Your turn";
+            case 1 -> "Bot 1's turn";
+            case 2 -> "Bot 2's turn";
+            default -> game.isRoundOver() ? "Round over" : "Dealer's turn";
+        };
+
+        turnLabel.setText(turnText);
+
         boolean isHumansTurn = !game.isRoundOver() && game.getTurnIndex() == 0;
         hitButton.setDisable(!isHumansTurn);
         standButton.setDisable(!isHumansTurn);
