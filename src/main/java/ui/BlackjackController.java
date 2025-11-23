@@ -97,8 +97,13 @@ public class BlackjackController {
 
         // totals 
         playerTotalLabel.setText(String.valueOf(game.getHuman().getHand().getBestTotal()));
-        dealerTotalLabel.setText(game.getDealer().getHand().isBust()
-            ? "BUST" : String.valueOf(game.getDealer().getHand().getBestTotal()));
+        if (!game.isRoundOver() && hasHiddenDealerCard()) {
+            dealerTotalLabel.setText("??"); // hide until dealer hole card revealed
+        } else { 
+            dealerTotalLabel.setText(game.getDealer().getHand().isBust()
+                ? "BUST" : String.valueOf(game.getDealer().getHand().getBestTotal()));
+        }
+        
 
 
         // turn indicator
@@ -123,6 +128,12 @@ public class BlackjackController {
         for (Card card : hand.getCards()){
             box.getChildren().add(cardNode(card));
         }
+    }
+    private boolean hasHiddenDealerCard(){
+        for (Card card : game.getDealer().getHand().getCards()){
+            if (!card.isFaceUp()) return true;
+        }
+        return false;
     }
     
     // Card to ImageView uses cache, show back.png if face-down
@@ -163,5 +174,8 @@ public class BlackjackController {
         });
     }
 
+    private Path savePath() {
+        return Path.of("data", "saves_blackjack", username + ".txt");
+    }
 
 }
