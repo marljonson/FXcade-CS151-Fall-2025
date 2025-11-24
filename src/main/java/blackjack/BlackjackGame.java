@@ -1,5 +1,8 @@
 package blackjack;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.*;
 
 public class BlackjackGame {
@@ -214,6 +217,20 @@ public class BlackjackGame {
             roundOver = true;
             return false;
         }
+    }
+    // Small helpers for Json save state
+    private static void replaceHand(Hand target, Hand src){
+        target.clear();
+        for (Card card : src.getCards()) target.add(card);
+    }
+    private static void makeDealerSecondCardFaceDown(Hand dealerHand){
+        var list = new ArrayList<>(dealerHand.getCards());
+        if (list.size() >= 2 && list.get(1).isFaceUp()){
+            list.set(1, list.get(1).flipped());
+            dealerHand.clear();
+            for (Card card : list) dealerHand.add(card);
+        }
+
     }
     // UI getters
     public Participant getHuman() { return players.get(0); }
