@@ -72,7 +72,7 @@ public class BlackjackController {
             Path path = savePath();
             Files.createDirectories(path.getParent());
             Files.writeString(path, json, StandardCharsets.UTF_8);
-            statusLabel.setText("Save to " + path.toString());         
+            statusLabel.setText("Saved to " + path.toString());         
         } catch (Exception e) {
             statusLabel.setText("Save failed: " + e.getMessage());
         }
@@ -100,12 +100,17 @@ public class BlackjackController {
     private void startRound(){
         int bet = parseBetOrDefault(DEFAULT_BET);
         game.startNewRound(bet, DEFAULT_BET, DEFAULT_BET); // bots bet 50 by default
+        statusLabel.setText(""); // clear last round banner
+        hitButton.setDisable(false);
+        standButton.setDisable(false);
+        newRoundButton.setDisable(true);
         refresh();
     }
 
     // Safely parse bet textfield and prevent negative input
     private int parseBetOrDefault(int fallback){
         try {
+            String s = (betField == null) ? null : betField.getText();
             int n = Integer.parseInt(betField.getText().trim());
             return Math.max(0, n);
         } catch (Exception e) {

@@ -54,7 +54,9 @@ public class BlackjackGame {
         players.get(1).setBet(clampNonNegative(bot1Bet));
         players.get(2).setBet(clampNonNegative(bot2Bet));
 
-        // initial deal, 2 to everyone, dealer'saveState second is face dwn
+        // initial deal, 2 to everyone, dealer's second is face down
+        // Human action when it's player's turn while round ongoing
+        // Deal a single face-down card into dealer's hand
         for (int i = 0; i < 2; i++){
             for(Participant player : players) {
                 if (!tryDealUp(player.getHand())) return;
@@ -222,6 +224,11 @@ public class BlackjackGame {
     public static BlackjackGame fromJsonSave(String json, String humanName){
         Gson gson = new Gson();
         SaveState saveState = gson.fromJson(json, SaveState.class);
+
+
+        if (saveState.banks == null || saveState.banks.size() != 4) throw new IllegalArgumentException("Bad banks array");
+        if (saveState.bets  == null || saveState.bets.size()  != 3) throw new IllegalArgumentException("Bad bets array");
+
 
         Deck deck = Deck.fromChars(saveState.deck);
         BlackjackGame game = new BlackjackGame(deck, humanName);
