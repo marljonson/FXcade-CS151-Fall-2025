@@ -52,8 +52,31 @@ public class BlackjackController {
         refresh();
         endIfOver();
     }
+    @FXML
+    private void onStand(){
+        game.humanStand();
+        refresh();
+        endIfOver();
+    }
 
-    // TODO: Internal event helpers to link with blackjackgame
+    @FXML
+    private void onNewRound(){
+        startRound();
+    }
+
+    @FXML
+    private void onSave(){
+        try {
+            
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
+    private void onLoad(){
+        
+    }
+
 
     // Read bet, call startNewRound, refresh
     private void startRound(){
