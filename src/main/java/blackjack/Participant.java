@@ -25,6 +25,7 @@ public class Participant {
     public int getBankroll() { return bankroll; }
     public int getBet() { return bet; }
     public void setBet(int amount) { this.bet = amount; }
+    public void setBankroll(int amount){ this.bankroll = amount; }
     public void win(int amount){ bankroll += amount; }
     public void lose(int amount){ bankroll -= amount; }
     public void push() {} // no change in case of tie

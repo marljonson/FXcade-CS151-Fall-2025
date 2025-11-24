@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -45,7 +46,7 @@ public class BlackjackController {
         startRound();
     }
 
-    // TODO: UI events: onStand, onNewRound, onSave, onLoad
+    // UI events: onHit, onStand, onNewRound, onSave, onLoad
     @FXML
     private void onHit(){
         game.humanHit();
@@ -67,14 +68,31 @@ public class BlackjackController {
     @FXML
     private void onSave(){
         try {
-            
+            String json = game.toJsonSave();
+            Path path = savePath();
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, json, StandardCharsets.UTF_8);
+            statusLabel.setText("Save to " + path.toString());         
         } catch (Exception e) {
-            // TODO: handle exception
+            statusLabel.setText("Save failed: " + e.getMessage());
         }
     }
 
+    @FXML
     private void onLoad(){
-        
+        try {
+            Path path = savePath();
+            if(!Files.exists(path)){
+                statusLabel.setText("No save found for " + username);
+                return;
+            }
+            String json = Files.readString(path, StandardCharsets.UTF_8);
+            this.game = BlackjackGame.fromJsonSave(json, username);
+            refresh();
+            statusLabel.setText("Loaded from" + path.toString());
+        } catch (Exception e) {
+            statusLabel.setText("Load failed: " + e.getMessage());
+        }
     }
 
 
@@ -198,7 +216,7 @@ public class BlackjackController {
     }
 
     private Path savePath() {
-        return Path.of("data", "saves_blackjack", username + ".txt");
+        return Path.of("data", "saves_blackjack", username + ".json");
     }
 
 }

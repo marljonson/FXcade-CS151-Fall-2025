@@ -218,7 +218,39 @@ public class BlackjackGame {
             return false;
         }
     }
-    // TODO: fromJsonSave for Load
+    // Allow load from controller
+    public static BlackjackGame fromJsonSave(String json, String humanName){
+        Gson gson = new Gson();
+        SaveState saveState = gson.fromJson(json, SaveState.class);
+
+        Deck deck = Deck.fromChars(saveState.deck);
+        BlackjackGame game = new BlackjackGame(deck, humanName);
+
+        // Load Hands from save state
+        replaceHand(game.getHuman().getHand(), Hand.fromChars(saveState.humanHand));
+        replaceHand(game.getBot1().getHand(), Hand.fromChars(saveState.bot1Hand));
+        replaceHand(game.getBot2().getHand(), Hand.fromChars(saveState.bot2Hand));
+        replaceHand(game.getDealer().getHand(), Hand.fromChars(saveState.dealerHand));
+
+        // Hole visibility
+        if (saveState.hideHole) { makeDealerSecondCardFaceDown(game.getDealer().getHand()); }
+
+        // Banks and bets
+        game.getHuman().setBankroll(saveState.banks.get(0));
+        game.getBot1().setBankroll(saveState.banks.get(1));
+        game.getBot2().setBankroll(saveState.banks.get(2));
+        game.getDealer().setBankroll(saveState.banks.get(3));
+
+        game.getHuman().setBet(saveState.bets.get(0));
+        game.getBot1().setBet(saveState.bets.get(1));
+        game.getBot2().setBet(saveState.bets.get(2));
+
+        game.turnIndex = saveState.turn;
+        game.roundOver = saveState.over;
+        game.resultBanner = ""; // Fresh blank slate
+
+        return game;
+    }
 
     // Allows Save of current game to resume later
     public String toJsonSave() {
