@@ -1,10 +1,14 @@
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import manager.AccountManager;
 
@@ -20,14 +24,36 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         // Login scene
         Label welcomeMessage = new Label("Welcome to FxCade!");
+        welcomeMessage.setStyle("-fx-font-size: 15px; -fx-font-weight: bold");
 
+        // Username text
+        Label usernameLabel = new Label("Username: ");
+        HBox usernameLabelBox = new HBox(usernameLabel);
+        usernameLabelBox.setAlignment(Pos.CENTER_LEFT);
+        usernameLabelBox.setPrefWidth(200);
+        usernameLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
+
+        // Username entry
         TextField loginUsernameField = new TextField();
         loginUsernameField.setPromptText("Username");
+        loginUsernameField.setPrefWidth(200);
+        loginUsernameField.setMaxWidth(Region.USE_PREF_SIZE);
 
+        // Password text
+        Label passwordLabel = new Label("Password: ");
+        HBox passwordLabelBox = new HBox(passwordLabel);
+        passwordLabelBox.setAlignment(Pos.CENTER_LEFT);
+        passwordLabelBox.setPrefWidth(200);
+        passwordLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
+
+        // Password entry
         TextField loginPasswordField = new TextField();
         loginPasswordField.setPromptText("Password");
+        loginPasswordField.setPrefWidth(200);
+        loginPasswordField.setMaxWidth(Region.USE_PREF_SIZE);
 
         Label loginMessageLabel = new Label();
+        loginMessageLabel.setTextFill(Color.RED);
 
         Button loginButton = new Button("Sign In");
 
@@ -35,7 +61,10 @@ public class Main extends Application {
 
         Button createAccountButton = new Button("Sign Up");
 
-        VBox signInlayout = new VBox(welcomeMessage, loginUsernameField, loginPasswordField, loginButton, loginMessageLabel, createAccountMessage, createAccountButton);
+        VBox signInlayout = new VBox(welcomeMessage, usernameLabelBox, loginUsernameField, passwordLabelBox, loginPasswordField, loginButton, loginMessageLabel, createAccountMessage, createAccountButton);
+        signInlayout.setSpacing(10);
+        signInlayout.setPadding(new Insets(30));
+        signInlayout.setAlignment(Pos.CENTER);
         Scene loginScene = new Scene(signInlayout, 700, 500);
 
         primaryStage.setScene(loginScene);
@@ -45,35 +74,73 @@ public class Main extends Application {
 
         // Sign up scene
         Label signUpMessage = new Label("Please fill in all the fields to sign up.");
+        signUpMessage.setStyle("-fx-font-size: 15px; -fx-font-weight: bold");
 
+        // Username text
+        Label usernameSignUpLabel = new Label("Username: ");
+        HBox usernameSignUpLabelBox = new HBox(usernameSignUpLabel);
+        usernameSignUpLabelBox.setAlignment(Pos.CENTER_LEFT);
+        usernameSignUpLabelBox.setPrefWidth(200);
+        usernameSignUpLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
+
+        // Username entry
         TextField signupUsernameField = new TextField();
         signupUsernameField.setPromptText("Username");
+        signupUsernameField.setPrefWidth(200);
+        signupUsernameField.setMaxWidth(Region.USE_PREF_SIZE);
 
+        // Password text
+        Label passwordSignUpLabel = new Label("Password: ");
+        HBox passwordSignUpLabelBox = new HBox(passwordSignUpLabel);
+        passwordSignUpLabelBox.setAlignment(Pos.CENTER_LEFT);
+        passwordSignUpLabelBox.setPrefWidth(200);
+        passwordSignUpLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
+
+        // Password entry
         TextField signupPasswordField = new TextField();
         signupPasswordField.setPromptText("Password");
+        signupPasswordField.setPrefWidth(200);
+        signupPasswordField.setMaxWidth(Region.USE_PREF_SIZE);
 
         Button signUpButton = new Button("Sign up");
 
         Label signUpMessageLabel = new Label();
+        signUpMessageLabel.setTextFill(Color.RED);
 
         Button signUpBackButton = new Button("Back");
 
-        VBox signupLayout = new VBox(signUpMessage, signupUsernameField, signupPasswordField, signUpButton, signUpMessageLabel,signUpBackButton);
+        VBox signupLayout = new VBox(signUpMessage, usernameSignUpLabelBox, signupUsernameField, passwordSignUpLabelBox, signupPasswordField, signUpButton, signUpMessageLabel,signUpBackButton);
+        signupLayout.setSpacing(10);
+        signupLayout.setPadding(new Insets(30));
+        signupLayout.setAlignment(Pos.CENTER);
         Scene singupScene = new Scene(signupLayout, 700, 500);
 
 
         // Main menu scene
         Label topScore = new Label("Top Scores");
+        topScore.setStyle("-fx-font-weight: bold");
         Label blackjackScores = new Label("Blackjack:");
         Label snakeScores = new Label("Snake:");
         VBox mainMenuLeft = new VBox(topScore, blackjackScores, snakeScores);
+        mainMenuLeft.setSpacing(10);
+        mainMenuLeft.setPadding(new Insets(20));
 
         Label gameMenu = new Label("Play Games");
+        gameMenu.setStyle("-fx-font-weight: bold");
         Button blackjackButton = new Button("Blackjack");
         Button snakeButton = new Button("Snake");
-        VBox mainMenuRight = new VBox(gameMenu, blackjackButton, snakeButton);
+        Label addGameMenu = new Label("Add Games");
+        addGameMenu.setStyle("-fx-font-weight: bold");
+        Button addGameButton1 = new Button("Add Game");
+        Button addGameButton2 = new Button("Add Game");
+        VBox mainMenuRight = new VBox(gameMenu, blackjackButton, snakeButton, addGameMenu, addGameButton1, addGameButton2);
+        mainMenuRight.setSpacing(10);
+        mainMenuRight.setPadding(new Insets(20));
 
         HBox mainMenu = new HBox(mainMenuLeft, mainMenuRight);
+        mainMenu.setSpacing(60);
+        mainMenu.setPadding(new Insets(40));
+        mainMenu.setAlignment(Pos.TOP_CENTER);
 
         Scene mainMenuScene = new Scene(mainMenu, 700, 500);
 
