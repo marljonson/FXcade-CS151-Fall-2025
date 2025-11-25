@@ -1,5 +1,8 @@
 package blackjack;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.*;
 
 public class BlackjackGame {
@@ -51,7 +54,9 @@ public class BlackjackGame {
         players.get(1).setBet(clampNonNegative(bot1Bet));
         players.get(2).setBet(clampNonNegative(bot2Bet));
 
-        // initial deal, 2 to everyone, dealer's second is face dwn
+        // initial deal, 2 to everyone, dealer's second is face down
+        // Human action when it's player's turn while round ongoing
+        // Deal a single face-down card into dealer's hand
         for (int i = 0; i < 2; i++){
             for(Participant player : players) {
                 if (!tryDealUp(player.getHand())) return;
@@ -70,7 +75,7 @@ public class BlackjackGame {
         }
     }
 
-    // Human action when it's player's turn while round ongoing
+    // Human action when it'saveState player'saveState turn while round ongoing
     public void humanHit(){
         if (roundOver || turnIndex != 0) return;
         if (!tryDealUp(players.get(0).getHand())) return;
@@ -204,7 +209,7 @@ public class BlackjackGame {
         }
     }
 
-    // Deal a single face-down card into dealer's hand. 
+    // Deal a single face-down card into dealer'saveState hand. 
     private boolean tryDealFaceDownToDealer() {
         try {
             dealer.getHand().add(deck.dealFaceDown());
@@ -215,6 +220,97 @@ public class BlackjackGame {
             return false;
         }
     }
+    // Allow load from controller
+    public static BlackjackGame fromJsonSave(String json, String humanName){
+        Gson gson = new Gson();
+        SaveState saveState = gson.fromJson(json, SaveState.class);
+
+
+        if (saveState.banks == null || saveState.banks.size() != 4) throw new IllegalArgumentException("Bad banks array");
+        if (saveState.bets  == null || saveState.bets.size()  != 3) throw new IllegalArgumentException("Bad bets array");
+
+
+        Deck deck = Deck.fromChars(saveState.deck);
+        BlackjackGame game = new BlackjackGame(deck, humanName);
+
+        // Load Hands from save state
+        replaceHand(game.getHuman().getHand(), Hand.fromChars(saveState.humanHand));
+        replaceHand(game.getBot1().getHand(), Hand.fromChars(saveState.bot1Hand));
+        replaceHand(game.getBot2().getHand(), Hand.fromChars(saveState.bot2Hand));
+        replaceHand(game.getDealer().getHand(), Hand.fromChars(saveState.dealerHand));
+
+        // Hole visibility
+        if (saveState.hideHole) { makeDealerSecondCardFaceDown(game.getDealer().getHand()); }
+
+        // Banks and bets
+        game.getHuman().setBankroll(saveState.banks.get(0));
+        game.getBot1().setBankroll(saveState.banks.get(1));
+        game.getBot2().setBankroll(saveState.banks.get(2));
+        game.getDealer().setBankroll(saveState.banks.get(3));
+
+        game.getHuman().setBet(saveState.bets.get(0));
+        game.getBot1().setBet(saveState.bets.get(1));
+        game.getBot2().setBet(saveState.bets.get(2));
+
+        game.turnIndex = saveState.turn;
+        game.roundOver = saveState.over;
+        game.resultBanner = ""; // Fresh blank slate
+
+        return game;
+    }
+
+    // Allows Save of current game to resume later
+    public String toJsonSave() {
+        SaveState saveState = new SaveState();
+
+        saveState.deck       = deck.toChars();
+        saveState.humanHand  = getHuman().getHand().toChars();
+        saveState.bot1Hand   = getBot1().getHand().toChars();
+        saveState.bot2Hand   = getBot2().getHand().toChars();
+        saveState.dealerHand = getDealer().getHand().toChars();
+
+        saveState.hideHole = hasDealerHoleHidden();   // reuse helper
+
+        saveState.banks = List.of(
+            getHuman().getBankroll(),
+            getBot1().getBankroll(),
+            getBot2().getBankroll(),
+            getDealer().getBankroll()
+        );
+        saveState.bets = List.of(
+            getHuman().getBet(),
+            getBot1().getBet(),
+            getBot2().getBet()
+        );
+
+        saveState.turn = getTurnIndex();
+        saveState.over = isRoundOver();
+
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        return gson.toJson(saveState);
+    }
+    // Small helpers for Json save state
+    private static void replaceHand(Hand target, Hand src){
+        target.clear();
+        for (Card card : src.getCards()) target.add(card);
+    }
+    private static void makeDealerSecondCardFaceDown(Hand dealerHand){
+        var list = new ArrayList<>(dealerHand.getCards());
+        if (list.size() >= 2 && list.get(1).isFaceUp()){
+            list.set(1, list.get(1).flipped());
+            dealerHand.clear();
+            for (Card card : list) dealerHand.add(card);
+        }
+
+    }
+
+    // True if the dealer currently has a hidden (face-down) hole card.
+    private boolean hasDealerHoleHidden() {
+        List<Card> dealerCards = dealer.getHand().getCards();
+        // If the dealer has at least two cards and the second one is face-down
+        return dealerCards.size() >= 2 && !dealerCards.get(1).isFaceUp();
+    }
+
     // UI getters
     public Participant getHuman() { return players.get(0); }
     public Participant getBot1()  { return players.get(1); }
