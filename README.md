@@ -6,24 +6,33 @@
 - **Team members:** Marl Jonson, Sajid Kaiser, Toey Lui, Bush Nguyen
 
 ## Overview
-FXcade is an offline console application the popular games blackjack and snake. It is built on a JavaFX frontend and a Java backend.
+**FXcade** is a game manager application featuring the popular games blackjack and snake. It is an an offline console application built on a JavaFX frontend and a Java backend. Our game manager uses a Caesar shift for encryption
 
 ## Design
+Our code is largely split into 3 categories: (1) manager, (2) blackjack, and (3) snake.
 
 ## Installation instructions
-1. Clone the repository
-2. More to come
+Prerequisites:
+- Java
+- - Our `pom.xml` file is set to match the user's existing SDK)
+- Maven
+- Git or GitHub Desktop installed
 
 ## Usage
+1. Clone project from GitHub
+2. Change directory to project folder (`FXcade-CS151-Fall-2025`)
+3. Run `mvn clean javafx:run` in the terminal
 
 ## Contributions
 **Marl Jonson (`marljonson`):**
 - Initialized GitHub repository
+- Managed music and sound effects
 
 **Sajid Kaiser (`Hazelette`):**
 - Wrote backend of blackjack game
 
 **Toey Lui (`toeyldev`):**
-- Wrote `Main.java`
+- Wrote `Main.java` and password encryption
 
 **Bush Nguyen (`bush-nguyen`):**
+- Wrote snake game
