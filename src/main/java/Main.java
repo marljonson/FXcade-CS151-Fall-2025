@@ -18,10 +18,8 @@ import manager.AccountManager;
 public class Main extends Application {
 
     private AccountManager accountManager;
-
-    // Fields for music
-    private MediaPlayer MediaPlayer;
-    private boolean isMusicPlaying = false;
+    private MediaPlayer mediaPlayer; // Field for music
+    private boolean isMusicPlaying = false; // Field for music
 
     public Main() {
         this.accountManager = new AccountManager();
@@ -32,10 +30,13 @@ public class Main extends Application {
 
         // Music setup
         try {
-            String musicPath = getClass().getResource("/resources/audio/fluffing_a_duck.mp3").toExternalForm();
-            Media media = new Media(musicPath);
+            var url = getClass().getResource("/audio/fluffing_a_duck.mp3");
+            if (url == null) {
+                throw new RuntimeException("MP3 file not found in resources!");
+            }   
+            Media media = new Media(url.toExternalForm());
             mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Loop music
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);  // Loop forever
         } catch (Exception e) {
             System.out.println("Failed to load music: " + e.getMessage());
         }
@@ -142,14 +143,26 @@ public class Main extends Application {
         // Top toolbar
         Button mainMenuButton = new Button("Main Menu");
         Button signOutButton = new Button("Sign Out");
-        HBox toolBar = new HBox(mainMenuButton, signOutButton);
+        Button musicToggleButton = new Button("Play Music"); // Music toggle button
+        HBox toolBar = new HBox(musicToggleButton, mainMenuButton, signOutButton);
         toolBar.setSpacing(10);
         toolBar.setPadding(new Insets(10));
         toolBar.setAlignment(Pos.CENTER_RIGHT);
         toolBar.setStyle("-fx-background-color: #555555;");
 
-        // Music toggle button
-        Button musicToggleButton = new Button("Play Music");
+        // Music toggle action
+        musicToggleButton.setOnAction(e -> {
+            if (mediaPlayer == null) return;
+            if (isMusicPlaying) {
+                mediaPlayer.pause();
+                musicToggleButton.setText("Play Music");
+                isMusicPlaying = false;
+            } else {
+                mediaPlayer.play();
+                musicToggleButton.setText("Pause Music");
+                isMusicPlaying = true;
+            }
+        });
 
         // Left main menu
         Label topScore = new Label("Top Scores");
