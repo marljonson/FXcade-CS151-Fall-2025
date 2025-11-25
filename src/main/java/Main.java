@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -55,10 +56,12 @@ public class Main extends Application {
         Label loginMessageLabel = new Label();
         loginMessageLabel.setTextFill(Color.RED);
 
+        // Sign in button
         Button loginButton = new Button("Sign In");
 
         Label createAccountMessage = new Label("Don't have an account yet?");
 
+        // Sign up button
         Button createAccountButton = new Button("Sign Up");
 
         VBox signInlayout = new VBox(welcomeMessage, usernameLabelBox, loginUsernameField, passwordLabelBox, loginPasswordField, loginButton, loginMessageLabel, createAccountMessage, createAccountButton);
@@ -109,7 +112,7 @@ public class Main extends Application {
 
         Button signUpBackButton = new Button("Back");
 
-        VBox signupLayout = new VBox(signUpMessage, usernameSignUpLabelBox, signupUsernameField, passwordSignUpLabelBox, signupPasswordField, signUpButton, signUpMessageLabel,signUpBackButton);
+        VBox signupLayout = new VBox(signUpMessage, usernameSignUpLabelBox, signupUsernameField, passwordSignUpLabelBox, signupPasswordField, signUpButton, signUpMessageLabel, signUpBackButton);
         signupLayout.setSpacing(10);
         signupLayout.setPadding(new Insets(30));
         signupLayout.setAlignment(Pos.CENTER);
@@ -117,6 +120,17 @@ public class Main extends Application {
 
 
         // Main menu scene
+        BorderPane borderPane = new BorderPane();
+
+        // Top toolbar
+        Button mainMenuButton = new Button("Main Menu");
+        HBox toolBar = new HBox(mainMenuButton);
+        toolBar.setSpacing(10);
+        toolBar.setPadding(new Insets(10));
+        toolBar.setAlignment(Pos.CENTER_RIGHT);
+        toolBar.setStyle("-fx-background-color: #555555;");
+
+        // Left main menu
         Label topScore = new Label("Top Scores");
         topScore.setStyle("-fx-font-weight: bold");
         Label blackjackScores = new Label("Blackjack:");
@@ -125,6 +139,7 @@ public class Main extends Application {
         mainMenuLeft.setSpacing(10);
         mainMenuLeft.setPadding(new Insets(20));
 
+        // Right main menu
         Label gameMenu = new Label("Play Games");
         gameMenu.setStyle("-fx-font-weight: bold");
         Button blackjackButton = new Button("Blackjack");
@@ -142,7 +157,10 @@ public class Main extends Application {
         mainMenu.setPadding(new Insets(40));
         mainMenu.setAlignment(Pos.TOP_CENTER);
 
-        Scene mainMenuScene = new Scene(mainMenu, 700, 500);
+        borderPane.setTop(toolBar);
+        borderPane.setCenter(mainMenu);
+
+        Scene mainMenuScene = new Scene(borderPane, 700, 500);
 
 
         // Button actions
@@ -153,8 +171,7 @@ public class Main extends Application {
 
             if (loginUsername.isEmpty() || loginPassword.isEmpty()) {
                 loginMessageLabel.setText("Please enter both username and password.");
-            }
-            else {
+            } else {
                 AccountManager.loginStatus signInStatus = accountManager.signIn(loginUsername, loginPassword);
                 switch (signInStatus) {
                     case SUCCESS:
@@ -183,8 +200,7 @@ public class Main extends Application {
 
             if (signupUsername.isEmpty() || signupPassword.isEmpty()) {
                 signUpMessageLabel.setText("Please enter both username and password.");
-            }
-            else {
+            } else {
                 AccountManager.signUpStatus signUpStatus = accountManager.createUser(signupUsername, signupPassword);
                 switch (signUpStatus) {
                     case SUCCESS:
@@ -210,10 +226,10 @@ public class Main extends Application {
             primaryStage.setScene(loginScene);
         });
 
-        // 3 - Main menu button
-        // loginButton.setOnAction(e -> {
-        //    primaryStage.setScene(mainMenuScene);
-        // });
+        // 5 - Tool bar "Main Menu" button
+        mainMenuButton.setOnAction(e -> {
+            primaryStage.setScene(mainMenuScene);
+        });
     }
 
     public static void main(String[] args) {
