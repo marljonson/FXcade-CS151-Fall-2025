@@ -20,6 +20,7 @@ public class Main extends Application {
     private AccountManager accountManager;
     private MediaPlayer mediaPlayer; // Field for music
     private boolean isMusicPlaying = false; // Field for music
+    private MediaPlayer sfxPlayer;
 
     public Main() {
         this.accountManager = new AccountManager();
@@ -39,6 +40,17 @@ public class Main extends Application {
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);  // Loop forever
         } catch (Exception e) {
             System.out.println("Failed to load music: " + e.getMessage());
+        }
+
+        try {
+            var popUrl = getClass().getResource("/audio/chime.mp3");
+            if (popUrl == null) {
+                throw new RuntimeException("MP3 file not found in resources!");
+            }
+            Media popMedia = new Media(popUrl.toExternalForm());
+            sfxPlayer = new MediaPlayer(popMedia);
+        } catch (Exception e) {
+            System.out.println("Failed to load pop SFX: ");
         }
 
         // Login scene
@@ -210,6 +222,10 @@ public class Main extends Application {
                 switch (signInStatus) {
                     case SUCCESS:
                         // Change scene to main menu
+                        if (sfxPlayer != null) {
+                            sfxPlayer.stop();
+                            sfxPlayer.play();
+                        }
                         primaryStage.setScene(mainMenuScene);
                         break;
                     case USER_NOT_FOUND:
