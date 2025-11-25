@@ -71,7 +71,7 @@ public class Main extends Application {
         Scene loginScene = new Scene(signInlayout, 700, 500);
 
         primaryStage.setScene(loginScene);
-        primaryStage.setTitle("FXCade Game Manager");
+        primaryStage.setTitle("FXcade Game Manager");
         primaryStage.show();
 
 

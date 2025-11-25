@@ -21,7 +21,9 @@ FXcade is an offline console application the popular games blackjack and snake. 
 - Initialized GitHub repository
 
 **Sajid Kaiser (`Hazelette`):**
+- Wrote backend of blackjack game
 
 **Toey Lui (`toeyldev`):**
+- Wrote `Main.java`
 
 **Bush Nguyen (`bush-nguyen`):**
