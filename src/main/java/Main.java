@@ -30,7 +30,7 @@ public class Main extends Application {
 
         // Music setup
         try {
-            var url = getClass().getResource("/audio/stray_sheep.mp3");
+            var url = getClass().getResource("/audio/catherine.mp3");
             if (url == null) {
                 throw new RuntimeException("MP3 file not found in resources!");
             }   
@@ -134,7 +134,7 @@ public class Main extends Application {
         signupLayout.setSpacing(10);
         signupLayout.setPadding(new Insets(30));
         signupLayout.setAlignment(Pos.CENTER);
-        Scene singupScene = new Scene(signupLayout, 700, 500);
+        Scene signupScene = new Scene(signupLayout, 700, 500);
 
 
         // Main menu scene
@@ -224,7 +224,7 @@ public class Main extends Application {
 
         // 2 - Login Scene: Sign up button clicked
         createAccountButton.setOnAction(e -> {
-            primaryStage.setScene(singupScene);
+            primaryStage.setScene(signupScene);
         });
 
         // 3 - Sign up scene: Sign up button clicked
