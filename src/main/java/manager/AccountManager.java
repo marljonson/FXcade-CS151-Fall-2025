@@ -9,16 +9,19 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import utils.Encryption;
 
 public class AccountManager {
 
     private Map<String, User> users = new HashMap<>();
     private User activeUser;
+
     public enum loginStatus {
         SUCCESS,
         USER_NOT_FOUND,
         WRONG_PASSWORD
     }
+
     public enum signUpStatus {
         SUCCESS,
         USER_TAKEN,
@@ -86,7 +89,7 @@ public class AccountManager {
 
         User signInUser = users.get(username);
 
-        if (signInUser.getPassword().equals(password)) {
+        if (signInUser.getPassword().equals(Encryption.encrypt(password))) {
             System.out.println("User " + username + " successfully logged in.");
             setActiveUser(signInUser);
             return loginStatus.SUCCESS;
@@ -116,8 +119,11 @@ public class AccountManager {
             return signUpStatus.PASSWORD_LENGTH;
         }
 
-        // Create new user with default high score of 0
-        User newUser = new User(username, password);
+        // Encrypt password
+        String encryptedPassword = Encryption.encrypt(password);
+
+        // Create new user with encrypted password and default high score of 0
+        User newUser = new User(username, encryptedPassword);
 
         // Add new user to the hash map
         users.put(username, newUser);
@@ -127,7 +133,7 @@ public class AccountManager {
 
         // Save details to user_accounts.txt
         Path filePath = Paths.get("data/user_accounts.txt");
-        String savedOutput = username + ":" + password + ":" + newUser.getHighScore();
+        String savedOutput = username + ":" + encryptedPassword + ":" + newUser.getHighScore();
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toString(), true));
             writer.write(savedOutput);
