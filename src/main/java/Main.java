@@ -204,6 +204,7 @@ public class Main extends Application {
                 AccountManager.signUpStatus signUpStatus = accountManager.createUser(signupUsername, signupPassword);
                 switch (signUpStatus) {
                     case SUCCESS:
+                        signUpMessageLabel.setText("Sign Up Successful! Please sign in.");
                         break;
                     case USER_TAKEN:
                         signUpMessageLabel.setText("Username taken. Please try again.");
