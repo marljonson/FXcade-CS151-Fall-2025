@@ -24,7 +24,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Login scene
-        Label welcomeMessage = new Label("Welcome to FxCade!");
+        Label welcomeMessage = new Label("Welcome to FXcade!");
         welcomeMessage.setStyle("-fx-font-size: 15px; -fx-font-weight: bold");
 
         // Username text

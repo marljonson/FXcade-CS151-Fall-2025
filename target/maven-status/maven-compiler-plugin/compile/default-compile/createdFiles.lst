@@ -1,3 +1,4 @@
+blackjack\SaveState.class
 blackjack\BotStrategy.class
 blackjack\BlackjackGame.class
 blackjack\Suit.class
@@ -5,6 +6,7 @@ blackjack\Participant.class
 manager\AccountManager$signUpStatus.class
 manager\AccountManager$loginStatus.class
 ui\BlackjackController.class
+utils\Encryption.class
 blackjack\Hand.class
 blackjack\Card.class
 blackjack\Rank.class
