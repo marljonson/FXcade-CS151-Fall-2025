@@ -124,7 +124,8 @@ public class Main extends Application {
 
         // Top toolbar
         Button mainMenuButton = new Button("Main Menu");
-        HBox toolBar = new HBox(mainMenuButton);
+        Button signOutButton = new Button("Sign Out");
+        HBox toolBar = new HBox(mainMenuButton, signOutButton);
         toolBar.setSpacing(10);
         toolBar.setPadding(new Insets(10));
         toolBar.setAlignment(Pos.CENTER_RIGHT);
@@ -204,18 +205,23 @@ public class Main extends Application {
                 AccountManager.signUpStatus signUpStatus = accountManager.createUser(signupUsername, signupPassword);
                 switch (signUpStatus) {
                     case SUCCESS:
+                        signUpMessageLabel.setTextFill(Color.GREEN);
                         signUpMessageLabel.setText("Sign Up Successful! Please sign in.");
                         break;
                     case USER_TAKEN:
+                        signUpMessageLabel.setTextFill(Color.RED);
                         signUpMessageLabel.setText("Username taken. Please try again.");
                         break;
                     case PASSWORD_LENGTH:
+                        signUpMessageLabel.setTextFill(Color.RED);
                         signUpMessageLabel.setText("Password length must be longer than 8. Please try again.");
                         break;
                     case COLON_SYMBOL:
+                        signUpMessageLabel.setTextFill(Color.RED);
                         signUpMessageLabel.setText("Username and password cannot contain colon. Please try again.");
                         break;
                     case FILE_ERROR:
+                        signUpMessageLabel.setTextFill(Color.RED);
                         signUpMessageLabel.setText("File error. Please try again.");
                         break;
                 }
@@ -230,6 +236,11 @@ public class Main extends Application {
         // 5 - Tool bar "Main Menu" button
         mainMenuButton.setOnAction(e -> {
             primaryStage.setScene(mainMenuScene);
+        });
+
+        // 6 - Tool bar "Sign Out" button
+        signOutButton.setOnAction(e -> {
+            primaryStage.setScene(loginScene);
         });
     }
 
