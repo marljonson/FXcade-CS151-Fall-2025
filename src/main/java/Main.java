@@ -141,9 +141,9 @@ public class Main extends Application {
         BorderPane borderPane = new BorderPane();
 
         // Top toolbar
+        Button musicToggleButton = new Button("Play Music"); // Music toggle button
         Button mainMenuButton = new Button("Main Menu");
         Button signOutButton = new Button("Sign Out");
-        Button musicToggleButton = new Button("Play Music"); // Music toggle button
         HBox toolBar = new HBox(musicToggleButton, mainMenuButton, signOutButton);
         toolBar.setSpacing(10);
         toolBar.setPadding(new Insets(10));
@@ -273,6 +273,13 @@ public class Main extends Application {
 
         // 6 - Tool bar "Sign Out" button
         signOutButton.setOnAction(e -> {
+            // Stop music if it's playing
+            if (mediaPlayer != null && isMusicPlaying) {
+                mediaPlayer.stop();
+                isMusicPlaying = false;
+                musicToggleButton.setText("Play Music");
+            }
+            // Go back to login scene
             primaryStage.setScene(loginScene);
         });
     }
