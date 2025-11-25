@@ -11,11 +11,15 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import manager.AccountManager;
 
 public class Main extends Application {
 
     private AccountManager accountManager;
+    private MediaPlayer mediaPlayer; // Field for music
+    private boolean isMusicPlaying = false; // Field for music
 
     public Main() {
         this.accountManager = new AccountManager();
@@ -23,6 +27,20 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+        // Music setup
+        try {
+            var url = getClass().getResource("/audio/fluffing_a_duck.mp3");
+            if (url == null) {
+                throw new RuntimeException("MP3 file not found in resources!");
+            }   
+            Media media = new Media(url.toExternalForm());
+            mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);  // Loop forever
+        } catch (Exception e) {
+            System.out.println("Failed to load music: " + e.getMessage());
+        }
+
         // Login scene
         Label welcomeMessage = new Label("Welcome to FXcade!");
         welcomeMessage.setStyle("-fx-font-size: 15px; -fx-font-weight: bold");
@@ -123,13 +141,28 @@ public class Main extends Application {
         BorderPane borderPane = new BorderPane();
 
         // Top toolbar
+        Button musicToggleButton = new Button("Play Music"); // Music toggle button
         Button mainMenuButton = new Button("Main Menu");
         Button signOutButton = new Button("Sign Out");
-        HBox toolBar = new HBox(mainMenuButton, signOutButton);
+        HBox toolBar = new HBox(musicToggleButton, mainMenuButton, signOutButton);
         toolBar.setSpacing(10);
         toolBar.setPadding(new Insets(10));
         toolBar.setAlignment(Pos.CENTER_RIGHT);
         toolBar.setStyle("-fx-background-color: #555555;");
+
+        // Music toggle action
+        musicToggleButton.setOnAction(e -> {
+            if (mediaPlayer == null) return;
+            if (isMusicPlaying) {
+                mediaPlayer.pause();
+                musicToggleButton.setText("Play Music");
+                isMusicPlaying = false;
+            } else {
+                mediaPlayer.play();
+                musicToggleButton.setText("Pause Music");
+                isMusicPlaying = true;
+            }
+        });
 
         // Left main menu
         Label topScore = new Label("Top Scores");
@@ -240,6 +273,13 @@ public class Main extends Application {
 
         // 6 - Tool bar "Sign Out" button
         signOutButton.setOnAction(e -> {
+            // Stop music if it's playing
+            if (mediaPlayer != null && isMusicPlaying) {
+                mediaPlayer.stop();
+                isMusicPlaying = false;
+                musicToggleButton.setText("Play Music");
+            }
+            // Go back to login scene
             primaryStage.setScene(loginScene);
         });
     }
