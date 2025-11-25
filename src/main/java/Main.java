@@ -11,11 +11,17 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import manager.AccountManager;
 
 public class Main extends Application {
 
     private AccountManager accountManager;
+
+    // Fields for music
+    private MediaPlayer MediaPlayer;
+    private boolean isMusicPlaying = false;
 
     public Main() {
         this.accountManager = new AccountManager();
@@ -23,6 +29,17 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+        // Music setup
+        try {
+            String musicPath = getClass().getResource("/resources/audio/fluffing_a_duck.mp3").toExternalForm();
+            Media media = new Media(musicPath);
+            mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Loop music
+        } catch (Exception e) {
+            System.out.println("Failed to load music: " + e.getMessage());
+        }
+
         // Login scene
         Label welcomeMessage = new Label("Welcome to FXcade!");
         welcomeMessage.setStyle("-fx-font-size: 15px; -fx-font-weight: bold");
