@@ -148,6 +148,9 @@ public class Main extends Application {
         toolBar.setAlignment(Pos.CENTER_RIGHT);
         toolBar.setStyle("-fx-background-color: #555555;");
 
+        // Music toggle button
+        Button musicToggleButton = new Button("Play Music");
+
         // Left main menu
         Label topScore = new Label("Top Scores");
         topScore.setStyle("-fx-font-weight: bold");
