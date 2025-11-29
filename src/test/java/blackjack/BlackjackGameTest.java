@@ -66,4 +66,21 @@ public class BlackjackGameTest {
         assertTrue(game.getHuman().getBet() >= 0, "Human bet should be positive");
     }
 
+    @Test
+    void handAceHandlingSoftVsHard(){
+        Hand hand = new Hand();
+
+        hand.add(new Card(Rank.ACE, Suit.CLUBS)); // Ace = 1 or 11
+        hand.add(new Card(Rank.SIX, Suit.HEARTS)); // 6
+
+        assertEquals(17, hand.getBestTotal()); // check that Ace counts as 11 here so 11 + 6 = 17
+        assertTrue(hand.isSoft());
+
+        hand.add(new Card(Rank.NINE, Suit.SPADES)); // unless Ace becomes 1, this pushes past 21
+        assertEquals(16, hand.getBestTotal());
+        assertFalse(hand.isSoft());
+    }
+
+
+
 }
