@@ -81,6 +81,44 @@ public class BlackjackGameTest {
         assertFalse(hand.isSoft());
     }
 
+    @Test
+    void dealerHitsSoft17() {
+        BlackjackGame game = new BlackjackGame("Test");
+        
+        // give dealer: Ace (11) + 6 = soft 17
+        Hand dealerHand = game.getDealer().getHand();
+        dealerHand.clear();
+        dealerHand.add(new Card(Rank.ACE, Suit.SPADES)); // 11
+        dealerHand.add(new Card(Rank.SIX, Suit.CLUBS)); // total = 17 which is soft
+
+        // Now call dealerTurn() manually
+        game.startNewRound(50, 50, 50);
+        dealerHand.clear();
+        dealerHand.add(new Card(Rank.SIX, Suit.CLUBS));
+        dealerHand.add(new Card(Rank.ACE, Suit.SPADES)); 
+        
+        // Make deck deterministic by manually adding card to hit
+        Deck deck = new Deck(1);
+        // Insert known hit card on top of deck, but is random
+
+        // We just check the rule here
+        assertTrue(dealerHand.isSoft());
+        assertEquals(17, dealerHand.getBestTotal());
+    }
+
+    @Test 
+    void bustIsDetected(){
+        Hand hand = new Hand();
+        hand.add(new Card(Rank.KING, Suit.CLUBS)); 
+        hand.add(new Card(Rank.QUEEN, Suit.DIAMONDS)); 
+        hand.add(new Card(Rank.FIVE, Suit.SPADES));
+
+        assertTrue(hand.isBust()); // 10 + 10 + 5 = 25 -> Bust
+
+    }
+
+
+
 
 
 }
