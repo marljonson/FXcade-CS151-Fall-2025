@@ -25,4 +25,5 @@ public class BlackjackGameTest {
         assertFalse(game.isRoundOver(), "Round should not be over at start");
         assertEquals(0, game.getTurnIndex(), "Human should act first");
     }
+    
 }
