@@ -114,7 +114,44 @@ public class BlackjackGameTest {
         hand.add(new Card(Rank.FIVE, Suit.SPADES));
 
         assertTrue(hand.isBust()); // 10 + 10 + 5 = 25 -> Bust
+    }
 
+    @Test
+    void saveLoadRestoresHandsAndTurn(){
+        BlackjackGame game1 = new BlackjackGame("Test");
+        game1.startNewRound(50, 50, 50);
+
+        // Simulate some play
+        game1.humanHit();
+        game1.humanStand();
+
+        String json = game1.toJsonSave();
+        BlackjackGame game2 = BlackjackGame.fromJsonSave(json, "Test");
+
+        assertEquals(game1.getTurnIndex(), game2.getTurnIndex());
+        assertEquals(game1.isRoundOver(), game2.isRoundOver());
+        assertEquals(game1.getHuman().getHand().toChars(), game2.getHuman().getHand().toChars());
+        assertEquals(game1.getDealer().getHand().toChars(), game2.getDealer().getHand().toChars());
+    }
+
+    // private helper pasted here to keep the game's helper private.
+    private void replaceHand(Hand target, Hand src){
+        target.clear();
+        for (Card card : src.getCards()) target.add(card);
+    }
+
+    @Test
+    void payoutWhenPlayerBeatsDealer(){
+        BlackjackGame game = new BlackjackGame("Test");
+        game.startNewRound(100, 50, 50);
+
+        // Replace hands with controlled cards and then force end of round
+        replaceHand(game.getHuman().getHand(), Hand.fromChars("9C-8D")); // 17
+        replaceHand(game.getDealer().getHand(), Hand.fromChars("9H-7S")); // 16
+
+        game.humanStand();
+        assertTrue(game.getHuman().getBankroll() > 1000);
+        
     }
 
 
