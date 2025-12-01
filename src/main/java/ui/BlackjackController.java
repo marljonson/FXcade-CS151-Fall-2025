@@ -100,7 +100,7 @@ public class BlackjackController extends BorderPane {
         );
         controlRow.setAlignment(Pos.CENTER_LEFT);
 
-                bottom.getChildren().addAll(bankRow, totalRow, controlRow, statusLabel);
+        bottom.getChildren().addAll(bankRow, totalRow, controlRow, statusLabel);
         setBottom(bottom);
 
         // Wire button actions
@@ -157,7 +157,7 @@ public class BlackjackController extends BorderPane {
             String json = Files.readString(path, StandardCharsets.UTF_8);
             this.game = BlackjackGame.fromJsonSave(json, username);
             refresh();
-            statusLabel.setText("Loaded from" + path.toString());
+            statusLabel.setText("Loaded from " + path.toString());
         } catch (Exception e) {
             statusLabel.setText("Load failed: " + e.getMessage());
         }
@@ -178,8 +178,8 @@ public class BlackjackController extends BorderPane {
     // Safely parse bet textfield and prevent negative input
     private int parseBetOrDefault(int fallback){
         try {
-            String s = (betField == null) ? null : betField.getText();
-            int n = Integer.parseInt(betField.getText().trim());
+            String s = betField.getText();
+            int n = Integer.parseInt(s.trim());
             return Math.max(0, n);
         } catch (Exception e) {
             return fallback;
