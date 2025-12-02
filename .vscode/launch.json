@@ -10,7 +10,6 @@
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}",
-            "vmArgs": "--module-path lib/ --add-modules javafx.controls",
             "args": ""
         },
         {
@@ -18,7 +17,8 @@
             "name": "Launch Java Program",
             "request": "launch",
             "mainClass": "Main",
-            "vmArgs": "--module-path lib/ --add.modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path \"C:/javafx/javafx-sdk-23.0.1/lib\" --add-modules javafx.controls,javafx.fxml,javafx.media"
+
         }
     ]
 }
