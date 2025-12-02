@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.BlackjackController">
+
+    <!-- Top: Dealer info -->
+    <top>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            <Label fx:id="dealerTotalLabel" text="Dealer Total: ??" style="-fx-font-weight: bold; -fx-font-size: 16px;" />
+            <HBox fx:id="dealerCards" spacing="10"/>
+        </VBox>
+    </top>
+
+    <!-- Center: Bots and Player -->
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+
+            <!-- Bots -->
+            <HBox spacing="50">
+                <VBox spacing="10">
+                    <Label fx:id="bot1BankLabel" text="Bot 1: $0"/>
+                    <HBox fx:id="bot1Cards" spacing="10"/>
+                </VBox>
+                <VBox spacing="10">
+                    <Label fx:id="bot2BankLabel" text="Bot 2: $0"/>
+                    <HBox fx:id="bot2Cards" spacing="10"/>
+                </VBox>
+            </HBox>
+
+            <!-- Player -->
+            <VBox spacing="10">
+                <Label fx:id="playerTotalLabel" text="Player Total: 0"/>
+                <HBox fx:id="playerCards" spacing="10"/>
+            </VBox>
+        </VBox>
+    </center>
+
+    <!-- Bottom: Controls -->
+    <bottom>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Bet: "/>
+                <TextField fx:id="betField" promptText="Enter bet" prefWidth="80"/>
+            </HBox>
+
+            <!-- In <bottom> section, update the HBox with buttons: -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Button fx:id="hitButton" text="Hit" onAction="#onHit" prefWidth="80"/>
+                <Button fx:id="standButton" text="Stand" onAction="#onStand" prefWidth="80"/>
+                <Button fx:id="newRoundButton" text="New Round" onAction="#onNewRound" prefWidth="100"/>
+                <Button fx:id="saveButton" text="Save" onAction="#onSave" prefWidth="80"/>
+                <Button fx:id="loadButton" text="Load" onAction="#onLoad" prefWidth="80"/>
+            </HBox>
+
+            <Label fx:id="statusLabel" text="" style="-fx-font-weight: bold; -fx-text-fill: green;"/>
+            <Label fx:id="bankrollLabel" text="Bankroll: $0"/>
+            <Label fx:id="turnLabel" text="Your turn"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>

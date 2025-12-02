@@ -1,0 +1,7 @@
+Snake:SnakeKing:5000
+Snake:LongBoi:4200
+Snake:Speedster:3800
+Blackjack:test:1050
+Blackjack:Default:1000
+Blackjack:ProPlayer:950
+Blackjack:BotMaster:900

@@ -1,5 +1,7 @@
+// ui/BlackjackController.java
 package ui;
 
+import main.Main;
 import blackjack.*;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -8,128 +10,118 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-/*
-* JavaFX controller for Blackjack screen
-* UI expects FXML with the fx:id's used below
-*/
+
 public class BlackjackController {
     private static final int DEFAULT_BET = 50;
 
-    // wire these fx ids in blackjack.fxml
-    @FXML private HBox dealerCards, playerCards, bot1Cards, bot2Cards;
-
-    @FXML private Label statusLabel, bankrollLabel, playerTotalLabel, dealerTotalLabel;
-    @FXML private Label bot1BankLabel, bot2BankLabel, turnLabel;
-
-
-    @FXML private TextField betField;
-
-    @FXML private Button hitButton, standButton, newRoundButton, saveButton, loadButton;
-
+    // ALL @FXML fields MUST be package-private or public
+    @FXML HBox dealerCards, playerCards, bot1Cards, bot2Cards;
+    @FXML Label statusLabel, bankrollLabel, playerTotalLabel, dealerTotalLabel;
+    @FXML Label bot1BankLabel, bot2BankLabel, turnLabel;
+    @FXML TextField betField;
+    @FXML Button hitButton, standButton, newRoundButton, saveButton, loadButton;
 
     private BlackjackGame game;
-    private String username = "Player"; // we set it in Main/App using init
+    private String username = "Player";
 
-    // Images from resources/cards
     private static final String CARD_DIR = "/cards/";
-    private static final double CARD_WIDTH = 90; // adjust later if needed (?)
+    private static final double CARD_WIDTH = 90;
     private final Map<String, Image> imageCache = new HashMap<>();
 
-    // Call from scene loader in Main
+    // Called from Main when loading FXML
     public void init(String username){
         if (username != null && !username.isBlank()) this.username = username;
         this.game = new BlackjackGame(this.username);
         startRound();
     }
 
-    // UI events: onHit, onStand, onNewRound, onSave, onLoad
+    // ALL @FXML methods MUST be package-private or public
     @FXML
-    private void onHit(){
+    void onHit(){
         game.humanHit();
         refresh();
         endIfOver();
     }
+
     @FXML
-    private void onStand(){
+    void onStand(){
         game.humanStand();
         refresh();
         endIfOver();
     }
 
     @FXML
-    private void onNewRound(){
+    void onNewRound(){
         startRound();
     }
 
     @FXML
-    private void onSave(){
+    void onSave(){
         try {
             String json = game.toJsonSave();
             Path path = savePath();
             Files.createDirectories(path.getParent());
-            Files.writeString(path, json, StandardCharsets.UTF_8);
-            statusLabel.setText("Saved to " + path.toString());         
+            Files.writeString(path, json);
+            statusLabel.setText("Saved to " + path.getFileName());
         } catch (Exception e) {
             statusLabel.setText("Save failed: " + e.getMessage());
         }
     }
 
     @FXML
-    private void onLoad(){
+    public void onLoad(){
         try {
             Path path = savePath();
             if(!Files.exists(path)){
-                statusLabel.setText("No save found for " + username);
+                statusLabel.setText("No save found");
                 return;
             }
-            String json = Files.readString(path, StandardCharsets.UTF_8);
+            String json = Files.readString(path);
             this.game = BlackjackGame.fromJsonSave(json, username);
             refresh();
-            statusLabel.setText("Loaded from" + path.toString());
+            statusLabel.setText("Loaded successfully");
         } catch (Exception e) {
             statusLabel.setText("Load failed: " + e.getMessage());
         }
     }
 
-
-    // Read bet, call startNewRound, refresh
     private void startRound(){
         int bet = parseBetOrDefault(DEFAULT_BET);
-        game.startNewRound(bet, DEFAULT_BET, DEFAULT_BET); // bots bet 50 by default
-        statusLabel.setText(""); // clear last round banner
+        game.startNewRound(bet, DEFAULT_BET, DEFAULT_BET);
+        statusLabel.setText("New round started!");
         hitButton.setDisable(false);
         standButton.setDisable(false);
         newRoundButton.setDisable(true);
         refresh();
     }
 
-    // Safely parse bet textfield and prevent negative input
     private int parseBetOrDefault(int fallback){
         try {
-            String s = (betField == null) ? null : betField.getText();
-            int n = Integer.parseInt(betField.getText().trim());
-            return Math.max(0, n);
+            String s = betField.getText();
+            if (s == null || s.isBlank()) return fallback;
+            int n = Integer.parseInt(s.trim());
+            return Math.max(1, n);
         } catch (Exception e) {
             return fallback;
         }
     }
 
-    // Allow player to end the game, implement high score submission later
     private void endIfOver(){
         if (game.isRoundOver()) {
             statusLabel.setText(game.getResultBanner());
             hitButton.setDisable(true);
             standButton.setDisable(true);
             newRoundButton.setDisable(false);
-            // Possible TODO: submit high score here
+
+            // New part
+            int playerBankroll = game.getHuman().getBankroll();
+            Main.updateHighScoreIfNeeded("Blackjack", username, game.getHuman().getBankroll());
         }
     }
-    
-    // Render everything based on backend
+
     private void refresh(){
         renderHand(playerCards, game.getHuman().getHand());
         renderHand(bot1Cards, game.getBot1().getHand());
@@ -139,89 +131,70 @@ public class BlackjackController {
         bankrollLabel.setText("Bankroll: $" + game.getHuman().getBankroll());
         bot1BankLabel.setText("Bot 1: $" + game.getBot1().getBankroll());
         bot2BankLabel.setText("Bot 2: $" + game.getBot2().getBankroll());
-        statusLabel.setText(game.getResultBanner());
 
-        // totals 
-        playerTotalLabel.setText(String.valueOf(game.getHuman().getHand().getBestTotal()));
-        if (!game.isRoundOver() && hasHiddenDealerCard()) {
-            dealerTotalLabel.setText("??"); // hide until dealer hole card revealed
-        } else { 
-            dealerTotalLabel.setText(game.getDealer().getHand().isBust()
-                ? "BUST" : String.valueOf(game.getDealer().getHand().getBestTotal()));
-        }
-        
+        playerTotalLabel.setText("You: " + game.getHuman().getHand().getBestTotal());
+        dealerTotalLabel.setText(game.isRoundOver() || !hasHiddenDealerCard() 
+            ? "Dealer: " + (game.getDealer().getHand().isBust() ? "BUST" : game.getDealer().getHand().getBestTotal())
+            : "Dealer: ??");
 
-
-        // turn indicator
-        String turnText = switch (game.getTurnIndex()) {
+        turnLabel.setText(switch (game.getTurnIndex()) {
             case 0 -> "Your turn";
             case 1 -> "Bot 1's turn";
             case 2 -> "Bot 2's turn";
             default -> game.isRoundOver() ? "Round over" : "Dealer's turn";
-        };
-
-        turnLabel.setText(turnText);
+        });
 
         boolean isHumansTurn = !game.isRoundOver() && game.getTurnIndex() == 0;
         hitButton.setDisable(!isHumansTurn);
         standButton.setDisable(!isHumansTurn);
-        newRoundButton.setDisable(isHumansTurn);
     }
 
-    // Render hand into HBox
     private void renderHand(HBox box, Hand hand){
         box.getChildren().clear();
         for (Card card : hand.getCards()){
             box.getChildren().add(cardNode(card));
         }
     }
+
     private boolean hasHiddenDealerCard(){
-        for (Card card : game.getDealer().getHand().getCards()){
-            if (!card.isFaceUp()) return true;
-        }
-        return false;
-    }
-    
-    // Card to ImageView uses cache, show back.png if face-down
-    private Node cardNode(Card card){
-        String file = card.isFaceUp() ? filenameFor(card.getRank(), card.getSuit()) : "back.png";
-        Image image = loadImage(file);
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(CARD_WIDTH);
-        imageView.setPreserveRatio(true);
-        imageView.setSmooth(true);
-        imageView.setCache(true);
-        return imageView;
+        var cards = game.getDealer().getHand().getCards();
+        return cards.size() >= 2 && !cards.get(1).isFaceUp();
     }
 
-    // Build file name like... 10_of_hearts.png or queen_of_spades.png
+    private Node cardNode(Card card){
+        String file = card.isFaceUp() ? filenameFor(card.getRank(), card.getSuit()) : "back.png";
+        Image image = imageCache.computeIfAbsent(file, f -> {
+            var url = getClass().getResource(CARD_DIR + f);
+            if (url == null) throw new IllegalStateException("Missing card: " + f);
+            return new Image(url.toExternalForm());
+        });
+        ImageView iv = new ImageView(image);
+        iv.setFitWidth(CARD_WIDTH);
+        iv.setPreserveRatio(true);
+        return iv;
+    }
+
     private String filenameFor(Rank rank, Suit suit) {
         String r = switch (rank) {
-            case TWO -> "2";   case THREE -> "3";  case FOUR -> "4";   case FIVE -> "5";
-            case SIX -> "6";   case SEVEN -> "7";  case EIGHT -> "8";  case NINE -> "9";
-            case TEN -> "10";  case JACK -> "jack"; case QUEEN -> "queen";
+            case TWO -> "2"; case THREE -> "3"; case FOUR -> "4"; case FIVE -> "5";
+            case SIX -> "6"; case SEVEN -> "7"; case EIGHT -> "8"; case NINE -> "9";
+            case TEN -> "10"; case JACK -> "jack"; case QUEEN -> "queen";
             case KING -> "king"; case ACE -> "ace";
         };
         String s = switch (suit) {
-            case CLUBS -> "clubs";
-            case DIAMONDS -> "diamonds";
-            case HEARTS -> "hearts";
-            case SPADES -> "spades";
+            case CLUBS -> "clubs"; case DIAMONDS -> "diamonds";
+            case HEARTS -> "hearts"; case SPADES -> "spades";
         };
         return r + "_of_" + s + ".png";
-    }
-
-    private Image loadImage(String file){
-        return imageCache.computeIfAbsent(file, f ->{
-            var in = Objects.requireNonNull(
-                getClass().getResourceAsStream(CARD_DIR + f),
-                "Missing card image: " + CARD_DIR + f);
-            return new Image(in);
-        });
     }
 
     private Path savePath() {
         return Path.of("data", "saves_blackjack", username + ".json");
     }
 
+    // Add this method to fix buttons after loading a save
+    public void refreshAfterLoad() {
+        refresh();
+        endIfOver();
+    }
 }

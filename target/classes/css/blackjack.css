@@ -1,0 +1,76 @@
+/* Root container */
+.blackjack-root {
+    -fx-background-color: linear-gradient(to bottom, #006400, #228B22);
+    -fx-padding: 20;
+}
+
+/* Labels */
+.status-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFD700; /* gold */
+}
+
+Label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Buttons */
+Button {
+    -fx-font-size: 14px;
+    -fx-background-color: #333333;
+    -fx-text-fill: #FFFFFF;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 5;
+}
+
+Button:hover {
+    -fx-background-color: #555555;
+}
+
+/* TextFields */
+TextField {
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+    -fx-padding: 5 10 5 10;
+}
+
+/* Card HBoxes */
+HBox {
+    -fx-alignment: CENTER;
+}
+
+HBox#dealerCards, HBox#playerCards, HBox#bot1Cards, HBox#bot2Cards {
+    -fx-spacing: 10;
+    -fx-pref-height: 150;
+}
+
+ImageView {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 5, 0, 0, 2);
+}
+
+/* Bottom control VBox */
+.bottom {
+    -fx-spacing: 15;
+    -fx-alignment: center;
+}
+
+/* Make cards scale with window */
+.blackjack-root .center {
+    -fx-vgrow: always;
+}
+
+.blackjack-root HBox {
+    -fx-hgrow: always;
+}
+
+.blackjack-root HBox ImageView {
+    -fx-fit-width: 10vw; /* card width is 10% of window width */
+    -fx-preserve-ratio: true;
+}
+
+/* Optional: make labels scale */
+Label {
+    -fx-font-size: calc(12px + 0.5vw);
+}
