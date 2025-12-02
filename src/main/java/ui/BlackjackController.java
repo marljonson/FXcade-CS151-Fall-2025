@@ -1,47 +1,38 @@
 package ui;
 
 import blackjack.*;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-
-public class BlackjackController extends BorderPane {
+/*
+* JavaFX controller for Blackjack screen
+* UI expects FXML with the fx:id's used below
+*/
+public class BlackjackController {
     private static final int DEFAULT_BET = 50;
-    
-    private final HBox dealerCards = new HBox(5);
-    private final HBox playerCards = new HBox(5);
-    private final HBox bot1Cards   = new HBox(5);
-    private final HBox bot2Cards   = new HBox(5);
 
-    private final Label statusLabel      = new Label();
-    private final Label bankrollLabel    = new Label();
-    private final Label playerTotalLabel = new Label();
-    private final Label dealerTotalLabel = new Label();
-    private final Label bot1BankLabel    = new Label();
-    private final Label bot2BankLabel    = new Label();
-    private final Label turnLabel        = new Label("Your turn");
+    // wire these fx ids in blackjack.fxml
+    @FXML private HBox dealerCards, playerCards, bot1Cards, bot2Cards;
+
+    @FXML private Label statusLabel, bankrollLabel, playerTotalLabel, dealerTotalLabel;
+    @FXML private Label bot1BankLabel, bot2BankLabel, turnLabel;
 
 
-    private final TextField betField = new TextField();
+    @FXML private TextField betField;
 
-    private final Button hitButton      = new Button("Hit");
-    private final Button standButton    = new Button("Stand");
-    private final Button newRoundButton = new Button("New Round");
-    private final Button saveButton     = new Button("Save");
-    private final Button loadButton     = new Button("Load");
+    @FXML private Button hitButton, standButton, newRoundButton, saveButton, loadButton;
 
 
     private BlackjackGame game;
-    private String username = "Player"; // we set it in Main/App using contructor
+    private String username = "Player"; // we set it in Main/App using init
 
     // Images from resources/cards
     private static final String CARD_DIR = "/cards/";
@@ -49,92 +40,32 @@ public class BlackjackController extends BorderPane {
     private final Map<String, Image> imageCache = new HashMap<>();
 
     // Call from scene loader in Main
-    public BlackjackController(String username){
+    public void init(String username){
         if (username != null && !username.isBlank()) this.username = username;
         this.game = new BlackjackGame(this.username);
-        buildUI();
         startRound();
     }
 
-    // Build user interface
-    private void buildUI(){
-        setPadding(new Insets(10));
-
-        // top bar 
-        HBox topBar = new HBox(10);
-        topBar.setAlignment(Pos.CENTER_LEFT);
-        topBar.setPadding(new Insets(5 , 5, 10, 5));
-        Label title = new Label("Blackjack");
-        topBar.getChildren().addAll(title, turnLabel);
-        setTop(topBar);
-
-        // Center: dealer + players
-        VBox center = new VBox(15);
-        center.setPadding(new Insets(10));
-        center.setAlignment(Pos.TOP_CENTER);
-
-        center.getChildren().addAll(
-                titledRow("Dealer", dealerCards),
-                titledRow("You", playerCards),
-                titledRow("Bot 1", bot1Cards),
-                titledRow("Bot 2", bot2Cards)
-        );
-        setCenter(center);
-
-        // Bottom: bankrolls, totals, controls, status
-        VBox bottom = new VBox(8);
-        bottom.setPadding(new Insets(10));
-
-        HBox bankRow = new HBox(15, bankrollLabel, bot1BankLabel, bot2BankLabel);
-        bankRow.setAlignment(Pos.CENTER_LEFT);
-
-        HBox totalRow = new HBox(10,
-                new Label("Your total:"),   playerTotalLabel,
-                new Label("Dealer total:"), dealerTotalLabel);
-        totalRow.setAlignment(Pos.CENTER_LEFT);
-
-        betField.setPrefWidth(80);
-        HBox controlRow = new HBox(10,
-                new Label("Bet:"), betField,
-                newRoundButton, hitButton, standButton, saveButton, loadButton
-        );
-        controlRow.setAlignment(Pos.CENTER_LEFT);
-
-        bottom.getChildren().addAll(bankRow, totalRow, controlRow, statusLabel);
-        setBottom(bottom);
-
-        // Wire button actions
-        hitButton.setOnAction(e -> onHit());
-        standButton.setOnAction(e -> onStand());
-        newRoundButton.setOnAction(e -> onNewRound());
-        saveButton.setOnAction(e -> onSave());
-        loadButton.setOnAction(e -> onLoad());
-    }
-
-    private Node titledRow(String title, HBox cardsBox) {
-        VBox v = new VBox(5);
-        Label label = new Label(title);
-        cardsBox.setAlignment(Pos.CENTER_LEFT);
-        v.getChildren().addAll(label, cardsBox);
-        return v;
-    }
-
     // UI events: onHit, onStand, onNewRound, onSave, onLoad
+    @FXML
     private void onHit(){
         game.humanHit();
         refresh();
         endIfOver();
     }
+    @FXML
     private void onStand(){
         game.humanStand();
         refresh();
         endIfOver();
     }
 
+    @FXML
     private void onNewRound(){
         startRound();
     }
 
+    @FXML
     private void onSave(){
         try {
             String json = game.toJsonSave();
@@ -147,6 +78,7 @@ public class BlackjackController extends BorderPane {
         }
     }
 
+    @FXML
     private void onLoad(){
         try {
             Path path = savePath();
@@ -157,7 +89,7 @@ public class BlackjackController extends BorderPane {
             String json = Files.readString(path, StandardCharsets.UTF_8);
             this.game = BlackjackGame.fromJsonSave(json, username);
             refresh();
-            statusLabel.setText("Loaded from " + path.toString());
+            statusLabel.setText("Loaded from" + path.toString());
         } catch (Exception e) {
             statusLabel.setText("Load failed: " + e.getMessage());
         }
@@ -178,8 +110,8 @@ public class BlackjackController extends BorderPane {
     // Safely parse bet textfield and prevent negative input
     private int parseBetOrDefault(int fallback){
         try {
-            String s = betField.getText();
-            int n = Integer.parseInt(s.trim());
+            String s = (betField == null) ? null : betField.getText();
+            int n = Integer.parseInt(betField.getText().trim());
             return Math.max(0, n);
         } catch (Exception e) {
             return fallback;
