@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import utils.Encryption;
 
 public class AccountManager {
@@ -133,21 +134,21 @@ public class AccountManager {
 
         // Save details to user_accounts.txt
         Path filePath = Paths.get("data/user_accounts.txt");
-String savedOutput = username + ":" + encryptedPassword + ":" + newUser.getHighScore();
+        String savedOutput = username + ":" + encryptedPassword + ":" + newUser.getHighScore();
 
-try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toString(), true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toString(), true))) {
 
-    // Add newline BEFORE writing ONLY if file already has content
-    if (Files.size(filePath) > 0) {
-        writer.newLine();
-    }
+            // Add newline BEFORE writing ONLY if file already has content
+            if (Files.size(filePath) > 0) {
+                writer.newLine();
+            }
 
-    writer.write(savedOutput);
-    return signUpStatus.SUCCESS;
+            writer.write(savedOutput);
+            return signUpStatus.SUCCESS;
 
-} catch (IOException e) {
-    System.out.println("Error saving new user to file: user_accounts.txt");
-    return signUpStatus.FILE_ERROR;
-}
+        } catch (IOException e) {
+            System.out.println("Error saving new user to file: user_accounts.txt");
+            return signUpStatus.FILE_ERROR;
+        }
     }
 }

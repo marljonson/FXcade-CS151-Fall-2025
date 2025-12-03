@@ -1,6 +1,7 @@
 package blackjack;
 
 // we use secure random as it is more unpredictable in shuffling
+
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -17,7 +18,7 @@ public class Deck {
     private final Deque<Card> cards = new ArrayDeque<>();
     private final int numDecks;
     private final Random rng;
-    
+
 
     // No arg constructor, 1 standard deck of 52 cards
     public Deck() {
@@ -31,18 +32,18 @@ public class Deck {
 
     // Master constructor, #1 and #2 depend on this for input validatio
     public Deck(int numDecks, Random rng) {
-        if(numDecks <= 0) throw new IllegalArgumentException("numDecks must be more than or equal to 1!");
+        if (numDecks <= 0) throw new IllegalArgumentException("numDecks must be more than or equal to 1!");
         this.numDecks = numDecks;
         this.rng = Objects.requireNonNull(rng);
         resetAndShuffle();
     }
 
     // Rebuild dealer's shoe and shuffles cards
-    public final void resetAndShuffle(){
+    public final void resetAndShuffle() {
         List<Card> list = new ArrayList<>(CARDS_PER_DECK * numDecks);
-        for(int i = 0; i < numDecks; i++){
-            for(Suit suit : Suit.values()){
-                for(Rank rank : Rank.values()){
+        for (int i = 0; i < numDecks; i++) {
+            for (Suit suit : Suit.values()) {
+                for (Rank rank : Rank.values()) {
                     list.add(new Card(rank, suit));
                 }
             }
@@ -53,50 +54,52 @@ public class Deck {
     }
 
     // Cards remaining in the table
-    public int remaining(){ return cards.size(); }
-    public boolean isEmpty(){ return cards.isEmpty(); }
+    public int remaining() {
+        return cards.size();
+    }
+
+    public boolean isEmpty() {
+        return cards.isEmpty();
+    }
 
     // Deal the next card face up
-    public Card deal(){
+    public Card deal() {
         if (cards.isEmpty()) throw new NoSuchElementException("Deck is empty");
         return cards.removeFirst();
     }
 
     // Deal next card face down (ie: dealer's hole card)
-    public Card dealFaceDown(){
+    public Card dealFaceDown() {
         Card up = deal();
-        return new Card(up.getRank(), up.getSuit(), false); 
+        return new Card(up.getRank(), up.getSuit(), false);
     }
 
     // Return cards to bottom of pile (like when reshuffling in between rounds)
-    public void returnToBottom(Collection<Card> returned){
-        for(Card card : returned){
+    public void returnToBottom(Collection<Card> returned) {
+        for (Card card : returned) {
             cards.addLast(new Card(card.getRank(), card.getSuit(), true));
         }
     }
 
     // Serialize to allow for save states, so we can resume from where we left off
-    public String toChars(){
+    public String toChars() {
         return String.join(",", cards.stream()
                 .map(Card::toString)
-                .toArray(String[]::new));          
+                .toArray(String[]::new));
     }
-    
+
     // Rebuild deck from comma separated list (AH, TC, 7S)
-    public static Deck fromChars(String csv){
+    public static Deck fromChars(String csv) {
         Deck deck = new Deck(1);
         deck.cards.clear();
-        if(csv != null && !csv.isBlank()){
-            for(String token : csv.split(",")){
+        if (csv != null && !csv.isBlank()) {
+            for (String token : csv.split(",")) {
                 String t = token.trim();
-                if(!t.isBlank()) deck.cards.addLast(Card.fromChars(t));
+                if (!t.isBlank()) deck.cards.addLast(Card.fromChars(t));
             }
         }
         return deck;
     }
-    
 
-    
-    
-    
+
 }

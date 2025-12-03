@@ -5,17 +5,27 @@ public enum Suit {
 
     private final char suitChar;
 
-    Suit(char suitChar){ this.suitChar = suitChar; }
-    public char getSuitChar(){ return suitChar; }
+    Suit(char suitChar) {
+        this.suitChar = suitChar;
+    }
 
-    public static Suit fromChar(char c){
+    public char getSuitChar() {
+        return suitChar;
+    }
+
+    public static Suit fromChar(char c) {
         switch (c) {
-            case 'C': return CLUBS;
-            case 'D': return DIAMONDS;
-            case 'H': return HEARTS;
-            case 'S': return SPADES;
-            default: throw new IllegalArgumentException("Invalid suit character: " + c);
-                
+            case 'C':
+                return CLUBS;
+            case 'D':
+                return DIAMONDS;
+            case 'H':
+                return HEARTS;
+            case 'S':
+                return SPADES;
+            default:
+                throw new IllegalArgumentException("Invalid suit character: " + c);
+
         }
     }
 }

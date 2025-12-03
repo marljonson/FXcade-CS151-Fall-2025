@@ -20,20 +20,34 @@ public final class Card {
         this.faceUp = faceUp;
     }
 
-    public Rank getRank() { return rank; }
-    public Suit getSuit() { return suit; }
-    public boolean isFaceUp() { return faceUp; }
+    public Rank getRank() {
+        return rank;
+    }
+
+    public Suit getSuit() {
+        return suit;
+    }
+
+    public boolean isFaceUp() {
+        return faceUp;
+    }
 
     // purely to flip a card's visibility, since card is immutable
-    public Card flipped() { return new Card(rank, suit, !faceUp); }
+    public Card flipped() {
+        return new Card(rank, suit, !faceUp);
+    }
 
     // Blackjack value, Ace is 11 but Hand will set it 1 if needed.
-    public int getValue() { return rank.getValue(); }
-    
+    public int getValue() {
+        return rank.getValue();
+    }
+
 
     // compact abbreviation of hand names, like Ace of Hearts -> AH , Ten of Clubs -> TC
     @Override
-    public String toString() { return "" + rank.getRankChar() + suit.getSuitChar(); }
+    public String toString() {
+        return "" + rank.getRankChar() + suit.getSuitChar();
+    }
 
 
     @Override
@@ -49,11 +63,11 @@ public final class Card {
     }
 
     // we check if the 'str' is exactly 2 characters and exists
-    public static Card fromChars(String str){
+    public static Card fromChars(String str) {
         if (str == null || str.length() != 2) {
             throw new IllegalArgumentException("Card string must be 2 characters: " + str);
         }
         return new Card(Rank.fromChar(str.charAt(0)), Suit.fromChar(str.charAt(1)));
-    } 
-    
+    }
+
 }

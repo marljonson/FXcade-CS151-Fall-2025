@@ -19,11 +19,27 @@ public class User {
     }
 
     // Getters and setters
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public int getHighScore() { return highScore; }
+    public String getUsername() {
+        return username;
+    }
 
-    public void setUsername(String username) { this.username = username; }
-    public void setPassword(String password) { this.password = password; }
-    public void setHighScore(int highScore) { this.highScore = highScore; }
+    public String getPassword() {
+        return password;
+    }
+
+    public int getHighScore() {
+        return highScore;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setHighScore(int highScore) {
+        this.highScore = highScore;
+    }
 }

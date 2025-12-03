@@ -16,26 +16,54 @@ public class Participant {
     }
 
     // player related getters
-    public String getName() { return name; }
-    public boolean isHuman() { return human; }
-    public boolean isDealer() { return dealer; }
-    public Hand getHand() { return hand; }
+    public String getName() {
+        return name;
+    }
+
+    public boolean isHuman() {
+        return human;
+    }
+
+    public boolean isDealer() {
+        return dealer;
+    }
+
+    public Hand getHand() {
+        return hand;
+    }
 
     // game related methods
-    public int getBankroll() { return bankroll; }
-    public int getBet() { return bet; }
-    public void setBet(int amount) { this.bet = amount; }
-    public void setBankroll(int amount){ this.bankroll = amount; }
-    public void win(int amount){ bankroll += amount; }
-    public void lose(int amount){ bankroll -= amount; }
-    public void push() {} // no change in case of tie
+    public int getBankroll() {
+        return bankroll;
+    }
 
-    public void clearForNextRound(){
+    public int getBet() {
+        return bet;
+    }
+
+    public void setBet(int amount) {
+        this.bet = amount;
+    }
+
+    public void setBankroll(int amount) {
+        this.bankroll = amount;
+    }
+
+    public void win(int amount) {
+        bankroll += amount;
+    }
+
+    public void lose(int amount) {
+        bankroll -= amount;
+    }
+
+    public void push() {
+    } // no change in case of tie
+
+    public void clearForNextRound() {
         hand.clear();
         bet = 0;
     }
-    
 
-    
-    
+
 }

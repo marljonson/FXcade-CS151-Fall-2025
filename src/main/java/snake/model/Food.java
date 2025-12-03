@@ -13,7 +13,7 @@ public class Food {
     public Food(int w, int h) {
         this.w = w;
         this.h = h;
-      
+
         pos = new Point(0, 0);
     }
 

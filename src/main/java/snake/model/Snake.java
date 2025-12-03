@@ -6,8 +6,8 @@ import java.util.List;
 public class Snake {
 
     private List<SnakeSegment> body;
-    private Direction dir;        
-    private Direction nextDir;   
+    private Direction dir;
+    private Direction nextDir;
 
     public Snake(int cx, int cy, Direction startDir) {
         body = new ArrayList<>();
