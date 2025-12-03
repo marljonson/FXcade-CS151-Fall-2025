@@ -14,7 +14,7 @@ Our code is largely split into 3 categories: (1) manager, (2) blackjack, and (3)
 ## Installation instructions
 Prerequisites:
 - Java
-- - Our `pom.xml` file is set to match the user's existing SDK)
+  - Our `pom.xml` file is set to match the user's existing SDK)
 - Maven
 - Git or GitHub Desktop installed
 
@@ -25,11 +25,13 @@ Prerequisites:
 
 ## Contributions
 **Marl Jonson (`marljonson`):**
-- Initialized GitHub repository
+- Initialized GitHub repository and structure
+- Wrote frontend of blackjack game
 - Managed music and sound effects
 
 **Sajid Kaiser (`Hazelette`):**
 - Wrote backend of blackjack game
+- Wrote JUnit tests for snake game
 
 **Toey Lui (`toeyldev`):**
 - Wrote `Main.java` and password encryption
