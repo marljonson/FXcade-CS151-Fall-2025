@@ -13,17 +13,17 @@ public class BlackjackGame {
     private final Deck deck;
     private final List<Participant> players = new ArrayList<>(3); // 1 human, 2 bot players
     private final Participant dealer;
-    
-    private final Map<Participant,BotStrategy> botBrains = new HashMap<>();
+
+    private final Map<Participant, BotStrategy> botBrains = new HashMap<>();
     private int turnIndex = 0;
     private boolean roundOver = false;
     private String resultBanner = "";
 
-    public BlackjackGame(String humanName){
+    public BlackjackGame(String humanName) {
         this(new Deck(), humanName);
     }
 
-    public BlackjackGame(Deck deck, String humanName){
+    public BlackjackGame(Deck deck, String humanName) {
         this.deck = deck;
         players.add(new Participant(humanName, true, false));
         Participant bot1 = new Participant("Bot-1", false, false);
@@ -39,14 +39,14 @@ public class BlackjackGame {
     }
 
     // Round life cycle, each player makes a bet
-    public void startNewRound(int humanBet, int bot1Bet, int bot2Bet){
+    public void startNewRound(int humanBet, int bot1Bet, int bot2Bet) {
         deck.resetAndShuffle();
         resultBanner = "";
         roundOver = false;
         turnIndex = 0;
 
         // clear and set bets
-        for(Participant participant : players){
+        for (Participant participant : players) {
             participant.clearForNextRound();
         }
         dealer.clearForNextRound();
@@ -57,18 +57,21 @@ public class BlackjackGame {
         // initial deal, 2 to everyone, dealer's second is face down
         // Human action when it's player's turn while round ongoing
         // Deal a single face-down card into dealer's hand
-        for (int i = 0; i < 2; i++){
-            for(Participant player : players) {
+        for (int i = 0; i < 2; i++) {
+            for (Participant player : players) {
                 if (!tryDealUp(player.getHand())) return;
             }
-            if (i == 0){ if (!tryDealUp(dealer.getHand())) return; }
-            else       { if (!tryDealFaceDownToDealer()) return; }
+            if (i == 0) {
+                if (!tryDealUp(dealer.getHand())) return;
+            } else {
+                if (!tryDealFaceDownToDealer()) return;
+            }
         }
 
         // natural blackjack shortcut (rare edge case with this many players)
         boolean anyNatural = players.stream().anyMatch(p -> p.getHand().isBlackjack())
-                              || dealer.getHand().isBlackjack();
-        if (anyNatural){
+                || dealer.getHand().isBlackjack();
+        if (anyNatural) {
             revealDealerHole();
             finishRound();
             return;
@@ -76,7 +79,7 @@ public class BlackjackGame {
     }
 
     // Human action when it'saveState player'saveState turn while round ongoing
-    public void humanHit(){
+    public void humanHit() {
         if (roundOver || turnIndex != 0) return;
         if (!tryDealUp(players.get(0).getHand())) return;
         int best = players.get(0).getHand().getBestTotal();
@@ -85,15 +88,15 @@ public class BlackjackGame {
         }
     }
 
-    public void humanStand(){
+    public void humanStand() {
         if (roundOver || turnIndex != 0) return;
         advanceToNextTurn();
     }
 
-    private void advanceToNextTurn(){
+    private void advanceToNextTurn() {
         turnIndex++;
         // play bots
-        while (!roundOver && turnIndex < players.size()){
+        while (!roundOver && turnIndex < players.size()) {
             Participant bot = players.get(turnIndex);
             playBotTurn(bot);
             turnIndex++;
@@ -106,16 +109,17 @@ public class BlackjackGame {
         }
     }
 
-    private void playBotTurn(Participant bot){
+    private void playBotTurn(Participant bot) {
         BotStrategy brain = botBrains.get(bot);
         if (brain == null) return;
-        while(true){
-            if(bot.getHand().isBust()) break;
+        while (true) {
+            if (bot.getHand().isBust()) break;
             BotStrategy.Action action = brain.decide(bot.getHand(), dealerUpCard());
             if (action == BotStrategy.Action.HIT) {
                 if (!tryDealUp(bot.getHand())) return; // stops on empty deck
-            } 
-            else { break; }
+            } else {
+                break;
+            }
         }
     }
 
@@ -126,36 +130,44 @@ public class BlackjackGame {
         return dealerCards.get(0);
     }
 
-    private void revealDealerHole(){
+    private void revealDealerHole() {
         // reveal (flip) the first face-down dealer card
         Hand src = dealer.getHand();
         Hand temp = new Hand();
         boolean flipped = false;
-        for (Card card : src.getCards()){
-            if (!flipped && !card.isFaceUp()) { 
-                temp.add(card.flipped()); 
+        for (Card card : src.getCards()) {
+            if (!flipped && !card.isFaceUp()) {
+                temp.add(card.flipped());
                 flipped = true;
+            } else {
+                temp.add(card);
             }
-            else { temp.add(card); }
         }
         src.clear();
         for (Card card : temp.getCards()) src.add(card);
-    
+
     }
-    private void dealerTurn(){
+
+    private void dealerTurn() {
         Hand hand = dealer.getHand();
         while (true) {
             int best = hand.getBestTotal();
             boolean soft = hand.isSoft();
-            if(best > 21) break;
-            if(best > 17) break;
-            if(best < 17){ if (!tryDealUp(hand)) break; continue;  }
-            if(best == 17 && DEALER_HITS_SOFT_17 && soft) { if (!tryDealUp(hand)) break; continue; } 
+            if (best > 21) break;
+            if (best > 17) break;
+            if (best < 17) {
+                if (!tryDealUp(hand)) break;
+                continue;
+            }
+            if (best == 17 && DEALER_HITS_SOFT_17 && soft) {
+                if (!tryDealUp(hand)) break;
+                continue;
+            }
             break;
         }
     }
 
-    private void finishRound(){
+    private void finishRound() {
         roundOver = true;
 
         // Simple banner summary with stringbuilder
@@ -163,14 +175,14 @@ public class BlackjackGame {
         int dealerBest = dealer.getHand().getBestTotal();
         boolean dealerBust = dealer.getHand().isBust();
 
-        for (Participant player : players){
+        for (Participant player : players) {
             int bet = player.getBet();
             int playerBest = player.getHand().getBestTotal();
             boolean playerBust = player.getHand().isBust();
 
-            if(player.getHand().isBlackjack() && !dealer.getHand().isBlackjack()) {
-                player.win((int)Math.round(bet * WIN_MULTIPLIER));
-                sb.append(player.getName()).append(": Blackjack! +").append((int)Math.round(bet * WIN_MULTIPLIER)).append("\n");
+            if (player.getHand().isBlackjack() && !dealer.getHand().isBlackjack()) {
+                player.win((int) Math.round(bet * WIN_MULTIPLIER));
+                sb.append(player.getName()).append(": Blackjack! +").append((int) Math.round(bet * WIN_MULTIPLIER)).append("\n");
             } else if (dealer.getHand().isBlackjack() && !player.getHand().isBlackjack()) {
                 player.lose(bet);
                 sb.append(player.getName()).append(": Dealer blackjack. -").append(bet).append("\n");
@@ -181,8 +193,8 @@ public class BlackjackGame {
                 player.win(bet);
                 sb.append(player.getName()).append(": Dealer busts ").append(dealerBest).append(". +").append(bet).append("\n");
             } else {
-                if (playerBest > dealerBest) { 
-                    player.win(bet);  
+                if (playerBest > dealerBest) {
+                    player.win(bet);
                     sb.append(player.getName()).append(": ").append(playerBest).append(" > ").append(dealerBest).append(" +").append(bet).append("\n");
                 } else if (playerBest < dealerBest) {
                     player.lose(bet);
@@ -220,14 +232,16 @@ public class BlackjackGame {
             return false;
         }
     }
+
     // Allow load from controller
-    public static BlackjackGame fromJsonSave(String json, String humanName){
+    public static BlackjackGame fromJsonSave(String json, String humanName) {
         Gson gson = new Gson();
         SaveState saveState = gson.fromJson(json, SaveState.class);
 
 
-        if (saveState.banks == null || saveState.banks.size() != 4) throw new IllegalArgumentException("Bad banks array");
-        if (saveState.bets  == null || saveState.bets.size()  != 3) throw new IllegalArgumentException("Bad bets array");
+        if (saveState.banks == null || saveState.banks.size() != 4)
+            throw new IllegalArgumentException("Bad banks array");
+        if (saveState.bets == null || saveState.bets.size() != 3) throw new IllegalArgumentException("Bad bets array");
 
 
         Deck deck = Deck.fromChars(saveState.deck);
@@ -240,7 +254,9 @@ public class BlackjackGame {
         replaceHand(game.getDealer().getHand(), Hand.fromChars(saveState.dealerHand));
 
         // Hole visibility
-        if (saveState.hideHole) { makeDealerSecondCardFaceDown(game.getDealer().getHand()); }
+        if (saveState.hideHole) {
+            makeDealerSecondCardFaceDown(game.getDealer().getHand());
+        }
 
         // Banks and bets
         game.getHuman().setBankroll(saveState.banks.get(0));
@@ -263,24 +279,24 @@ public class BlackjackGame {
     public String toJsonSave() {
         SaveState saveState = new SaveState();
 
-        saveState.deck       = deck.toChars();
-        saveState.humanHand  = getHuman().getHand().toChars();
-        saveState.bot1Hand   = getBot1().getHand().toChars();
-        saveState.bot2Hand   = getBot2().getHand().toChars();
+        saveState.deck = deck.toChars();
+        saveState.humanHand = getHuman().getHand().toChars();
+        saveState.bot1Hand = getBot1().getHand().toChars();
+        saveState.bot2Hand = getBot2().getHand().toChars();
         saveState.dealerHand = getDealer().getHand().toChars();
 
         saveState.hideHole = hasDealerHoleHidden();   // reuse helper
 
         saveState.banks = List.of(
-            getHuman().getBankroll(),
-            getBot1().getBankroll(),
-            getBot2().getBankroll(),
-            getDealer().getBankroll()
+                getHuman().getBankroll(),
+                getBot1().getBankroll(),
+                getBot2().getBankroll(),
+                getDealer().getBankroll()
         );
         saveState.bets = List.of(
-            getHuman().getBet(),
-            getBot1().getBet(),
-            getBot2().getBet()
+                getHuman().getBet(),
+                getBot1().getBet(),
+                getBot2().getBet()
         );
 
         saveState.turn = getTurnIndex();
@@ -289,14 +305,16 @@ public class BlackjackGame {
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         return gson.toJson(saveState);
     }
+
     // Small helpers for Json save state
-    private static void replaceHand(Hand target, Hand src){
+    private static void replaceHand(Hand target, Hand src) {
         target.clear();
         for (Card card : src.getCards()) target.add(card);
     }
-    private static void makeDealerSecondCardFaceDown(Hand dealerHand){
+
+    private static void makeDealerSecondCardFaceDown(Hand dealerHand) {
         var list = new ArrayList<>(dealerHand.getCards());
-        if (list.size() >= 2 && list.get(1).isFaceUp()){
+        if (list.size() >= 2 && list.get(1).isFaceUp()) {
             list.set(1, list.get(1).flipped());
             dealerHand.clear();
             for (Card card : list) dealerHand.add(card);
@@ -312,16 +330,44 @@ public class BlackjackGame {
     }
 
     // UI getters
-    public Participant getHuman() { return players.get(0); }
-    public Participant getBot1()  { return players.get(1); }
-    public Participant getBot2()  { return players.get(2); }
-    public Participant getDealer(){ return dealer; }
-    public List<Participant> getPlayers() { return Collections.unmodifiableList(players); }
+    public Participant getHuman() {
+        return players.get(0);
+    }
+
+    public Participant getBot1() {
+        return players.get(1);
+    }
+
+    public Participant getBot2() {
+        return players.get(2);
+    }
+
+    public Participant getDealer() {
+        return dealer;
+    }
+
+    public List<Participant> getPlayers() {
+        return Collections.unmodifiableList(players);
+    }
 
 
-    public boolean isHumansTurn() { return !roundOver && turnIndex == 0; }
-    private static int clampNonNegative(int betAmount){ return Math.max(0, betAmount); } // validate bet
-    public boolean isRoundOver() { return roundOver; }
-    public String getResultBanner() { return resultBanner; }
-    public int getTurnIndex() { return turnIndex; } // 0 = human, 1 = bot1, 2 = bot2, 3 = dealer/done
+    public boolean isHumansTurn() {
+        return !roundOver && turnIndex == 0;
+    }
+
+    private static int clampNonNegative(int betAmount) {
+        return Math.max(0, betAmount);
+    } // validate bet
+
+    public boolean isRoundOver() {
+        return roundOver;
+    }
+
+    public String getResultBanner() {
+        return resultBanner;
+    }
+
+    public int getTurnIndex() {
+        return turnIndex;
+    } // 0 = human, 1 = bot1, 2 = bot2, 3 = dealer/done
 }
