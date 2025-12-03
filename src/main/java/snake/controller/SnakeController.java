@@ -32,9 +32,24 @@ public class SnakeController {
 
     private SnakeGameView view;
     private Stage stage;
+    private Runnable onMainMenu;
 
     public SnakeController(Stage stage) {
         this.stage = stage;
+        view = new SnakeGameView(stage);
+
+        loadHighScore();
+        resetGame();
+        setupControls();
+        startLoop();
+
+        view.render(snake, food, isPaused, isGameOver);
+    }
+
+
+    public SnakeController(Stage stage, Runnable onMainMenu) {
+        this.stage = stage;
+        this.onMainMenu = onMainMenu;
         view = new SnakeGameView(stage);
 
         loadHighScore();
@@ -75,8 +90,12 @@ public class SnakeController {
 
         view.getRestartButton().setOnAction(e -> restart());
         view.getMenuButton().setOnAction(e -> {
-            if (loop != null) loop.stop();
-            stage.close();
+            if (loop != null) {
+                loop.stop();
+            }
+            if (onMainMenu != null) {
+                onMainMenu.run();
+            }
         });
     }
 
@@ -167,10 +186,18 @@ public class SnakeController {
         int x = p.x, y = p.y;
 
         switch (d) {
-            case UP:    y--; break;
-            case DOWN:  y++; break;
-            case LEFT:  x--; break;
-            case RIGHT: x++; break;
+            case UP:
+                y--;
+                break;
+            case DOWN:
+                y++;
+                break;
+            case LEFT:
+                x--;
+                break;
+            case RIGHT:
+                x++;
+                break;
         }
 
         return new Point(x, y);

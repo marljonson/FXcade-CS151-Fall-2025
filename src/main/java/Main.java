@@ -35,7 +35,7 @@ public class Main extends Application {
             var url = getClass().getResource("/audio/catherine.mp3");
             if (url == null) {
                 throw new RuntimeException("MP3 file not found in resources!");
-            }   
+            }
             Media media = new Media(url.toExternalForm());
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);  // Loop forever
@@ -300,14 +300,21 @@ public class Main extends Application {
             primaryStage.setScene(loginScene);
         });
 
-        // add launch snake game
+        // 7 - Launch snake game
         snakeButton.setOnAction(e -> {
-            SnakeController controller = new SnakeController(primaryStage);
+            SnakeController controller = new SnakeController(primaryStage, () -> {
+                // Snake Main Menu button
+                primaryStage.setScene(mainMenuScene);
+                primaryStage.setTitle("FXcade Game Manager");
+                mainMenu.requestFocus();
+            });
+
             primaryStage.setScene(controller.getView().getScene());
             primaryStage.setTitle("Snake Game");
             primaryStage.getScene().getRoot().requestFocus();
         });
     }
+
 
     public static void main(String[] args) {
         launch(args);
