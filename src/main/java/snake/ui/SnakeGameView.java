@@ -19,6 +19,13 @@ import snake.model.*;
 import java.util.List;
 
 public class SnakeGameView {
+
+    private static final double WINDOW_WIDTH = 700;
+    private static final double WINDOW_HEIGHT = 500;
+
+    private BorderPane root;
+    private VBox headerBox;
+
     private Canvas canvas;
     private GraphicsContext gc;
     private Label scoreLabel;
@@ -54,6 +61,10 @@ public class SnakeGameView {
         topPanel.getChildren().addAll(scoreLabel, new Label("  |  "), highScoreLabel);
         root.setTop(topPanel);
 
+        headerBox = new VBox();
+        headerBox.getChildren().add(topPanel);
+        root.setTop(headerBox);
+
         canvas = new Canvas(Grid.CANVAS_WIDTH, Grid.CANVAS_HEIGHT);
         gc = canvas.getGraphicsContext2D();
 
@@ -63,7 +74,8 @@ public class SnakeGameView {
         gameContainer.setStyle("-fx-background-color: #F5F5DC;");
         root.setCenter(gameContainer);
 
-        gameScene = new Scene(root, Grid.CANVAS_WIDTH + 20, Grid.CANVAS_HEIGHT + 120);
+        // gameScene = new Scene(root, Grid.CANVAS_WIDTH + 20, Grid.CANVAS_HEIGHT + 120);
+        gameScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         canvas.setFocusTraversable(true);
         canvas.requestFocus();
@@ -102,6 +114,7 @@ public class SnakeGameView {
                 "-fx-text-fill: #2F4F2F;");
         restartButton.setId("restartButton");
 
+        /*
         Button menuButton = new Button("Main Menu");
         menuButton.setFont(new Font("System", 18));
         menuButton.setPrefWidth(150);
@@ -110,8 +123,9 @@ public class SnakeGameView {
                 "-fx-background-radius: 10; " +
                 "-fx-text-fill: #2F2F2F;");
         menuButton.setId("menuButton");
+         */
 
-        content.getChildren().addAll(gameOverLabel, finalScoreLabel, highScoreUpdateLabel, restartButton, menuButton);
+        content.getChildren().addAll(gameOverLabel, finalScoreLabel, highScoreUpdateLabel, restartButton);
         overlay.getChildren().add(content);
 
         return overlay;
@@ -243,6 +257,12 @@ public class SnakeGameView {
         gameOverOverlay.setVisible(true);
     }
 
+    public void setToolbar(HBox toolbar) {
+        if (headerBox == null) return;
+
+        headerBox.getChildren().add(0, toolbar);
+    }
+
     public void hideGameOver() {
         gameOverOverlay.setVisible(false);
     }
@@ -251,9 +271,10 @@ public class SnakeGameView {
         return (Button) gameOverOverlay.lookup("#restartButton");
     }
 
-    public Button getMenuButton() {
+    /* public Button getMenuButton() {
         return (Button) gameOverOverlay.lookup("#menuButton");
     }
+     */
 
     public Canvas getCanvas() {
         return canvas;

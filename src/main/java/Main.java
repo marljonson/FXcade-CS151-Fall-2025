@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -17,6 +18,9 @@ import manager.AccountManager;
 import snake.controller.SnakeController;
 
 public class Main extends Application {
+
+    public static final double WINDOW_WIDTH = 700;
+    public static final double WINDOW_HEIGHT = 500;
 
     private AccountManager accountManager;
     private MediaPlayer mediaPlayer; // Field for music
@@ -99,7 +103,7 @@ public class Main extends Application {
         signInlayout.setSpacing(10);
         signInlayout.setPadding(new Insets(30));
         signInlayout.setAlignment(Pos.CENTER);
-        Scene loginScene = new Scene(signInlayout, 700, 500);
+        Scene loginScene = new Scene(signInlayout, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         primaryStage.setScene(loginScene);
         primaryStage.setTitle("FXcade Game Manager");
@@ -147,35 +151,11 @@ public class Main extends Application {
         signupLayout.setSpacing(10);
         signupLayout.setPadding(new Insets(30));
         signupLayout.setAlignment(Pos.CENTER);
-        Scene signupScene = new Scene(signupLayout, 700, 500);
+        Scene signupScene = new Scene(signupLayout, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 
         // Main menu scene
         BorderPane borderPane = new BorderPane();
-
-        // Top toolbar
-        Button musicToggleButton = new Button("Play Music"); // Music toggle button
-        Button mainMenuButton = new Button("Main Menu");
-        Button signOutButton = new Button("Sign Out");
-        HBox toolBar = new HBox(musicToggleButton, mainMenuButton, signOutButton);
-        toolBar.setSpacing(10);
-        toolBar.setPadding(new Insets(10));
-        toolBar.setAlignment(Pos.CENTER_RIGHT);
-        toolBar.setStyle("-fx-background-color: #555555;");
-
-        // Music toggle action
-        musicToggleButton.setOnAction(e -> {
-            if (mediaPlayer == null) return;
-            if (isMusicPlaying) {
-                mediaPlayer.pause();
-                musicToggleButton.setText("Play Music");
-                isMusicPlaying = false;
-            } else {
-                mediaPlayer.play();
-                musicToggleButton.setText("Pause Music");
-                isMusicPlaying = true;
-            }
-        });
 
         // Left main menu
         Label topScore = new Label("Top Scores");
@@ -190,11 +170,15 @@ public class Main extends Application {
         Label gameMenu = new Label("Play Games");
         gameMenu.setStyle("-fx-font-weight: bold");
         Button blackjackButton = new Button("Blackjack");
+        blackjackButton.setStyle("-fx-background-radius: 8;");
         Button snakeButton = new Button("Snake");
+        snakeButton.setStyle("-fx-background-radius: 8;");
         Label addGameMenu = new Label("Add Games");
         addGameMenu.setStyle("-fx-font-weight: bold");
         Button addGameButton1 = new Button("Add Game");
+        addGameButton1.setStyle("-fx-background-radius: 8;");
         Button addGameButton2 = new Button("Add Game");
+        addGameButton2.setStyle("-fx-background-radius: 8;");
         VBox mainMenuRight = new VBox(gameMenu, blackjackButton, snakeButton, addGameMenu, addGameButton1, addGameButton2);
         mainMenuRight.setSpacing(10);
         mainMenuRight.setPadding(new Insets(20));
@@ -204,11 +188,12 @@ public class Main extends Application {
         mainMenu.setPadding(new Insets(40));
         mainMenu.setAlignment(Pos.TOP_CENTER);
 
-        borderPane.setTop(toolBar);
         borderPane.setCenter(mainMenu);
 
-        Scene mainMenuScene = new Scene(borderPane, 700, 500);
+        Scene mainMenuScene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 
+        HBox toolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
+        borderPane.setTop(toolBar);
 
         // Button actions
         // 1 - Login Scene: Sign in button clicked
@@ -283,9 +268,63 @@ public class Main extends Application {
             primaryStage.setScene(loginScene);
         });
 
+        // 7 - Launch snake game
+        snakeButton.setOnAction(e -> {
+            SnakeController controller = new SnakeController(primaryStage, () -> {
+                // Snake Main Menu button
+                primaryStage.setScene(mainMenuScene);
+                primaryStage.setTitle("FXcade Game Manager");
+                mainMenu.requestFocus();
+            });
+
+            HBox snakeToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
+            controller.getView().setToolbar(snakeToolBar);
+
+            primaryStage.setScene(controller.getView().getScene());
+            primaryStage.setTitle("Snake Game");
+            // primaryStage.getScene().getRoot().requestFocus();
+            controller.getView().getCanvas().requestFocus();
+        });
+    }
+
+    private HBox createToolBar(Stage primaryStage, Scene loginScene, Scene mainMenuScene) {
+        // Top toolbar
+        Button musicToggleButton = new Button("Play Music"); // Music toggle button
+        musicToggleButton.setFont(new Font("System", 13));
+        musicToggleButton.setStyle("-fx-background-radius: 8;");
+
+        Button mainMenuButton = new Button("Main Menu");
+        mainMenuButton.setFont(new Font("System", 13));
+        mainMenuButton.setStyle("-fx-background-radius: 8;");
+
+        Button signOutButton = new Button("Sign Out");
+        signOutButton.setFont(new Font("System", 13));
+        signOutButton.setStyle("-fx-background-radius: 8;");
+
+        HBox toolBar = new HBox(musicToggleButton, mainMenuButton, signOutButton);
+        toolBar.setSpacing(10);
+        toolBar.setPadding(new Insets(10));
+        toolBar.setAlignment(Pos.CENTER_RIGHT);
+        toolBar.setStyle("-fx-background-color: #555555;");
+
+        // Music toggle action
+        musicToggleButton.setOnAction(e -> {
+            if (mediaPlayer == null) return;
+            if (isMusicPlaying) {
+                mediaPlayer.pause();
+                musicToggleButton.setText("Play Music");
+                isMusicPlaying = false;
+            } else {
+                mediaPlayer.play();
+                musicToggleButton.setText("Pause Music");
+                isMusicPlaying = true;
+            }
+        });
+
         // 5 - Tool bar "Main Menu" button
         mainMenuButton.setOnAction(e -> {
             primaryStage.setScene(mainMenuScene);
+            primaryStage.setTitle("FXcade Game Manager");
         });
 
         // 6 - Tool bar "Sign Out" button
@@ -298,23 +337,11 @@ public class Main extends Application {
             }
             // Go back to login scene
             primaryStage.setScene(loginScene);
+            primaryStage.setTitle("FXcade Game Manager");
         });
 
-        // 7 - Launch snake game
-        snakeButton.setOnAction(e -> {
-            SnakeController controller = new SnakeController(primaryStage, () -> {
-                // Snake Main Menu button
-                primaryStage.setScene(mainMenuScene);
-                primaryStage.setTitle("FXcade Game Manager");
-                mainMenu.requestFocus();
-            });
-
-            primaryStage.setScene(controller.getView().getScene());
-            primaryStage.setTitle("Snake Game");
-            primaryStage.getScene().getRoot().requestFocus();
-        });
+        return toolBar;
     }
-
 
     public static void main(String[] args) {
         launch(args);

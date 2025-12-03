@@ -86,10 +86,11 @@ public class SnakeController {
     }
 
     private void setupControls() {
-        view.getScene().setOnKeyPressed(this::handleKeys);
+        // view.getScene().setOnKeyPressed(this::handleKeys);
+        view.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeys);
 
         view.getRestartButton().setOnAction(e -> restart());
-        view.getMenuButton().setOnAction(e -> {
+        /*view.getMenuButton().setOnAction(e -> {
             if (loop != null) {
                 loop.stop();
             }
@@ -97,6 +98,7 @@ public class SnakeController {
                 onMainMenu.run();
             }
         });
+         */
     }
 
     private void handleKeys(KeyEvent e) {
@@ -225,6 +227,8 @@ public class SnakeController {
         resetGame();
         startLoop();
         view.render(snake, food, isPaused, isGameOver);
+
+        view.getCanvas().requestFocus();
     }
 
     private void loadHighScore() {
