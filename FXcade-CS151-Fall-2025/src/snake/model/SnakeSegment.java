@@ -1,17 +1,30 @@
 package snake.model;
 
 public class SnakeSegment {
-    private int x;
-    private int y;
-
-    public SnakeSegment(int x, int y) {
-        this.x = x;
-        this.y = y;
+    private Point position;
+    
+    public SnakeSegment(Point position) {
+        this.position = position;
     }
-
-    public int getX() { return x; }
-    public int getY() { return y; }
-
-    public void setX(int x) { this.x = x; }
-    public void setY(int y) { this.y = y; }
+    
+    public SnakeSegment(int x, int y) {
+        this.position = new Point(x, y);
+    }
+    
+    public Point getPosition() {
+        return position;
+    }
+    
+    public void setPosition(Point position) {
+        this.position = position;
+    }
+    
+    public int getX() {
+        return position.x;
+    }
+    
+    public int getY() {
+        return position.y;
+    }
 }
+

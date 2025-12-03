@@ -1,14 +1,40 @@
 package snake.model;
 
-public class Food {
-    private int x;
-    private int y;
+import java.util.List;
+import java.util.Random;
 
-    public Food(int x, int y) {
-        this.x = x;
-        this.y = y;
+public class Food {
+
+    private Point pos;
+    private Random rand = new Random();
+    private int w;
+    private int h;
+
+    public Food(int w, int h) {
+        this.w = w;
+        this.h = h;
+      
+        pos = new Point(0, 0);
     }
 
-    public int getX() { return x; }
-    public int getY() { return y; }
+    public Point getPosition() {
+        return pos;
+    }
+
+    public void spawn(List<Point> taken) {
+        int x, y;
+        Point p;
+
+        do {
+            x = rand.nextInt(w);
+            y = rand.nextInt(h);
+            p = new Point(x, y);
+        } while (taken.contains(p));
+
+        pos = p;
+    }
+
+    public boolean isAt(Point p) {
+        return pos.equals(p);
+    }
 }
