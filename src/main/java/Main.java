@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import manager.AccountManager;
+import snake.controller.SnakeController;
 
 public class Main extends Application {
 
@@ -297,6 +298,14 @@ public class Main extends Application {
             }
             // Go back to login scene
             primaryStage.setScene(loginScene);
+        });
+
+        // add launch snake game
+        snakeButton.setOnAction(e -> {
+            SnakeController controller = new SnakeController(primaryStage);
+            primaryStage.setScene(controller.getView().getScene());
+            primaryStage.setTitle("Snake Game");
+            primaryStage.getScene().getRoot().requestFocus();
         });
     }
 
