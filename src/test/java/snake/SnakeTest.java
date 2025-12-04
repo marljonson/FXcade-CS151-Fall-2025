@@ -60,5 +60,31 @@ public class SnakeTest {
         assertEquals(oldLength + 1, snake.getLength());
     }
 
+    @Test
+    void removeTailDecreasesLengthButNotBelowOne(){
+        int originalLength = snake.getLength();
+
+        snake.removeTail();
+        assertEquals(originalLength - 1, snake.getLength());
+
+        // keep removing until length = 1
+        for(int i = 0; i < 10; i++){
+            snake.removeTail();
+        }
+        assertEquals(1, snake.getLength());
+    }
+
+    @Test
+    void collidesWithSelfReturnsTrueWhenPositionBody(){
+        // use an exsiting segment position
+        Point bodyPos = snake.getSegments().get(1).getPosition();
+        assertTrue(snake.collidesWithSelf(bodyPos));
+    }
+    @Test
+    void collidesWithSelfReturnsFalseWhenPositionNotOnBody() {
+        Point notOnBody = new Point(999, 999);
+        assertFalse(snake.collidesWithSelf(notOnBody));
+    }
+
 
 }
