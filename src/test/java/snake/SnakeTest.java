@@ -40,5 +40,25 @@ public class SnakeTest {
         assertEquals(Direction.UP, snake.getNextDirection()); // should still be UP and ignore above
     }
 
+    @Test
+    void setNextDirectionCanTurnLeftOrRight(){
+        snake.setNextDirection(Direction.LEFT);
+        assertEquals(Direction.LEFT, snake.getNextDirection());
+        snake.updateDirection();
+        assertEquals(Direction.LEFT, snake.getCurrentDirection());
+    }
+
+    @Test
+    void moveAddsNewHeadInFront(){
+        Point newHead = new Point(5, 4); // go up
+
+        int oldLength = snake.getLength();
+        snake.move(newHead);
+
+        assertEquals(newHead, snake.getHeadPosition());
+        assertEquals(newHead, snake.getSegments().get(0).getPosition());
+        assertEquals(oldLength + 1, snake.getLength());
+    }
+
 
 }
