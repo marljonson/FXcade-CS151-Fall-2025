@@ -14,6 +14,8 @@ import utils.Encryption;
 
 public class AccountManager {
 
+    private static final int MAX_TOP_SCORES = 5;
+
     private Map<String, User> users = new HashMap<>();
     private User activeUser;
 
@@ -144,11 +146,43 @@ public class AccountManager {
             }
 
             writer.write(savedOutput);
+            createHighScore(username);
+
             return signUpStatus.SUCCESS;
 
         } catch (IOException e) {
             System.out.println("Error saving new user to file: user_accounts.txt");
             return signUpStatus.FILE_ERROR;
+        }
+    }
+
+    public void createHighScore(String username) {
+        Path filePath = Paths.get("data/high_scores.txt");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toString(), true))) {
+
+            if (Files.size(filePath) > 0) {
+                writer.newLine();
+            }
+
+            StringBuilder snakeHighScores = new StringBuilder();
+            snakeHighScores.append(username).append(":snake");
+            for (int i = 0; i < MAX_TOP_SCORES; i++) {
+                snakeHighScores.append(":0");
+            }
+
+            StringBuilder blackJackHighScores = new StringBuilder();
+            blackJackHighScores.append(username).append(":blackjack");
+            for (int i = 0; i < MAX_TOP_SCORES; i++) {
+                blackJackHighScores.append(":0");
+            }
+
+            writer.write(snakeHighScores.toString());
+            writer.newLine();
+            writer.write(blackJackHighScores.toString());
+
+        } catch (IOException e) {
+            System.out.println("Error creating high scores for user: " + username);
         }
     }
 }

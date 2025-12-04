@@ -19,6 +19,8 @@ public class SnakeController {
 
     private final int START_SPEED = 150;
     private final int SPEED_UP = 5;
+    private final String username;
+    private static final int MAX_TOP_SCORES = 5;
 
     private Snake snake;
     private Food food;
@@ -26,6 +28,7 @@ public class SnakeController {
     private boolean isPaused = false;
     private int score = 0;
     private int highScore = 0;
+    private List<Integer> topScores = new ArrayList<>();
     private int speed;
     private Random rand = new Random();
     private Timeline loop;
@@ -34,11 +37,12 @@ public class SnakeController {
     private Stage stage;
     private Runnable onMainMenu;
 
-    public SnakeController(Stage stage) {
+    public SnakeController(Stage stage, String username) {
         this.stage = stage;
+        this.username = username;
         view = new SnakeGameView(stage);
 
-        loadHighScore();
+        loadHighScores();
         resetGame();
         setupControls();
         startLoop();
@@ -47,12 +51,13 @@ public class SnakeController {
     }
 
 
-    public SnakeController(Stage stage, Runnable onMainMenu) {
+    public SnakeController(Stage stage, String username, Runnable onMainMenu) {
         this.stage = stage;
+        this.username = username;
         this.onMainMenu = onMainMenu;
         view = new SnakeGameView(stage);
 
-        loadHighScore();
+        loadHighScores();
         resetGame();
         setupControls();
         startLoop();
@@ -86,19 +91,10 @@ public class SnakeController {
     }
 
     private void setupControls() {
-        // view.getScene().setOnKeyPressed(this::handleKeys);
         view.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeys);
 
         view.getRestartButton().setOnAction(e -> restart());
-        /*view.getMenuButton().setOnAction(e -> {
-            if (loop != null) {
-                loop.stop();
-            }
-            if (onMainMenu != null) {
-                onMainMenu.run();
-            }
-        });
-         */
+
     }
 
     private void handleKeys(KeyEvent e) {
@@ -209,13 +205,7 @@ public class SnakeController {
         isGameOver = true;
         loop.stop();
 
-        boolean newHS = score > highScore;
-
-        if (newHS) {
-            highScore = score;
-            saveHighScore();
-            view.updateHighScore(highScore);
-        }
+        boolean newHS = updateTopScores(score);
 
         view.showGameOver(score, highScore, newHS);
         view.render(snake, food, isPaused, isGameOver);
@@ -231,55 +221,113 @@ public class SnakeController {
         view.getCanvas().requestFocus();
     }
 
-    private void loadHighScore() {
+    private void loadHighScores() {
+        topScores.clear();
+        highScore = 0;
+
         try {
             Path p = Paths.get("data/high_scores.txt");
-            if (!Files.exists(p)) {
-                highScore = 0;
-                return;
-            }
 
             List<String> lines = Files.readAllLines(p);
+            String prefix = username + ":snake:";
+
             for (String line : lines) {
-                if (line.startsWith("Snake:")) {
+                if (!line.startsWith(prefix)) continue;
+
+                // Format: username:snake:top1:top2:top3:top4:top5
+                String[] parts = line.split(":");
+                // parts[0] = username
+                // parts[1] = "snake"
+                for (int i = 2; i < parts.length; i++) {
+                    if (parts[i].isBlank()) continue;
                     try {
-                        highScore = Integer.parseInt(line.substring(6).trim());
-                    } catch (Exception ex) {
-                        highScore = 0;
+                        int s = Integer.parseInt(parts[i]);
+                        topScores.add(s);
+                    } catch (NumberFormatException ignored) {
                     }
                 }
+                // user's snake scores found
+                break;
             }
 
-        } catch (Exception ex) {
-            System.out.println("Couldn't read high score file.");
+            topScores.sort(Comparator.reverseOrder());
+            while (topScores.size() > MAX_TOP_SCORES) {
+                topScores.remove(topScores.size() - 1);
+            }
+
+            if (!topScores.isEmpty()) {
+                highScore = topScores.get(0);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Couldn't read high scores file.");
+            topScores.clear();
             highScore = 0;
         }
     }
 
-    private void saveHighScore() {
+    private boolean updateTopScores(int newScore) {
+        int lastBest = highScore;
+
+        topScores.add(newScore);
+        topScores.sort(Comparator.reverseOrder());
+
+        while (topScores.size() > MAX_TOP_SCORES) {
+            topScores.remove(topScores.size() - 1);
+        }
+
+        highScore = topScores.isEmpty() ? 0 : topScores.get(0);
+
+        saveHighScores();
+        view.updateHighScore(highScore);
+
+        return highScore > lastBest;
+    }
+
+
+    private void saveHighScores() {
         try {
             Path p = Paths.get("data/high_scores.txt");
-            List<String> list = new ArrayList<>();
+            List<String> lines;
 
             if (Files.exists(p)) {
-                list = Files.readAllLines(p);
+                lines = new ArrayList<>(Files.readAllLines(p));
+            } else {
+                lines = new ArrayList<>();
             }
 
+            String prefix = username + ":snake:";
+
+            // Build updated line: username:snake:top1:top2:top3:top4:top5
+            StringBuilder sb = new StringBuilder();
+            sb.append(username).append(":snake");
+            for (int i = 0; i < MAX_TOP_SCORES; i++) {
+                sb.append(":");
+                if (i < topScores.size()) {
+                    sb.append(topScores.get(i));
+                } else {
+                    sb.append("0");
+                }
+            }
+            String newLine = sb.toString();
+
             boolean found = false;
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i).startsWith("Snake:")) {
-                    list.set(i, "Snake: " + highScore);
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).startsWith(prefix)) {
+                    lines.set(i, newLine);
                     found = true;
                     break;
                 }
             }
 
-            if (!found) list.add("Snake: " + highScore);
+            if (!found) {
+                lines.add(newLine);
+            }
 
-            Files.write(p, list);
+            Files.write(p, lines);
 
         } catch (IOException e) {
-            System.out.println("Error writing high score.");
+            System.out.println("Error writing high scores for user: " + username);
         }
     }
 

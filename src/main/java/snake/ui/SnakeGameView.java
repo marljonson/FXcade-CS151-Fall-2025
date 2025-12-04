@@ -21,7 +21,7 @@ import java.util.List;
 public class SnakeGameView {
 
     private static final double WINDOW_WIDTH = 700;
-    private static final double WINDOW_HEIGHT = 500;
+    private static final double WINDOW_HEIGHT = 700;
 
     private BorderPane root;
     private VBox headerBox;
@@ -109,21 +109,17 @@ public class SnakeGameView {
         restartButton.setFont(new Font("System", 18));
         restartButton.setPrefWidth(150);
         restartButton.setPrefHeight(40);
-        restartButton.setStyle("-fx-background-color: #90EE90; " +
-                "-fx-background-radius: 10; " +
-                "-fx-text-fill: #2F4F2F;");
         restartButton.setId("restartButton");
-
-        /*
-        Button menuButton = new Button("Main Menu");
-        menuButton.setFont(new Font("System", 18));
-        menuButton.setPrefWidth(150);
-        menuButton.setPrefHeight(40);
-        menuButton.setStyle("-fx-background-color: #E8E8D8; " +
+        String normal = "-fx-background-color: #90EE90; " +
                 "-fx-background-radius: 10; " +
-                "-fx-text-fill: #2F2F2F;");
-        menuButton.setId("menuButton");
-         */
+                "-fx-text-fill: #2F4F2F;";
+        String hover = "-fx-background-color: #A8F5A8; " +
+                "-fx-background-radius: 10; " +
+                "-fx-text-fill: #2F4F2F;";
+
+        restartButton.setStyle(normal);
+        restartButton.setOnMouseEntered(e -> restartButton.setStyle(hover));
+        restartButton.setOnMouseExited(e -> restartButton.setStyle(normal));
 
         content.getChildren().addAll(gameOverLabel, finalScoreLabel, highScoreUpdateLabel, restartButton);
         overlay.getChildren().add(content);
