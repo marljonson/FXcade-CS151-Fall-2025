@@ -21,4 +21,12 @@ public class EncryptionTest {
         String actual = Encryption.encrypt(input);
         assertEquals(expected, actual, "Encrypting an empty string should return an empty string.");
     }
+
+    @Test
+    void testEncryptSpecialCharacters() {
+        String input = "hello world!";
+        String expected = "khoor#zruog$"; // password encryption (Caesar; +3 shift) should handle spaces
+        String actual = Encryption.encrypt(input);
+        assertEquals(expected, actual, "The encryption result should handle spaces and special characters.");
+    }
 }
