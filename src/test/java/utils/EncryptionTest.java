@@ -13,4 +13,12 @@ public class EncryptionTest {
         String actual = Encryption.encrypt(input);
         assertEquals(expected, actual, "The encryption result should match the expected value.");
     }
+
+    @Test
+    void testEncryptEmptyString() {
+        String input = "";
+        String expected = ""; // encryption of empty string is still empty string
+        String actual = Encryption.encrypt(input);
+        assertEquals(expected, actual, "Encrypting an empty string should return an empty string.");
+    }
 }
