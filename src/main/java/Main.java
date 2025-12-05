@@ -295,26 +295,10 @@ public class Main extends Application {
 
         // Working blackjack button
         blackjackButton.setOnAction(e -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/blackjack.fxml"));
-                Parent blackjackRoot = loader.load();
-
-                BlackjackController controller = loader.getController();
-                String username = accountManager.getActiveUser().getUsername();
-                controller.init(username);  // This now starts the game + refreshes
-
-                // Add toolbar above the root
-                HBox bjToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
-                BorderPane fullScreen = new BorderPane();
-                fullScreen.setTop(bjToolBar);
-                fullScreen.setCenter(blackjackRoot);
-
-                Scene bjScene = new Scene(fullScreen, 1200, 850);
-                primaryStage.setScene(bjScene);
-                primaryStage.setTitle("FXcade - Blackjack");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            new BlackjackController(primaryStage, () -> {
+                primaryStage.setScene(mainMenuScene);
+                primaryStage.setTitle("FXcade Game Manager");
+            }).start(accountManager.getActiveUser().getUsername());
         });
 
         primaryStage.setScene(loginScene);
