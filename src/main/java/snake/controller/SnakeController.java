@@ -352,7 +352,7 @@ public class SnakeController {
 
                 // Snake music setup
                 try {
-                    var url = getClass().getResource("/audio/snake_game.mp3");
+                    var url = getClass().getResource("/audio/snake.mp3");
                     if (url != null) {
                         Media media = new Media(url.toExternalForm());
                         snakeMusicPlayer = new MediaPlayer(media);
