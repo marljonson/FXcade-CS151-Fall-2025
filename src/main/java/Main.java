@@ -712,14 +712,14 @@ public class Main extends Application {
 
             Label scoreLabel = new Label(text);
             scoreLabel.setFont(Font.font("Consolas", 14));
-            scoreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1B5E20;");
+            scoreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #0D47A1;");
 
             HBox row = new HBox(scoreLabel);
             row.setSpacing(8);
             row.setAlignment(Pos.CENTER_LEFT);
             row.setPadding(new Insets(4, 10, 4, 10));
 
-            String backgroundColor = (i % 2 == 0) ? "#C8E6C9" : "#A5D6A7";
+            String backgroundColor = (i % 2 == 0) ? "#BBDEFB" : "#90CAF9";
             row.setStyle(
                     "-fx-background-color: " + backgroundColor + ";" +
                             "-fx-background-radius: 6;");
