@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -586,8 +587,12 @@ public class Main extends Application {
             primaryStage.setScene(mainMenuScene);
             primaryStage.setTitle("FXcade Game Manager");
 
-            // Force button to say "Play Music" when returning
-            musicToggleButton.setText("Play Music");
+            // When returning to main menu — sync button with real state
+            if (isMusicPlaying) {
+                musicToggleButton.setText("Pause Music");
+            } else {
+                musicToggleButton.setText("Play Music");
+            }
         });
 
         // Tool bar "Sign Out" button
