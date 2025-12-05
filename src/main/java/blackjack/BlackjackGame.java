@@ -123,7 +123,7 @@ public class BlackjackGame {
         }
     }
 
-    private Card dealerUpCard() {
+    public Card dealerUpCard() {
         // first card is up
         List<Card> dealerCards = dealer.getHand().getCards();
         if (dealerCards.isEmpty()) throw new IllegalStateException("Dealer has no cards yet");
