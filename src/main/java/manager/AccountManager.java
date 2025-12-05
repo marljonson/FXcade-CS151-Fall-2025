@@ -77,7 +77,7 @@ public class AccountManager {
                 users.put(username, new User(username, password, highScore));
             }
         } catch (IOException e) {
-            System.out.println("Error reading from file: user_accounts.txt");
+            System.out.println("Error reading from file [user_accounts.txt]: " + e.getMessage());
         }
     }
 
@@ -151,7 +151,7 @@ public class AccountManager {
             return signUpStatus.SUCCESS;
 
         } catch (IOException e) {
-            System.out.println("Error saving new user to file: user_accounts.txt");
+            System.out.println("Error saving new user to file [user_accounts.txt]: " + e.getMessage());
             return signUpStatus.FILE_ERROR;
         }
     }
