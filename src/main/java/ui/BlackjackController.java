@@ -1,6 +1,7 @@
 package ui;
 
 import blackjack.*;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -228,34 +229,32 @@ public class BlackjackController {
         standButton.setDisable(true);
 
         new Thread(() -> {
-            while (!game.isRoundOver()) {
-                if (game.getTurnIndex() < 3) {
-                    Participant p = game.getPlayers().get(game.getTurnIndex());
-                    BotStrategy brain = p == game.getBot1() ? BotStrategy.hitUnder(16)
-                                      : p == game.getBot2() ? BotStrategy.hitUnder(15) : null;
-
-                    while (brain != null && !p.getHand().isBust() &&
-                           brain.decide(p.getHand(), game.dealerUpCard()) == BotStrategy.Action.HIT) {
-                        game.tryDealUp(p.getHand());
-                        sleep(800);
-                        runLater(this::refresh);
-                    }
-                } else {
-                    game.revealDealerHole();
-                    runLater(this::refresh);
-                    sleep(1000);
-                    game.dealerTurn();
-                    game.finishRound();
-                }
-                game.turnIndex++;
+            // Play Bot 1
+            if (game.getTurnIndex() == 0) {
+                playBot(game.getBot1(), BotStrategy.hitUnder(16));
+                game.turnIndex = 1;
+            }
+            // Play Bot 2
+            if (game.getTurnIndex() == 1) {
+                playBot(game.getBot2(), BotStrategy.hitUnder(15));
+                game.turnIndex = 2;
+            }
+            // Dealer turn
+            if (game.getTurnIndex() == 2) {
+                game.revealDealerHole();
+                Platform.runLater(this::refresh);
+                sleep(1000);
+                game.dealerTurn();
+                game.finishRound();
+                game.turnIndex = 3;
             }
 
-            runLater(() -> {
+            Platform.runLater(() -> {
                 refresh();
                 statusLabel.setText(game.getResultBanner().replace("\n", " • "));
                 newRoundButton.setDisable(false);
-                hitButton.setDisable(false);
-                standButton.setDisable(false);
+                hitButton.setDisable(true);
+                standButton.setDisable(true);
             });
         }).start();
     }
