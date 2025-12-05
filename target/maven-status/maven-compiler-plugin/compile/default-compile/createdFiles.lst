@@ -26,6 +26,5 @@ blackjack\Strategies.class
 snake\model\Point.class
 snake\model\Direction.class
 snake\ui\SnakeGameView.class
-utils\placeholder.txt
 blackjack\Deck.class
 snake\controller\SnakeController.class
