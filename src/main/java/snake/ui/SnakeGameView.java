@@ -280,4 +280,3 @@ public class SnakeGameView {
         return gameScene;
     }
 }
-

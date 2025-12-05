@@ -22,4 +22,3 @@ public class Point {
         return 31 * x + y;
     }
 }
-

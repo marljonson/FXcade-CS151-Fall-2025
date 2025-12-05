@@ -113,6 +113,4 @@ public class Hand {
     public String toString() {
         return cards.toString(); // Solely for debugging: [AH, TC, 7S]
     }
-
-
 }

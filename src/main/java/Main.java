@@ -500,6 +500,27 @@ public class Main extends Application {
             primaryStage.setScene(loginScene);
         });
 
+        // Launch blackjack game
+        blackjackButton.setOnAction(e -> {
+            new BlackjackController(primaryStage, () -> {
+                primaryStage.setScene(mainMenuScene);
+                primaryStage.setTitle("FXcade Game Manager");
+                // updateTopScores(accountManager, snakeListBox, blackjackListBox);
+                updateBlackjackTopScores(accountManager, blackjackListBox);
+                // Restart main menu music when returning
+                if (mediaPlayer != null) {
+                    mediaPlayer.play();
+                    isMusicPlaying = true;
+                }
+            }).start(accountManager.getActiveUser().getUsername());
+
+            // Stop main menu music when entering Blackjack
+            if (mediaPlayer != null && isMusicPlaying) {
+                mediaPlayer.pause();
+                isMusicPlaying = false;
+            }
+        });
+
         // 7 - Launch snake game
         snakeButton.setOnAction(e -> {
             SnakeController controller = new SnakeController(primaryStage, accountManager.getActiveUser().getUsername(), () -> {

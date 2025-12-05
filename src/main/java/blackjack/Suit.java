@@ -25,7 +25,6 @@ public enum Suit {
                 return SPADES;
             default:
                 throw new IllegalArgumentException("Invalid suit character: " + c);
-
         }
     }
 }
