@@ -182,7 +182,7 @@ public class AccountManager {
             writer.write(blackJackHighScores.toString());
 
         } catch (IOException e) {
-            System.out.println("Error creating high scores for user: " + username);
+            System.out.println("Error creating high scores for user [" + username + "]: " + e.getMessage());
         }
     }
 }
