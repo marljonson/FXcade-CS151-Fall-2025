@@ -42,6 +42,18 @@ public class BlackjackGame {
         dealer = new Participant("Dealer", false, true);
     }
 
+    // for new game
+    public void resetForNewGame() {
+        for (Participant participant : players) {
+            participant.resetForNewGame();
+        }
+        dealer.resetForNewGame();
+        roundOver = false;
+        resultBanner = "";
+        turnIndex = 0;
+    }
+
+
     // Round life cycle, each player makes a bet
     public void startNewRound(int humanBet, int bot1Bet, int bot2Bet) {
         deck.resetAndShuffle();

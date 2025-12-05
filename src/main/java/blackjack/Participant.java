@@ -70,5 +70,7 @@ public class Participant {
         bankroll = START_BANKROLL;
         bet = 0;
         hand.clear();
-    }
+    }   
+
+
 }

@@ -18,7 +18,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.layout.Priority;
 import manager.AccountManager;
 import snake.controller.SnakeController;
-import ui.BlackjackController;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -653,21 +653,25 @@ public class Main extends Application {
         }
     }
 
-  private void updateBlackjackTopScores(AccountManager accountManager, VBox blackjackListBox) {
-    blackjackListBox.getChildren().clear();
+    private void updateBlackjackTopScores(AccountManager accountManager, VBox blackjackListBox){
+        blackjackListBox.getChildren().clear();
 
-    String username = accountManager.getActiveUser().getUsername();
-    Path filePath = Paths.get("data/blackjack_high_scores.txt");
+        String username = accountManager.getActiveUser().getUsername();
+        Path filePath = Paths.get("data/blackjack_high_scores.txt");
 
-    Integer best = null;
+        if (!Files.exists(filePath)){
+            return; // nothing to show yet
+        }
 
-    try {
-        if (Files.exists(filePath)) {
+        try {
             List<String> lines = Files.readAllLines(filePath);
             String prefix = username + ":";
 
+
+            Integer best = null;
+
             // Find this user's line
-            for (String line : lines) {
+            for (String line : lines){
                 if (line.startsWith(prefix)) {
                     String[] parts = line.split(":");
                     if (parts.length >= 2) {
@@ -676,45 +680,45 @@ public class Main extends Application {
                     break;
                 }
             }
+
+            // If we have a score, display as 1. <score> and pad with 0 until 5
+            List<Integer> scores = new ArrayList<>();
+            if (best != null) { scores.add(best); }
+            while (scores.size() < 5) {
+                scores.add(0);
+            }
+
+            for(int i = 0; i < scores.size(); i++){
+                String text = (i + 1) + ". " + scores.get(i);
+
+                Label scoreLabel = new Label(text);
+                scoreLabel.setFont(Font.font("Consolas", 14));
+                scoreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1B5E20;");
+
+                HBox row = new HBox(scoreLabel);
+                row.setSpacing(8);
+                row.setAlignment(Pos.CENTER_LEFT);
+                row.setPadding(new Insets(4, 10, 4, 10));
+
+                String backgroundColor = (i % 2 == 0) ? "#C8E6C9" : "#A5D6A7";
+                row.setStyle(
+                        "-fx-background-color: " + backgroundColor + ";" +
+                                "-fx-background-radius: 6;"
+                );
+
+                row.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(scoreLabel, Priority.ALWAYS);
+                VBox.setMargin(row, new Insets(2, 0, 2, 0));
+
+                blackjackListBox.getChildren().add(row);
+            }
+
+
+        } catch (Exception e) {
+            System.out.println("Error reading blackjack high scores: " + e.getMessage());
         }
-    } catch (Exception e) {
-        System.out.println("Error reading blackjack high scores: " + e.getMessage());
     }
 
-    // Always build 5 entries
-    List<Integer> scores = new ArrayList<>();
-    if (best != null) {
-        scores.add(best);
-    }
-    while (scores.size() < 5) {
-        scores.add(0);
-    }
-
-    for (int i = 0; i < scores.size(); i++) {
-        String text = (i + 1) + ". " + scores.get(i);
-
-        Label scoreLabel = new Label(text);
-        scoreLabel.setFont(Font.font("Consolas", 14));
-        scoreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1B5E20;");
-
-        HBox row = new HBox(scoreLabel);
-        row.setSpacing(8);
-        row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(4, 10, 4, 10));
-
-        String backgroundColor = (i % 2 == 0) ? "#C8E6C9" : "#A5D6A7";
-        row.setStyle(
-                "-fx-background-color: " + backgroundColor + ";" +
-                        "-fx-background-radius: 6;"
-        );
-
-        row.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(scoreLabel, Priority.ALWAYS);
-        VBox.setMargin(row, new Insets(2, 0, 2, 0));
-
-        blackjackListBox.getChildren().add(row);
-    }
-}
     public static void main(String[] args) {
         launch(args);
     }
