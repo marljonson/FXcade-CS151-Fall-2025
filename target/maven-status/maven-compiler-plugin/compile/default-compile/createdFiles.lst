@@ -1,5 +1,7 @@
 snake\controller\SnakeController$1.class
+ui\BlackjackController$2.class
 blackjack\BlackjackGame.class
+ui\BlackjackController$5.class
 blackjack\Suit.class
 snake\ui\SnakeGameView$1.class
 blackjack\Participant.class
@@ -18,14 +20,15 @@ manager\AccountManager$signUpStatus.class
 snake\model\Food.class
 ui\BlackjackController.class
 blackjack\Hand.class
+ui\BlackjackController$3.class
 snake\model\Snake.class
 blackjack\Rank.class
 Main$1.class
 manager\AccountManager.class
+ui\BlackjackController$4.class
 blackjack\Strategies.class
 snake\model\Point.class
 snake\model\Direction.class
 snake\ui\SnakeGameView.class
-utils\placeholder.txt
 blackjack\Deck.class
 snake\controller\SnakeController.class

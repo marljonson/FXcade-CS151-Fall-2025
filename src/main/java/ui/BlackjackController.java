@@ -1,289 +1,352 @@
 package ui;
 
 import blackjack.*;
-import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.*;
+import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
 
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-
-/*
- * JavaFX controller for Blackjack screen
- * UI expects FXML with the fx:id's used below
- */
 public class BlackjackController {
-    private static final int DEFAULT_BET = 50;
-    private static final Path HIGH_SCORE_PATH = Paths.get("data", "blackjack_high_scores.txt");
 
-
-    // wire these fx ids in blackjack.fxml
-    @FXML
-    private HBox dealerCards, playerCards, bot1Cards, bot2Cards;
-
-    @FXML
-    private Label statusLabel, bankrollLabel, playerTotalLabel, dealerTotalLabel;
-    @FXML
-    private Label bot1BankLabel, bot2BankLabel, turnLabel;
-
-
-    @FXML
-    private TextField betField;
-
-    @FXML
-    private Button hitButton, standButton, newRoundButton, saveButton, loadButton;
-
-
+    private final Stage stage;
+    private final Runnable backToMenu;
     private BlackjackGame game;
-    private String username = "Player"; // we set it in Main/App using init
 
-    // Images from resources/cards
-    private static final String CARD_DIR = "/cards/";
-    private static final double CARD_WIDTH = 90; // adjust later if needed (?)
-    private final Map<String, Image> imageCache = new HashMap<>();
+    private HBox dealerHandBox;
+    private HBox playerHandBox, bot1HandBox, bot2HandBox;
+    private Label playerTotal, dealerTotal;
+    private Label playerBankroll, bot1Bankroll, bot2Bankroll;
+    private Label statusLabel;
+    private TextField betField;
+    private Button hitButton, standButton, newRoundButton;
 
-    // Call from scene loader in Main
-    public void init(String username) {
-        if (username != null && !username.isBlank()) this.username = username;
-        this.game = new BlackjackGame(this.username);
-        startRound();
+    private MediaPlayer blackjackMusicPlayer;
+    private Button musicToggleButton;
+
+    public BlackjackController(Stage stage, Runnable backToMenu) {
+        this.stage = stage;
+        this.backToMenu = backToMenu;
     }
 
-    // UI events: onHit, onStand, onNewRound, onSave, onLoad
-    @FXML
-    private void onHit() {
-        game.humanHit();
-        refresh();
-        endIfOver();
+    public void start(String username) {
+        showMainMenu(username);
     }
 
-    @FXML
-    private void onStand() {
-        game.humanStand();
-        refresh();
-        endIfOver();
+    private void showMainMenu(String username) {
+        VBox root = new VBox(40);
+        root.setPadding(new Insets(50));
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #f8f9fa;");
+
+        Label title = new Label("BLACKJACK");
+        title.setStyle("-fx-font-size: 48; -fx-font-weight: bold; -fx-text-fill: #212529;");
+
+        Button newGameBtn = new Button("NEW GAME");
+        Button loadGameBtn = new Button("LOAD GAME");
+
+        newGameBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 22; -fx-padding: 20 60; -fx-font-weight: bold;");
+        loadGameBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 22; -fx-padding: 20 60; -fx-font-weight: bold;");
+
+        newGameBtn.setOnAction(e -> startNewGame(username));
+        loadGameBtn.setOnAction(e -> loadGame(username));
+
+        root.getChildren().addAll(title, newGameBtn, loadGameBtn);
+        addToolbar(root);
+
+        Scene scene = new Scene(root, 900, 700);
+        stage.setScene(scene);
+        stage.setTitle("FXcade - Blackjack");
+        stage.show();
     }
 
-    
-    private void onNewGame() {
-        game.resetForNewGame();
-        startRound();
+    private void startNewGame(String username) {
+        game = new BlackjackGame(username);
+        game.getHuman().setBankroll(1000);
+        showGameScreen();
     }
 
-    @FXML
-    private void onNewRound() {
-        startRound();
-    }
+    private void loadGame(String username) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Load Game");
+        dialog.setHeaderText("Paste your save code:");
+        dialog.setContentText("Save Code:");
 
-    @FXML
-    private void onSave() {
-        try {
-            String json = game.toJsonSave();
-            Path path = savePath();
-            Files.createDirectories(path.getParent());
-            Files.writeString(path, json, StandardCharsets.UTF_8);
-            statusLabel.setText("Saved to " + path.toString());
-        } catch (Exception e) {
-            statusLabel.setText("Save failed: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    private void onLoad() {
-        try {
-            Path path = savePath();
-            if (!Files.exists(path)) {
-                statusLabel.setText("No save found for " + username);
-                return;
+        dialog.showAndWait().ifPresent(code -> {
+            try {
+                game = BlackjackGame.fromJsonSave(code, username);
+                showGameScreen();
+            } catch (Exception ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid save code!");
+                alert.show();
             }
-            String json = Files.readString(path, StandardCharsets.UTF_8);
-            this.game = BlackjackGame.fromJsonSave(json, username);
-            refresh();
-            statusLabel.setText("Loaded from" + path.toString());
-        } catch (Exception e) {
-            statusLabel.setText("Load failed: " + e.getMessage());
-        }
+        });
     }
 
+    private void showGameScreen() {
+        VBox root = new VBox();
+        root.setStyle("-fx-background-color: #f8f9fa;");
 
-    // Read bet, call startNewRound, refresh
-    private void startRound() {
-        int bet = parseBetOrDefault(DEFAULT_BET);
-        game.startNewRound(bet, DEFAULT_BET, DEFAULT_BET); // bots bet 50 by default
-        statusLabel.setText(""); // clear last round banner
+        addToolbar(root);
+
+        VBox gameArea = new VBox(20);
+        gameArea.setPadding(new Insets(20));
+        gameArea.setAlignment(Pos.TOP_CENTER);
+
+        Label title = new Label("BLACKJACK");
+        title.setStyle("-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #212529;");
+
+        VBox dealerArea = new VBox(10);
+        dealerArea.setAlignment(Pos.CENTER);
+        dealerArea.getChildren().addAll(
+            new Label("DEALER") {{ setStyle("-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #dc3545;"); }},
+            dealerHandBox = new HBox(12) {{ setAlignment(Pos.CENTER); }},
+            dealerTotal = new Label("??") {{ setStyle("-fx-font-size: 20;"); }}
+        );
+
+        HBox playersRow = new HBox(60);
+        playersRow.setAlignment(Pos.CENTER);
+        playersRow.getChildren().addAll(
+            createPlayerArea("YOU", "#28a745"),
+            createPlayerArea("BOT 1", "#17a2b8"),
+            createPlayerArea("BOT 2", "#6f42c1")
+        );
+
+        betField = new TextField("50");
+        betField.setPrefWidth(80);
+
+        hitButton = new Button("HIT");
+        standButton = new Button("STAND");
+        newRoundButton = new Button("NEW ROUND");
+        Button saveButton = new Button("SAVE GAME");
+
+        hitButton.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;");
+        standButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;");
+        newRoundButton.setStyle("-fx-background-color: #ffc107; -fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 16;");
+        saveButton.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;");
+
+        HBox controls = new HBox(20, new Label("Bet:"), betField, hitButton, standButton, newRoundButton, saveButton);
+        controls.setAlignment(Pos.CENTER);
+
+        statusLabel = new Label("Click NEW ROUND to start");
+        statusLabel.setStyle("-fx-font-size: 22; -fx-text-fill: #007bff; -fx-font-weight: bold;");
+
+        gameArea.getChildren().addAll(title, dealerArea, playersRow, controls, statusLabel);
+        root.getChildren().add(gameArea);
+
+        hitButton.setOnAction(e -> hit());
+        standButton.setOnAction(e -> stand());
+        newRoundButton.setOnAction(e -> newRound());
+        saveButton.setOnAction(e -> showSaveDialog());
+
+        // Start first round — AFTER betField exists
+        newRound();
+
+        Scene scene = new Scene(root, 1200, 800);
+        stage.setScene(scene);
+    }
+
+    private void addToolbar(VBox root) {
+        HBox toolBar = new HBox(15);
+        toolBar.setPadding(new Insets(10));
+        toolBar.setStyle("-fx-background-color: #555555;");
+        toolBar.setAlignment(Pos.CENTER_RIGHT);
+
+        musicToggleButton = new Button("Play Music");
+        Button mainMenuButton = new Button("Main Menu");
+        Button signOutButton = new Button("Sign Out");
+
+        toolBar.getChildren().addAll(musicToggleButton, mainMenuButton, signOutButton);
+        mainMenuButton.setOnAction(e -> {
+            if (blackjackMusicPlayer != null) {
+                blackjackMusicPlayer.stop();
+                musicToggleButton.setText("Play Music");
+            }
+            backToMenu.run();
+        });
+
+        signOutButton.setOnAction(e -> {
+            if (blackjackMusicPlayer != null) {
+                blackjackMusicPlayer.stop();
+                musicToggleButton.setText("Play Music");
+            }
+            backToMenu.run();
+        });
+
+        // Blackjack music
+        try {
+            var url = getClass().getResource("/audio/stray_sheep.mp3");
+            if (url != null) {
+                Media media = new Media(url.toExternalForm());
+                blackjackMusicPlayer = new MediaPlayer(media);
+                blackjackMusicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+
+                musicToggleButton.setOnAction(e -> {
+                    if (blackjackMusicPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                        blackjackMusicPlayer.pause();
+                        musicToggleButton.setText("Play Music");
+                    } else {
+                        blackjackMusicPlayer.play();
+                        musicToggleButton.setText("Pause Music");
+                    }
+                });
+            }
+        } catch (Exception ignored) {}
+
+        root.getChildren().add(0, toolBar);
+    }
+
+    private VBox createPlayerArea(String name, String color) {
+        HBox handBox = new HBox(10);
+        Label total = new Label("0");
+        Label bankroll = new Label("$1000");
+
+        if ("YOU".equals(name)) {
+            playerHandBox = handBox;
+            playerTotal = total;
+            playerBankroll = bankroll;
+        } else if ("BOT 1".equals(name)) {
+            bot1HandBox = handBox;
+            bot1Bankroll = bankroll;
+        } else {
+            bot2HandBox = handBox;
+            bot2Bankroll = bankroll;
+        }
+
+        VBox area = new VBox(10,
+            new Label(name) {{ setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: " + color + ";"); }},
+            handBox, total, bankroll
+        );
+        area.setAlignment(Pos.CENTER);
+        area.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);");
+        return area;
+    }
+
+    private void newRound() {
+        int bet = 50;
+        try {
+            String text = betField.getText().trim();
+            if (!text.isEmpty()) {
+                bet = Integer.parseInt(text);
+                if (bet < 1 || bet > game.getHuman().getBankroll()) {
+                    bet = Math.min(50, game.getHuman().getBankroll());
+                }
+            }
+        } catch (Exception ignored) {}
+
+        game.startNewRound(bet, 50, 50);
+        refresh();
+        statusLabel.setText("YOUR TURN");
         hitButton.setDisable(false);
         standButton.setDisable(false);
         newRoundButton.setDisable(true);
+    }
+
+    private void hit() {
+        if (!game.isHumansTurn()) return;
+        game.humanHit();
         refresh();
+        if (game.getHuman().getHand().getBestTotal() >= 21) endTurn();
     }
 
-    // Safely parse bet textfield and prevent negative input
-    private int parseBetOrDefault(int fallback) {
-        try {
-            String s = (betField == null) ? null : betField.getText();
-            int n = Integer.parseInt(s);
-            return Math.max(0, n);
-        } catch (Exception e) {
-            return fallback;
-        }
+    private void stand() {
+        if (!game.isHumansTurn()) return;
+        endTurn();
     }
 
-    // Allow player to end the game, implement high score submission later
-    private void endIfOver() {
-        if (game.isRoundOver()) {
-            statusLabel.setText(game.getResultBanner());
-            hitButton.setDisable(true);
-            standButton.setDisable(true);
-            newRoundButton.setDisable(false);
-            saveHighScore(game.getHuman().getBankroll());
-        }
-    }
+    private void endTurn() {
+        hitButton.setDisable(true);
+        standButton.setDisable(true);
 
-    // Render everything based on backend
-    private void refresh() {
-        renderHand(playerCards, game.getHuman().getHand());
-        renderHand(bot1Cards, game.getBot1().getHand());
-        renderHand(bot2Cards, game.getBot2().getHand());
-        renderHand(dealerCards, game.getDealer().getHand());
+        new Thread(() -> {
+            while (!game.isRoundOver()) {
+                if (game.getTurnIndex() < 3) {
+                    Participant p = game.getPlayers().get(game.getTurnIndex());
+                    BotStrategy brain = p == game.getBot1() ? BotStrategy.hitUnder(16)
+                                      : p == game.getBot2() ? BotStrategy.hitUnder(15) : null;
 
-        bankrollLabel.setText("Bankroll: $" + game.getHuman().getBankroll());
-        bot1BankLabel.setText("Bot 1: $" + game.getBot1().getBankroll());
-        bot2BankLabel.setText("Bot 2: $" + game.getBot2().getBankroll());
-        statusLabel.setText(game.getResultBanner());
-
-        // totals 
-        playerTotalLabel.setText(String.valueOf(game.getHuman().getHand().getBestTotal()));
-        if (!game.isRoundOver() && hasHiddenDealerCard()) {
-            dealerTotalLabel.setText("??"); // hide until dealer hole card revealed
-        } else {
-            dealerTotalLabel.setText(game.getDealer().getHand().isBust()
-                    ? "BUST" : String.valueOf(game.getDealer().getHand().getBestTotal()));
-        }
-
-
-        // turn indicator
-        String turnText = switch (game.getTurnIndex()) {
-            case 0 -> "Your turn";
-            case 1 -> "Bot 1's turn";
-            case 2 -> "Bot 2's turn";
-            default -> game.isRoundOver() ? "Round over" : "Dealer's turn";
-        };
-
-        turnLabel.setText(turnText);
-
-        boolean isHumansTurn = !game.isRoundOver() && game.getTurnIndex() == 0;
-        hitButton.setDisable(!isHumansTurn);
-        standButton.setDisable(!isHumansTurn);
-        newRoundButton.setDisable(isHumansTurn);
-    }
-
-    // Render hand into HBox
-    private void renderHand(HBox box, Hand hand) {
-        box.getChildren().clear();
-        for (Card card : hand.getCards()) {
-            box.getChildren().add(cardNode(card));
-        }
-    }
-
-    private boolean hasHiddenDealerCard() {
-        for (Card card : game.getDealer().getHand().getCards()) {
-            if (!card.isFaceUp()) return true;
-        }
-        return false;
-    }
-
-    // Card to ImageView uses cache, show back.png if face-down
-    private Node cardNode(Card card) {
-        String file = card.isFaceUp() ? filenameFor(card.getRank(), card.getSuit()) : "back.png";
-        Image image = loadImage(file);
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(CARD_WIDTH);
-        imageView.setPreserveRatio(true);
-        imageView.setSmooth(true);
-        imageView.setCache(true);
-        return imageView;
-    }
-
-    // Build file name like... 10_of_hearts.png or queen_of_spades.png
-    private String filenameFor(Rank rank, Suit suit) {
-        String r = switch (rank) {
-            case TWO -> "2";
-            case THREE -> "3";
-            case FOUR -> "4";
-            case FIVE -> "5";
-            case SIX -> "6";
-            case SEVEN -> "7";
-            case EIGHT -> "8";
-            case NINE -> "9";
-            case TEN -> "10";
-            case JACK -> "jack";
-            case QUEEN -> "queen";
-            case KING -> "king";
-            case ACE -> "ace";
-        };
-        String s = switch (suit) {
-            case CLUBS -> "clubs";
-            case DIAMONDS -> "diamonds";
-            case HEARTS -> "hearts";
-            case SPADES -> "spades";
-        };
-        return r + "_of_" + s + ".png";
-    }
-
-    private Image loadImage(String file) {
-        return imageCache.computeIfAbsent(file, f -> {
-            var in = Objects.requireNonNull(
-                    getClass().getResourceAsStream(CARD_DIR + f),
-                    "Missing card image: " + CARD_DIR + f);
-            return new Image(in);
-        });
-    }
-    private void saveHighScore(int bankroll){
-        try {
-            List<String> lines;
-            if (Files.exists(HIGH_SCORE_PATH)){
-                lines = new ArrayList<>(Files.readAllLines(HIGH_SCORE_PATH));
-            } else {
-                lines = new ArrayList<>();
-            }
-
-            String prefix = username + ":";
-
-            boolean found = false;
-            for(int i = 0; i < lines.size(); i++){
-                String line = lines.get(i);
-                if (line.startsWith(prefix)) {
-                    // Existing entry = keep bigger value between old/new
-                    String[] split = line.split(":");
-                    int oldScore = Integer.parseInt(split[1]);
-                    int best = Math.max(oldScore, bankroll);
-                    lines.set(i, prefix + best);
-                    found = true;
-                    break;
+                    while (brain != null && !p.getHand().isBust() &&
+                           brain.decide(p.getHand(), game.dealerUpCard()) == BotStrategy.Action.HIT) {
+                        game.tryDealUp(p.getHand());
+                        sleep(800);
+                        Platform.runLater(this::refresh);
+                    }
+                } else {
+                    game.revealDealerHole();
+                    Platform.runLater(this::refresh);
+                    sleep(1000);
+                    game.dealerTurn();
+                    game.finishRound();
                 }
-            }
-            if (!found){
-                // new user in the high score file
-                lines.add(prefix + bankroll);
+                game.turnIndex++;
             }
 
-            Files.createDirectories(HIGH_SCORE_PATH.getParent());
-            Files.write(HIGH_SCORE_PATH, lines);
-            
-        } catch (Exception e) {
-            System.out.println("Error writing blackjack high scores: " + e.getMessage() + "for user: " + username);
+            Platform.runLater(() -> {
+                refresh();
+                statusLabel.setText(game.getResultBanner().replace("\n", " • "));
+                newRoundButton.setDisable(false);
+                hitButton.setDisable(false);
+                standButton.setDisable(false);
+            });
+        }).start();
+    }
+
+    private void showSaveDialog() {
+        String saveCode = game.toJsonSave();
+        TextInputDialog dialog = new TextInputDialog(saveCode);
+        dialog.setTitle("Save Game");
+        dialog.setHeaderText("Your Save Code — Copy It!");
+        dialog.getEditor().setEditable(false);
+        dialog.getEditor().selectAll();
+        dialog.showAndWait();
+    }
+
+    private void refresh() {
+        renderHand(dealerHandBox, game.getDealer().getHand(), true);
+        renderHand(playerHandBox, game.getHuman().getHand(), false);
+        renderHand(bot1HandBox, game.getBot1().getHand(), !game.isRoundOver());
+        renderHand(bot2HandBox, game.getBot2().getHand(), !game.isRoundOver());
+
+        playerTotal.setText("Total: " + game.getHuman().getHand().getBestTotal());
+        playerBankroll.setText("Bankroll: $" + game.getHuman().getBankroll());
+        bot1Bankroll.setText("Bot 1: $" + game.getBot1().getBankroll());
+        bot2Bankroll.setText("Bot 2: $" + game.getBot2().getBankroll());
+
+        int dt = game.getDealer().getHand().getBestTotal();
+        dealerTotal.setText((game.isRoundOver() || !game.hasDealerHoleHidden())
+            ? (dt > 21 ? "BUST" : String.valueOf(dt))
+            : "??");
+    }
+
+    private void renderHand(HBox box, Hand hand, boolean hideAll) {
+        box.getChildren().clear();
+        for (Card c : hand.getCards()) {
+            boolean show = !hideAll && c.isFaceUp();
+            String name = show ? cardName(c.getRank(), c.getSuit()) : "back.png";
+            Image img = new Image(getClass().getResourceAsStream("/cards/" + name));
+            ImageView iv = new ImageView(img);
+            iv.setFitWidth(90);
+            iv.setPreserveRatio(true);
+            box.getChildren().add(iv);
         }
     }
 
-    private Path savePath() {
-        return Path.of("data", "saves_blackjack", username + ".json");
+    private String cardName(Rank r, Suit s) {
+        String rank = switch (r) {
+            case ACE -> "ace"; case KING -> "king"; case QUEEN -> "queen"; case JACK -> "jack";
+            case TEN -> "10"; default -> String.valueOf(r.getValue());
+        };
+        String suit = switch (s) {
+            case CLUBS -> "clubs"; case DIAMONDS -> "diamonds";
+            case HEARTS -> "hearts"; case SPADES -> "spades";
+        };
+        return rank + "_of_" + suit + ".png";
     }
 
+    private void sleep(long ms) { try { Thread.sleep(ms); } catch (Exception ignored) {} }
 }

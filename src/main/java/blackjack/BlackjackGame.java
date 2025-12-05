@@ -3,6 +3,10 @@ package blackjack;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.*;
 
 public class BlackjackGame {
@@ -15,7 +19,7 @@ public class BlackjackGame {
     private final Participant dealer;
 
     private final Map<Participant, BotStrategy> botBrains = new HashMap<>();
-    private int turnIndex = 0;
+    public int turnIndex = 0;
     private boolean roundOver = false;
     private String resultBanner = "";
 
@@ -32,23 +36,11 @@ public class BlackjackGame {
         players.add(bot2);
 
         // each bot has a different 'personality'
-        botBrains.put(bot1, Strategies.hitUnder(16)); // hit under 16
-        botBrains.put(bot2, Strategies.hitUnder(15)); // tighter than bot 1 threshold
+        botBrains.put(bot1, BotStrategy.hitUnder(16));
+        botBrains.put(bot2, BotStrategy.hitUnder(15));
 
         dealer = new Participant("Dealer", false, true);
     }
-
-    // for new game
-    public void resetForNewGame() {
-        for (Participant participant : players) {
-            participant.resetForNewGame();
-        }
-        dealer.resetForNewGame();
-        roundOver = false;
-        resultBanner = "";
-        turnIndex = 0;
-    }
-
 
     // Round life cycle, each player makes a bet
     public void startNewRound(int humanBet, int bot1Bet, int bot2Bet) {
@@ -135,14 +127,14 @@ public class BlackjackGame {
         }
     }
 
-    private Card dealerUpCard() {
+    public Card dealerUpCard() {
         // first card is up
         List<Card> dealerCards = dealer.getHand().getCards();
         if (dealerCards.isEmpty()) throw new IllegalStateException("Dealer has no cards yet");
         return dealerCards.get(0);
     }
 
-    private void revealDealerHole() {
+    public void revealDealerHole() {
         // reveal (flip) the first face-down dealer card
         Hand src = dealer.getHand();
         Hand temp = new Hand();
@@ -160,7 +152,7 @@ public class BlackjackGame {
 
     }
 
-    private void dealerTurn() {
+    public void dealerTurn() {
         Hand hand = dealer.getHand();
         while (true) {
             int best = hand.getBestTotal();
@@ -179,7 +171,7 @@ public class BlackjackGame {
         }
     }
 
-    private void finishRound() {
+    public void finishRound() {
         roundOver = true;
 
         // Simple banner summary with stringbuilder
@@ -218,11 +210,14 @@ public class BlackjackGame {
             }
         }
         resultBanner = sb.toString().trim();
+        if (getHuman().getBankroll() > 1000) {  // only save if profited
+            saveHighScore(getHuman().getName(), getHuman().getBankroll());
+        }
     }
 
     // These helpers encase deal() calls in a try-catch block for more error proofing
     // Deal one face-up card into a hand. If deck is empty, end the round gracefully. 
-    private boolean tryDealUp(Hand hand) {
+    public boolean tryDealUp(Hand hand) {
         try {
             hand.add(deck.deal());
             return true;
@@ -335,10 +330,50 @@ public class BlackjackGame {
     }
 
     // True if the dealer currently has a hidden (face-down) hole card.
-    private boolean hasDealerHoleHidden() {
+    public boolean hasDealerHoleHidden() {
         List<Card> dealerCards = dealer.getHand().getCards();
         // If the dealer has at least two cards and the second one is face-down
         return dealerCards.size() >= 2 && !dealerCards.get(1).isFaceUp();
+    }
+
+    // method needed to save high score for new saving system
+    public static void saveHighScore(String username, int score) {
+        Path path = Paths.get("data", "high_scores.txt");
+        List<String> lines = new ArrayList<>();
+        boolean found = false;
+
+        try {
+            if (Files.exists(path)) lines = Files.readAllLines(path);
+            List<String> newLines = new ArrayList<>();
+
+            for (String line : lines) {
+                if (line.startsWith(username + ":blackjack:")) {
+                    String[] parts = line.split(":");
+                    List<Integer> scores = new ArrayList<>();
+                    for (int i = 2; i < parts.length; i++) {
+                        try { scores.add(Integer.parseInt(parts[i])); } catch (Exception ignored) {}
+                    }
+                    scores.add(0, score);
+                    scores.sort(Collections.reverseOrder());
+                    while (scores.size() > 5) scores.remove(scores.size() - 1);
+
+                    StringBuilder sb = new StringBuilder(username + ":blackjack");
+                    for (int s : scores) sb.append(":").append(s);
+                    newLines.add(sb.toString());
+                    found = true;
+                } else {
+                    newLines.add(line);
+                }
+            }
+
+            if (!found) {
+                newLines.add(username + ":blackjack:" + score + ":0:0:0:0");
+            }
+
+            Files.write(path, newLines);
+        } catch (IOException e) {
+            System.out.println("Failed to save blackjack score: " + e);
+        }
     }
 
     // UI getters
