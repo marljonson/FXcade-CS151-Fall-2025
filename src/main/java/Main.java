@@ -667,21 +667,26 @@ public class Main extends Application {
         blackjackListBox.getChildren().clear();
 
         String username = accountManager.getActiveUser().getUsername();
-        Path filePath = Paths.get("data/blackjack_high_scores.txt");
+        Path filePath = Paths.get("data/high_scores.txt");
 
-        Integer best = null;
+
+        List<Integer> scores = new ArrayList<>();
 
         try {
             if (Files.exists(filePath)) {
                 List<String> lines = Files.readAllLines(filePath);
-                String prefix = username + ":";
+                String prefix = username + ":blackjack:";
 
                 // Find this user's line
                 for (String line : lines) {
                     if (line.startsWith(prefix)) {
                         String[] parts = line.split(":");
-                        if (parts.length >= 2) {
-                            best = Integer.parseInt(parts[1]);
+                        for(int i = 2; i < parts.length; i++){
+                            try {
+                                scores.add(Integer.parseInt(parts[i]));
+                            } catch (NumberFormatException ignored) {
+    
+                            }
                         }
                         break;
                     }
@@ -691,13 +696,15 @@ public class Main extends Application {
             System.out.println("Error reading blackjack high scores: " + e.getMessage());
         }
 
-        // Always build 5 entries
-        List<Integer> scores = new ArrayList<>();
-        if (best != null) {
-            scores.add(best);
-        }
+        // sort high to low (just in case)
+        scores.sort(java.util.Comparator.reverseOrder());
+
+        // ensure 5 entries exactly
         while (scores.size() < 5) {
             scores.add(0);
+        }
+        if (scores.size() > 5) {
+            scores = scores.subList(0, 5);
         }
 
         for (int i = 0; i < scores.size(); i++) {
