@@ -3,6 +3,9 @@ package blackjack;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class BlackjackGame {
@@ -330,6 +333,46 @@ public class BlackjackGame {
         List<Card> dealerCards = dealer.getHand().getCards();
         // If the dealer has at least two cards and the second one is face-down
         return dealerCards.size() >= 2 && !dealerCards.get(1).isFaceUp();
+    }
+
+    // method needed to save high score for new saving system
+    public static void saveHighScore(String username, int score) {
+        Path path = Paths.get("data/high_scores.txt");
+        List<String> lines = new ArrayList<>();
+        boolean found = false;
+
+        try {
+            if (Files.exists(path)) lines = Files.readAllLines(path);
+            List<String> newLines = new ArrayList<>();
+
+            for (String line : lines) {
+                if (line.startsWith(username + ":blackjack:")) {
+                    String[] parts = line.split(":");
+                    List<Integer> scores = new ArrayList<>();
+                    for (int i = 2; i < parts.length; i++) {
+                        try { scores.add(Integer.parseInt(parts[i])); } catch (Exception ignored) {}
+                    }
+                    scores.add(0, score);
+                    scores.sort(Collections.reverseOrder());
+                    while (scores.size() > 5) scores.remove(scores.size() - 1);
+
+                    StringBuilder sb = new StringBuilder(username + ":blackjack");
+                    for (int s : scores) sb.append(":").append(s);
+                    newLines.add(sb.toString());
+                    found = true;
+                } else {
+                    newLines.add(line);
+                }
+            }
+
+            if (!found) {
+                newLines.add(username + ":blackjack:" + score + ":0:0:0:0");
+            }
+
+            Files.write(path, newLines);
+        } catch (IOException e) {
+            System.out.println("Failed to save BJ score: " + e);
+        }
     }
 
     // UI getters
