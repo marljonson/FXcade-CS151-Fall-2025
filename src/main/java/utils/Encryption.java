@@ -1,6 +1,7 @@
 package utils;
 
 public class Encryption {
+    
     private static final int SHIFT = 3;
 
     // Caesar cipher encryption
