@@ -2,8 +2,12 @@ package snake.controller;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import snake.model.*;
@@ -37,10 +41,23 @@ public class SnakeController {
     private Stage stage;
     private Runnable onMainMenu;
 
+    private MediaPlayer snakeMusicPlayer;
+    private boolean snakeMusicPlaying = false;
+
     public SnakeController(Stage stage, String username) {
         this.stage = stage;
         this.username = username;
         view = new SnakeGameView(stage);
+
+        // Snake game music
+        try {
+            var musicUrl = getClass().getResource("/audio/alright.mp3");
+            if (musicUrl != null) {
+                Media media = new Media(musicUrl.toExternalForm());
+                snakeMusicPlayer = new MediaPlayer(media);
+                snakeMusicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+            }
+        } catch (Exception ignored) {}
 
         loadHighScores();
         resetGame();
@@ -333,5 +350,27 @@ public class SnakeController {
 
     public SnakeGameView getView() {
         return view;
+    }
+
+    public void setToolbar(HBox toolbar) {
+        // Find the "Play Music" button and make it control Snake music
+        for (var node : toolbar.getChildren()) {
+            if (node instanceof Button btn && "Play Music".equals(btn.getText())) {
+                btn.setOnAction(e -> {
+                    if (snakeMusicPlayer == null) return;
+
+                    if (snakeMusicPlaying) {
+                        snakeMusicPlayer.pause();
+                        btn.setText("Play Music");
+                    } else {
+                        snakeMusicPlayer.play();
+                        btn.setText("Pause Music");
+                    }
+                    snakeMusicPlaying = !snakeMusicPlaying;
+                });
+                break;
+            }
+        }
+        view.setToolbar(toolbar);
     }
 }

@@ -291,34 +291,35 @@ public class Main extends Application {
 
         signUpBackButton.setOnAction(e -> primaryStage.setScene(loginScene));
 
-        // Snake Button — stop main menu music
         snakeButton.setOnAction(e -> {
             SnakeController controller = new SnakeController(primaryStage, accountManager.getActiveUser().getUsername(), () -> {
                 primaryStage.setScene(mainMenuScene);
                 primaryStage.setTitle("FXcade Game Manager");
                 mainMenu.requestFocus();
-                // Restart main menu music when returning
+                updateTopScores(accountManager, snakeListBox, blackjackListBox);
                 if (mediaPlayer != null) {
                     mediaPlayer.play();
                     isMusicPlaying = true;
                 }
             });
 
-            // Stop main menu music when entering Snake
+            // stop main menu music
             if (mediaPlayer != null && isMusicPlaying) {
                 mediaPlayer.pause();
                 isMusicPlaying = false;
             }
 
+            // create toolbar first
             HBox snakeToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
-            controller.getView().setToolbar(snakeToolBar);
+            
+            // then set it - this must be after createToolBar
+            controller.setToolbar(snakeToolBar);
 
             primaryStage.setScene(controller.getView().getScene());
             primaryStage.setTitle("Snake Game");
             controller.getView().getCanvas().requestFocus();
         });
 
-        // Blackjack Button — stop main menu music
         blackjackButton.setOnAction(e -> {
             new BlackjackController(primaryStage, () -> {
                 primaryStage.setScene(mainMenuScene);
