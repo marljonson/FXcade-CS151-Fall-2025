@@ -71,6 +71,12 @@ public class BlackjackController {
         endIfOver();
     }
 
+    
+    private void onNewGame() {
+        game.resetForNewGame();
+        startRound();
+    }
+
     @FXML
     private void onNewRound() {
         startRound();

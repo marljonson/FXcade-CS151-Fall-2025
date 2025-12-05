@@ -8,6 +8,7 @@ public class Participant {
 
     private int bankroll = 1000; // default starting money
     private int bet = 0;
+    private static final int START_BANKROLL = 1000;
 
     public Participant(String name, boolean human, boolean dealer) {
         this.name = name;
@@ -64,6 +65,12 @@ public class Participant {
         hand.clear();
         bet = 0;
     }
+
+    public void resetForNewGame() {
+        bankroll = START_BANKROLL;
+        bet = 0;
+        hand.clear();
+    }   
 
 
 }
