@@ -376,6 +376,16 @@ public class BlackjackGame {
         }
     }
 
+    public void resetForNewGame() {
+        for (Participant participant : players) {
+            participant.resetForNewGame();
+        }
+        dealer.resetForNewGame();
+        roundOver = false;
+        resultBanner = "";
+        turnIndex = 0;
+    }
+
     // UI getters
     public Participant getHuman() {
         return players.get(0);

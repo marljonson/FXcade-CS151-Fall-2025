@@ -348,5 +348,12 @@ public class BlackjackController {
         return rank + "_of_" + suit + ".png";
     }
 
+    /**
+    private void onNewGame() {
+        game.resetForNewGame();
+        startRound();
+    }
+    */
+
     private void sleep(long ms) { try { Thread.sleep(ms); } catch (Exception ignored) {} }
 }

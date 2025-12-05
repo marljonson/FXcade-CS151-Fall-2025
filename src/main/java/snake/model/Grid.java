@@ -17,4 +17,3 @@ public class Grid {
         return new Point(GRID_WIDTH / 2, GRID_HEIGHT / 2);
     }
 }
-

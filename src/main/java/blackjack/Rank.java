@@ -62,9 +62,6 @@ public enum Rank {
                 return ACE;
             default:
                 throw new IllegalArgumentException("Invalid rank character: " + c);
-
         }
     }
-
-
 }

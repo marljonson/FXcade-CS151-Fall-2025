@@ -18,5 +18,4 @@ class SaveState {
 
     int turn;              // 0 to 3
     boolean over;          // roundOver
-
 }

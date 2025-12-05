@@ -25,4 +25,3 @@ public class SnakeSegment {
         return position.y;
     }
 }
-

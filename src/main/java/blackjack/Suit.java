@@ -9,15 +9,22 @@ public enum Suit {
         this.suitChar = suitChar;
     }
 
-    public char getSuitChar() { return suitChar; }
+    public char getSuitChar() {
+        return suitChar;
+    }
 
     public static Suit fromChar(char c) {
-        return switch (Character.toUpperCase(c)) {
-            case 'C' -> CLUBS;
-            case 'D' -> DIAMONDS;
-            case 'H' -> HEARTS;
-            case 'S' -> SPADES;
-            default -> throw new IllegalArgumentException("Invalid suit: " + c);
-        };
+        switch (c) {
+            case 'C':
+                return CLUBS;
+            case 'D':
+                return DIAMONDS;
+            case 'H':
+                return HEARTS;
+            case 'S':
+                return SPADES;
+            default:
+                throw new IllegalArgumentException("Invalid suit character: " + c);
+        }
     }
 }
