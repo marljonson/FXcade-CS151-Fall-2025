@@ -291,15 +291,24 @@ public class Main extends Application {
 
         signUpBackButton.setOnAction(e -> primaryStage.setScene(loginScene));
 
-        // Snake Button
+        // Snake Button — stop main menu music
         snakeButton.setOnAction(e -> {
             SnakeController controller = new SnakeController(primaryStage, accountManager.getActiveUser().getUsername(), () -> {
                 primaryStage.setScene(mainMenuScene);
                 primaryStage.setTitle("FXcade Game Manager");
                 mainMenu.requestFocus();
+                // Restart main menu music when returning
+                if (mediaPlayer != null) {
+                    mediaPlayer.play();
+                    isMusicPlaying = true;
+                }
             });
 
-            // updateSnakeTopScores(accountManager, snakeListBox);
+            // Stop main menu music when entering Snake
+            if (mediaPlayer != null && isMusicPlaying) {
+                mediaPlayer.pause();
+                isMusicPlaying = false;
+            }
 
             HBox snakeToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
             controller.getView().setToolbar(snakeToolBar);
@@ -309,13 +318,24 @@ public class Main extends Application {
             controller.getView().getCanvas().requestFocus();
         });
 
+        // Blackjack Button — stop main menu music
         blackjackButton.setOnAction(e -> {
             new BlackjackController(primaryStage, () -> {
                 primaryStage.setScene(mainMenuScene);
                 primaryStage.setTitle("FXcade Game Manager");
-                // update high scores when coming back
                 updateTopScores(accountManager, snakeListBox, blackjackListBox);
+                // Restart main menu music when returning
+                if (mediaPlayer != null) {
+                    mediaPlayer.play();
+                    isMusicPlaying = true;
+                }
             }).start(accountManager.getActiveUser().getUsername());
+
+            // Stop main menu music when entering Blackjack
+            if (mediaPlayer != null && isMusicPlaying) {
+                mediaPlayer.pause();
+                isMusicPlaying = false;
+            }
         });
 
         primaryStage.setScene(loginScene);
