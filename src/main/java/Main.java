@@ -61,14 +61,14 @@ public class Main extends Application {
         }
 
         try {
-            var popUrl = getClass().getResource("/audio/chime.mp3");
-            if (popUrl == null) {
+            var chimeUrl = getClass().getResource("/audio/chime.mp3");
+            if (chimeUrl == null) {
                 throw new RuntimeException("MP3 file not found in resources!");
             }
-            Media popMedia = new Media(popUrl.toExternalForm());
-            sfxPlayer = new MediaPlayer(popMedia);
+            Media chimeMedia = new Media(chimeUrl.toExternalForm());
+            sfxPlayer = new MediaPlayer(chimeMedia);
         } catch (Exception e) {
-            System.out.println("Failed to load pop SFX: ");
+            System.out.println("Failed to load chime SFX: ");
         }
 
         // Login scene
