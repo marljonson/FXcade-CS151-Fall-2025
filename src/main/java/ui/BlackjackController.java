@@ -338,15 +338,24 @@ public class BlackjackController {
 
     private String cardName(Rank r, Suit s) {
         String rank = switch (r) {
-            case ACE -> "ace"; case KING -> "king"; case QUEEN -> "queen"; case JACK -> "jack";
-            case TEN -> "10"; default -> String.valueOf(r.getValue());
+            case ACE -> "ace";
+            case KING -> "king";
+            case QUEEN -> "queen";
+            case JACK -> "jack";
+            case TEN -> "10";
+            default -> String.valueOf(r.getValue());
         };
         String suit = switch (s) {
-            case CLUBS -> "clubs"; case DIAMONDS -> "diamonds";
-            case HEARTS -> "hearts"; case SPADES -> "spades";
+            case CLUBS -> "clubs";
+            case DIAMONDS -> "diamonds";
+            case HEARTS -> "hearts";
+            case SPADES -> "spades";
         };
         return rank + "_of_" + suit + ".png";
     }
 
-    private void sleep(long ms) { try { Thread.sleep(ms); } catch (Exception ignored) {} }
+    private void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (Exception ignored) {} }
 }
