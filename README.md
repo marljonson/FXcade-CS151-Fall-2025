@@ -34,6 +34,7 @@ Prerequisites:
 - Wrote backend of blackjack game
 - Debugged game logic for blackjack
 - Wrote JUnit tests for snake game
+- Debugged "freezing" issues on blackjack frontend
 
 **Toey Lui (`toeyldev`):**
 - Wrote `Main.java` and password encryption
