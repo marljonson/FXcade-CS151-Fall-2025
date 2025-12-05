@@ -180,7 +180,7 @@ public class BlackjackController {
 
         // Blackjack music
         try {
-            var url = getClass().getResource("/audio/stray_sheep.mp3");
+            var url = getClass().getResource("/audio/blackjack_music.mp3");
             if (url != null) {
                 Media media = new Media(url.toExternalForm());
                 blackjackMusicPlayer = new MediaPlayer(media);
