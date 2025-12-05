@@ -206,6 +206,9 @@ public class BlackjackGame {
             }
         }
         resultBanner = sb.toString().trim();
+        if (getHuman().getBankroll() > 1000) {  // only save if profited
+            saveHighScore(getHuman().getName(), getHuman().getBankroll());
+        }
     }
 
     // These helpers encase deal() calls in a try-catch block for more error proofing

@@ -26,7 +26,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main extends Application {
 
@@ -153,6 +155,9 @@ public class Main extends Application {
         blackjackScores.setFont(new Font("System", 18));
         blackjackScores.setStyle("-fx-text-fill: #1A3D7C; -fx-font-weight: bold;");
 
+        VBox blackjackListBox = new VBox();
+        blackjackListBox.setSpacing(4);
+
         Label snakeScores = new Label("Snake");
         snakeScores.setFont(new Font("System", 18));
         snakeScores.setStyle("-fx-text-fill: #1A3D7C; -fx-font-weight: bold;");
@@ -160,7 +165,7 @@ public class Main extends Application {
         snakeListBox = new VBox();
         snakeListBox.setSpacing(4);
 
-        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, snakeScores, snakeListBox);
+        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, blackjackListBox, snakeScores, snakeListBox);
         mainMenuLeft.setSpacing(10);
         mainMenuLeft.setPadding(new Insets(20));
 
@@ -224,7 +229,7 @@ public class Main extends Application {
                             sfxPlayer.stop();
                             sfxPlayer.play();
                         }
-                        updateSnakeTopScores(accountManager, snakeListBox);
+                        updateTopScores(accountManager, snakeListBox, blackjackListBox);
                         welcomeLabel.setText("Welcome to FXcade, " + accountManager.getActiveUser().getUsername() + "!");
                         primaryStage.setScene(mainMenuScene);
                         break;
@@ -293,7 +298,6 @@ public class Main extends Application {
             controller.getView().getCanvas().requestFocus();
         });
 
-        // Working blackjack button
         blackjackButton.setOnAction(e -> {
             new BlackjackController(primaryStage, () -> {
                 primaryStage.setScene(mainMenuScene);
@@ -360,34 +364,55 @@ public class Main extends Application {
         return toolBar;
     }
 
-    private void updateSnakeTopScores(AccountManager accountManager, VBox snakeListBox) {
-        // your existing method — unchanged
-        snakeListBox.getChildren().clear();
-        String username = accountManager.getActiveUser().getUsername();
+    private void updateTopScores(AccountManager accountManager, VBox snakeBox, VBox blackjackBox) {
+        snakeBox.getChildren().clear();
+        blackjackBox.getChildren().clear();
+
         Path filePath = Paths.get("data/high_scores.txt");
+        if (!Files.exists(filePath)) return;
 
         try {
             List<String> lines = Files.readAllLines(filePath);
-            String start = username + ":snake:";
-
-            List<Integer> scores = new ArrayList<>();
+            Map<String, List<Integer>> snakeScores = new HashMap<>();
+            Map<String, List<Integer>> bjScores = new HashMap<>();
 
             for (String line : lines) {
-                if (line.startsWith(start)) {
-                    String[] parts = line.split(":");
-                    for (int i = 2; i < parts.length; i++) {
-                        scores.add(Integer.parseInt(parts[i]));
-                    }
-                    break;
+                String[] parts = line.split(":");
+                if (parts.length < 3) continue;
+                String user = parts[0];
+                String game = parts[1];
+                List<Integer> scores = new ArrayList<>();
+                for (int i = 2; i < parts.length; i++) {
+                    try { scores.add(Integer.parseInt(parts[i])); } catch (Exception ignored) {}
                 }
+                if ("snake".equalsIgnoreCase(game)) snakeScores.put(user, scores);
+                else if ("blackjack".equalsIgnoreCase(game)) bjScores.put(user, scores);
             }
 
-            for (int i = 0; i < scores.size(); i++) {
-                snakeListBox.getChildren().add(new Label((i + 1) + ". " + scores.get(i)));
-            }
+            displayTop5(snakeScores, snakeBox);
+            displayTop5(bjScores, blackjackBox);
+
         } catch (IOException e) {
-            snakeListBox.getChildren().add(new Label("Error reading scores"));
+            snakeBox.getChildren().add(new Label("Error loading scores"));
         }
+    }
+
+    // helper method
+    private void displayTop5(Map<String, List<Integer>> map, VBox box) {
+        List<Map.Entry<String, Integer>> all = new ArrayList<>();
+        for (var e : map.entrySet()) {
+            for (int s : e.getValue()) {
+                if (s > 0) all.add(Map.entry(e.getKey(), s));
+            }
+        }
+        all.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+        int count = 0;
+        for (var e : all) {
+            if (count >= 5) break;
+            box.getChildren().add(new Label((count + 1) + ". " + e.getKey() + " – " + e.getValue()));
+            count++;
+        }
+        if (count == 0) box.getChildren().add(new Label("—"));
     }
 
     public static void main(String[] args) {
