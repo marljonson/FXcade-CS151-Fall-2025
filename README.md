@@ -43,6 +43,7 @@ Prerequisites:
 - Wrote `Main.java` and password encryption
 - Designed UI/UX for sign-in and main menu
 - Connected snake game to main menu
+- Completed top bar and snake high score
 
 **Bush Nguyen (`bush-nguyen`):**
 - Wrote backend and frontend of snake game
