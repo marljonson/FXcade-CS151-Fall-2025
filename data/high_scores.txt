@@ -1,3 +1,6 @@
 Snake: 200
-test:snake:140:80:50:30:30
-test:blackjack:1075:1075:1050:1050:1050
+test:snake:150:140:80:50:30
+test:blackjack:1450:1150:1075:1075:1075
+
+johnny:snake:70:50:30:0:0
+johnny:blackjack:1100:0:0:0:0

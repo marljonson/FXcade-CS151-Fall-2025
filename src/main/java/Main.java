@@ -76,26 +76,29 @@ public class Main extends Application {
         welcomeMessage.setStyle("-fx-font-weight: bold");
         welcomeMessage.setFont(new Font("System", 24));
 
-        Label usernameLabel = new Label("Username: ");
+                Label usernameLabel = new Label("Username: ");
         usernameLabel.setFont(new Font("System", 15));
-        HBox usernameLabelBox = new HBox(usernameLabel);
-        usernameLabelBox.setAlignment(Pos.CENTER_LEFT);
-        usernameLabelBox.setPrefWidth(200);
-        usernameLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
+        usernameLabel.setPrefWidth(100);
+        usernameLabel.setAlignment(Pos.CENTER_RIGHT);
 
-        TextField loginUsernameField = new TextField("Username");
+        TextField loginUsernameField = new TextField();
+        loginUsernameField.setPromptText("Enter username");
+        loginUsernameField.setPrefWidth(200);
+
+        HBox usernameRow = new HBox(15, usernameLabel, loginUsernameField);
+        usernameRow.setAlignment(Pos.CENTER);
 
         Label passwordLabel = new Label("Password: ");
         passwordLabel.setFont(new Font("System", 15));
-        HBox passwordLabelBox = new HBox(passwordLabel);
-        passwordLabelBox.setAlignment(Pos.CENTER_LEFT);
-        passwordLabelBox.setPrefWidth(200);
-        passwordLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
+        passwordLabel.setPrefWidth(100);
+        passwordLabel.setAlignment(Pos.CENTER_RIGHT);
 
         TextField loginPasswordField = new TextField();
-        loginPasswordField.setPromptText("Password");
+        loginPasswordField.setPromptText("Enter password");
         loginPasswordField.setPrefWidth(200);
-        loginPasswordField.setMaxWidth(Region.USE_PREF_SIZE);
+
+        HBox passwordRow = new HBox(15, passwordLabel, loginPasswordField);
+        passwordRow.setAlignment(Pos.CENTER);
 
         Label loginMessageLabel = new Label();
         loginMessageLabel.setTextFill(Color.RED);
@@ -103,8 +106,14 @@ public class Main extends Application {
         Button loginButton = createStyledButton("Sign In", "#4aa3ff", "#1e88e5");
         Button createAccountButton = createStyledButton("Sign Up", "#ffffff", "#f2f2f2", "#1e88e5");
 
-        VBox signInlayout = new VBox(welcomeMessage, usernameLabelBox, loginUsernameField,
-                passwordLabelBox, loginPasswordField, loginButton, loginMessageLabel, createAccountButton);
+        VBox signInlayout = new VBox(20,
+            welcomeMessage,
+            usernameRow,
+            passwordRow,
+            loginButton,
+            loginMessageLabel,
+            createAccountButton
+        );
         signInlayout.setSpacing(10);
         signInlayout.setPadding(new Insets(30));
         signInlayout.setAlignment(Pos.CENTER);
@@ -165,7 +174,9 @@ public class Main extends Application {
         snakeListBox = new VBox();
         snakeListBox.setSpacing(4);
 
-        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, blackjackListBox, snakeScores, snakeListBox);
+        VBox mainMenuLeft = new VBox(topScore, underline, 
+            blackjackScores, blackjackListBox, 
+            snakeScores, snakeListBox);
         mainMenuLeft.setSpacing(10);
         mainMenuLeft.setPadding(new Insets(20));
 
@@ -302,6 +313,8 @@ public class Main extends Application {
             new BlackjackController(primaryStage, () -> {
                 primaryStage.setScene(mainMenuScene);
                 primaryStage.setTitle("FXcade Game Manager");
+                // update high scores when coming back
+                updateTopScores(accountManager, snakeListBox, blackjackListBox);
             }).start(accountManager.getActiveUser().getUsername());
         });
 

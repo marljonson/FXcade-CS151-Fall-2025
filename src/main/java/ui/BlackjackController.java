@@ -139,6 +139,7 @@ public class BlackjackController {
         newRoundButton.setOnAction(e -> newRound());
         saveButton.setOnAction(e -> showSaveDialog());
 
+        // Start first round — AFTER betField exists
         newRound();
 
         Scene scene = new Scene(root, 1200, 800);
@@ -191,8 +192,13 @@ public class BlackjackController {
     private void newRound() {
         int bet = 50;
         try {
-            bet = Integer.parseInt(betField.getText().trim());
-            if (bet < 1 || bet > game.getHuman().getBankroll()) bet = 50;
+            String text = betField.getText().trim();
+            if (!text.isEmpty()) {
+                bet = Integer.parseInt(text);
+                if (bet < 1 || bet > game.getHuman().getBankroll()) {
+                    bet = Math.min(50, game.getHuman().getBankroll());
+                }
+            }
         } catch (Exception ignored) {}
 
         game.startNewRound(bet, 50, 50);
@@ -265,8 +271,8 @@ public class BlackjackController {
     private void refresh() {
         renderHand(dealerHandBox, game.getDealer().getHand(), true);
         renderHand(playerHandBox, game.getHuman().getHand(), false);
-        renderHand(bot1HandBox, game.getBot1().getHand(), false);
-        renderHand(bot2HandBox, game.getBot2().getHand(), false);
+        renderHand(bot1HandBox, game.getBot1().getHand(), !game.isRoundOver());
+        renderHand(bot2HandBox, game.getBot2().getHand(), !game.isRoundOver());
 
         playerTotal.setText("Total: " + game.getHuman().getHand().getBestTotal());
         playerBankroll.setText("Bankroll: $" + game.getHuman().getBankroll());
@@ -279,11 +285,10 @@ public class BlackjackController {
             : "??");
     }
 
-    private void renderHand(HBox box, Hand hand, boolean hideFirst) {
+    private void renderHand(HBox box, Hand hand, boolean hideAll) {
         box.getChildren().clear();
-        for (int i = 0; i < hand.getCards().size(); i++) {
-            Card c = hand.getCards().get(i);
-            boolean show = hideFirst && i == 1 ? false : c.isFaceUp();
+        for (Card c : hand.getCards()) {
+            boolean show = !hideAll && c.isFaceUp();
             String name = show ? cardName(c.getRank(), c.getSuit()) : "back.png";
             Image img = new Image(getClass().getResourceAsStream("/cards/" + name));
             ImageView iv = new ImageView(img);
