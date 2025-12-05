@@ -14,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.shape.Line;
 import manager.AccountManager;
 import snake.controller.SnakeController;
 
@@ -34,6 +35,7 @@ public class Main extends Application {
     private boolean isMusicPlaying = false; // Field for music
     private MediaPlayer sfxPlayer;
     private VBox snakeListBox;
+    private Label welcomeLabel;
 
     public Main() {
         this.accountManager = new AccountManager();
@@ -236,24 +238,29 @@ public class Main extends Application {
 
         // Main menu scene
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color: linear-gradient(#f6f7fb, #e9ecf5);");
+        borderPane.setStyle("-fx-background-color:  #f2f2f7;");
 
         // Left main menu
         Label topScore = new Label("Top Scores");
         topScore.setStyle("-fx-font-weight: bold");
         topScore.setFont(new Font("System", 24));
 
-        Label blackjackScores = new Label("Blackjack:");
+        Line underline = new Line(0, 0, 140, 0);
+        underline.setStroke(Color.rgb(0, 0, 0, 0.15));
+        underline.setStrokeWidth(2);
+
+        Label blackjackScores = new Label("Blackjack");
         blackjackScores.setFont(new Font("System", 18));
-        blackjackScores.setStyle("-fx-font-weight: bold");
+        blackjackScores.setStyle("-fx-text-fill: #1A3D7C; -fx-font-weight: bold;");
 
         Label snakeScores = new Label("Snake");
         snakeScores.setFont(new Font("System", 18));
-        snakeScores.setStyle("-fx-font-weight: bold");
+        snakeScores.setStyle("-fx-text-fill: #1A3D7C; -fx-font-weight: bold;");
 
         snakeListBox = new VBox();
+        snakeListBox.setSpacing(4);
 
-        VBox mainMenuLeft = new VBox(topScore, blackjackScores, snakeScores, snakeListBox);
+        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, snakeScores, snakeListBox);
         mainMenuLeft.setSpacing(10);
         mainMenuLeft.setPadding(new Insets(20));
 
@@ -304,7 +311,13 @@ public class Main extends Application {
         Scene mainMenuScene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         HBox toolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
-        borderPane.setTop(toolBar);
+
+        welcomeLabel = new Label();
+        welcomeLabel.setStyle("-fx-font-style: italic; -fx-font-size: 16px;");
+        welcomeLabel.setPadding(new Insets(10, 0, 10, 20));
+
+        VBox topArea = new VBox(toolBar, welcomeLabel);
+        borderPane.setTop(topArea);
 
         // Button actions
         // 1 - Login Scene: Sign in button clicked
@@ -324,6 +337,7 @@ public class Main extends Application {
                             sfxPlayer.play();
                         }
                         updateSnakeTopScores(accountManager, snakeListBox);
+                        welcomeLabel.setText("Welcome to FXcade, " + accountManager.getActiveUser().getUsername() + "!");
                         primaryStage.setScene(mainMenuScene);
                         break;
                     case USER_NOT_FOUND:
