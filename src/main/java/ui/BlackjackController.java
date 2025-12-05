@@ -41,7 +41,8 @@ public class BlackjackController {
         bot2BankLabel.setText("Bot 2: $" + STARTING_MONEY);
 
         // Start first round automatically
-        startNewRound();
+        onNewRound();
+        refresh(); // draws the cards on screen; enables/disables buttons
     }
 
     @FXML
