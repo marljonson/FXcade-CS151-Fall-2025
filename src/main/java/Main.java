@@ -41,6 +41,7 @@ public class Main extends Application {
     private VBox blackjackListBox;
     private Label welcomeLabel;
 
+    // Constructor
     public Main() {
         this.accountManager = new AccountManager();
     }
@@ -85,7 +86,7 @@ public class Main extends Application {
         usernameLabelBox.setPrefWidth(200);
         usernameLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
 
-        // Username entry
+        // Username entry text box
         TextField loginUsernameField = new TextField();
         loginUsernameField.setPromptText("Username");
         loginUsernameField.setPrefWidth(200);
@@ -99,12 +100,13 @@ public class Main extends Application {
         passwordLabelBox.setPrefWidth(200);
         passwordLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
 
-        // Password entry
+        // Password entry text box
         TextField loginPasswordField = new TextField();
         loginPasswordField.setPromptText("Password");
         loginPasswordField.setPrefWidth(200);
         loginPasswordField.setMaxWidth(Region.USE_PREF_SIZE);
 
+        // Login status message
         Label loginMessageLabel = new Label();
         loginMessageLabel.setTextFill(Color.RED);
 
@@ -147,6 +149,7 @@ public class Main extends Application {
                 "-fx-border-width: 1;" +
                 "-fx-border-radius: 8;" +
                 "-fx-padding: 6 18;";
+
         String createAccountHover = "-fx-background-color: linear-gradient(#e8f3ff, #d6eaff);" +
                 "-fx-text-fill: #1565c0;" +
                 "-fx-background-radius: 8;" +
@@ -183,7 +186,7 @@ public class Main extends Application {
         usernameSignUpLabelBox.setPrefWidth(200);
         usernameSignUpLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
 
-        // Username entry
+        // Username entry text box
         TextField signupUsernameField = new TextField();
         signupUsernameField.setPromptText("Username");
         signupUsernameField.setPrefWidth(200);
@@ -197,12 +200,13 @@ public class Main extends Application {
         passwordSignUpLabelBox.setPrefWidth(200);
         passwordSignUpLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
 
-        // Password entry
+        // Password entry text box
         TextField signupPasswordField = new TextField();
         signupPasswordField.setPromptText("Password");
         signupPasswordField.setPrefWidth(200);
         signupPasswordField.setMaxWidth(Region.USE_PREF_SIZE);
 
+        // Sign up button
         Button signUpButton = new Button("Sign Up");
         signUpButton.setPrefWidth(100);
         signUpButton.setPrefHeight(30);
@@ -215,6 +219,7 @@ public class Main extends Application {
                 "-fx-border-width: 1;" +
                 "-fx-border-radius: 8;" +
                 "-fx-padding: 6 18;";
+
         String signUpHover = "-fx-background-color: linear-gradient(#e8f3ff, #d6eaff);" +
                 "-fx-text-fill: #1565c0;" +
                 "-fx-background-radius: 8;" +
@@ -227,9 +232,11 @@ public class Main extends Application {
         signUpButton.setOnMouseEntered(e -> signUpButton.setStyle(signUpHover));
         signUpButton.setOnMouseExited(e -> signUpButton.setStyle(signUpNormal));
 
+        // Sign up status message
         Label signUpMessageLabel = new Label();
         signUpMessageLabel.setTextFill(Color.RED);
 
+        // Back button
         Button signUpBackButton = new Button("Back");
         signUpBackButton.setPrefWidth(70);
         signUpBackButton.setPrefHeight(20);
@@ -242,6 +249,7 @@ public class Main extends Application {
                 "-fx-border-width: 1;" +
                 "-fx-border-radius: 8;" +
                 "-fx-padding: 6 18;";
+
         String signUpBackHover = "-fx-background-color: #666666;" +
                 "-fx-text-fill: white;" +
                 "-fx-background-radius: 8;" +
@@ -274,17 +282,21 @@ public class Main extends Application {
         underline.setStroke(Color.rgb(0, 0, 0, 0.15));
         underline.setStrokeWidth(2);
 
+        // Blackjack score label
         Label blackjackScores = new Label("Blackjack");
         blackjackScores.setFont(new Font("System", 18));
         blackjackScores.setStyle("-fx-text-fill: #1A3D7C; -fx-font-weight: bold;");
 
+        // Snake score label
         Label snakeScores = new Label("Snake");
         snakeScores.setFont(new Font("System", 18));
         snakeScores.setStyle("-fx-text-fill: #2E7D32; -fx-font-weight: bold;");
 
+        // Black jack top score list
         blackjackListBox = new VBox();
         blackjackListBox.setSpacing(4);
 
+        // Snake top score list
         snakeListBox = new VBox();
         snakeListBox.setSpacing(4);
 
@@ -297,6 +309,7 @@ public class Main extends Application {
         gameMenu.setStyle("-fx-font-weight: bold");
         gameMenu.setFont(new Font("System", 24));
 
+        // Blackjack launch game button
         Button blackjackButton = new Button("Blackjack");
         blackjackButton.setStyle("-fx-background-radius: 8;");
         blackjackButton.setPrefWidth(115);
@@ -323,6 +336,7 @@ public class Main extends Application {
         blackjackButton.setOnMouseEntered(e -> blackjackButton.setStyle(blackjackHover));
         blackjackButton.setOnMouseExited(e -> blackjackButton.setStyle(blackjackNormal));
 
+        // Snack launch game button
         Button snakeButton = new Button("Snake");
         snakeButton.setStyle("-fx-background-radius: 8;");
         snakeButton.setPrefWidth(100);
@@ -336,6 +350,7 @@ public class Main extends Application {
                 "-fx-border-width: 1;" +
                 "-fx-border-radius: 8;" +
                 "-fx-padding: 6 18;";
+
         String snakeHover = "-fx-background-color: #388E3C;" +
                 "-fx-text-fill: white;" +
                 "-fx-background-radius: 8;" +
@@ -348,10 +363,12 @@ public class Main extends Application {
         snakeButton.setOnMouseEntered(e -> snakeButton.setStyle(snakeHover));
         snakeButton.setOnMouseExited(e -> snakeButton.setStyle(snakeNormal));
 
+        // Add game menu
         Label addGameMenu = new Label("Add Games");
         addGameMenu.setStyle("-fx-font-weight: bold");
         addGameMenu.setFont(new Font("System", 24));
 
+        // Add game button
         Button addGameButton1 = new Button("Add Game");
         addGameButton1.setStyle("-fx-background-radius: 8;");
         addGameButton1.setPrefWidth(130);
@@ -365,6 +382,7 @@ public class Main extends Application {
                 "-fx-border-width: 1;" +
                 "-fx-border-radius: 8;" +
                 "-fx-padding: 6 18;";
+
         String addGameButton1Hover = "-fx-background-color: #666666;" +
                 "-fx-text-fill: white;" +
                 "-fx-background-radius: 8;" +
@@ -377,6 +395,7 @@ public class Main extends Application {
         addGameButton1.setOnMouseEntered(e -> addGameButton1.setStyle(addGameButton1Hover));
         addGameButton1.setOnMouseExited(e -> addGameButton1.setStyle(addGameButton1Normal));
 
+        // Add game button 2
         Button addGameButton2 = new Button("Add Game");
         addGameButton2.setStyle("-fx-background-radius: 8;");
         addGameButton2.setPrefWidth(130);
@@ -390,6 +409,7 @@ public class Main extends Application {
                 "-fx-border-width: 1;" +
                 "-fx-border-radius: 8;" +
                 "-fx-padding: 6 18;";
+
         String addGameButton2Hover = "-fx-background-color: #666666;" +
                 "-fx-text-fill: white;" +
                 "-fx-background-radius: 8;" +
@@ -416,8 +436,10 @@ public class Main extends Application {
 
         Scene mainMenuScene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 
+        // Tool bar
         HBox toolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
 
+        // User welcome text
         welcomeLabel = new Label();
         welcomeLabel.setStyle("-fx-font-style: italic; -fx-font-size: 16px;");
         welcomeLabel.setPadding(new Insets(10, 0, 10, 20));
@@ -426,7 +448,7 @@ public class Main extends Application {
         borderPane.setTop(topArea);
 
         // Button actions
-        // 1 - Login Scene: Sign in button clicked
+        // Login Scene: Sign in button clicked
         loginButton.setOnAction(event -> {
             String loginUsername = loginUsernameField.getText();
             String loginPassword = loginPasswordField.getText();
@@ -458,12 +480,12 @@ public class Main extends Application {
             }
         });
 
-        // 2 - Login Scene: Sign up button clicked
+        // Login Scene: Sign up button clicked
         createAccountButton.setOnAction(e -> {
             primaryStage.setScene(signupScene);
         });
 
-        // 3 - Sign up scene: Sign up button clicked
+        // Sign up scene: Sign up button clicked
         signUpButton.setOnAction(e -> {
             String signupUsername = signupUsernameField.getText();
             String signupPassword = signupPasswordField.getText();
@@ -497,7 +519,7 @@ public class Main extends Application {
             }
         });
 
-        // 4 - Sign Up scene: Back button clicked
+        // Sign Up scene: Back button clicked
         signUpBackButton.setOnAction(e -> {
             primaryStage.setScene(loginScene);
         });
@@ -507,20 +529,18 @@ public class Main extends Application {
             new BlackjackController(primaryStage, () -> {
                 primaryStage.setScene(mainMenuScene);
                 primaryStage.setTitle("FXcade Game Manager");
-                // updateTopScores(accountManager, snakeListBox, blackjackListBox);
                 updateBlackjackTopScores(accountManager, blackjackListBox);
                 updateSnakeTopScores(accountManager, snakeListBox);
             }).start(accountManager.getActiveUser().getUsername());
 
             // Stop main menu music when entering Blackjack
-            // This matches above
             if (mediaPlayer != null && isMusicPlaying) {
                 mediaPlayer.pause();
                 isMusicPlaying = false;
             }
         });
 
-        // 7 - Launch snake game
+        // Launch snake game
         snakeButton.setOnAction(e -> {
             SnakeController controller = new SnakeController(primaryStage, accountManager.getActiveUser().getUsername(), () -> {
                 primaryStage.setScene(mainMenuScene);
@@ -545,6 +565,7 @@ public class Main extends Application {
         });
     }
 
+    // Helper function for creating tool bar
     private HBox createToolBar(Stage primaryStage, Scene loginScene, Scene mainMenuScene) {
         // Top toolbar
         Button musicToggleButton = new Button("Play Music"); // Music toggle button
@@ -587,7 +608,7 @@ public class Main extends Application {
             primaryStage.setScene(mainMenuScene);
             primaryStage.setTitle("FXcade Game Manager");
 
-            // When returning to main menu — sync button with real state
+            // When returning to main menu, sync button with real state
             if (isMusicPlaying) {
                 musicToggleButton.setText("Pause Music");
             } else {
@@ -611,6 +632,7 @@ public class Main extends Application {
         return toolBar;
     }
 
+    // Helper function for updating snake top scores
     private void updateSnakeTopScores(AccountManager accountManager, VBox snakeListBox) {
         snakeListBox.getChildren().clear();
 
@@ -663,6 +685,7 @@ public class Main extends Application {
         }
     }
 
+    // Helper function for updating blackjack top scores
     private void updateBlackjackTopScores(AccountManager accountManager, VBox blackjackListBox) {
         blackjackListBox.getChildren().clear();
 
@@ -681,11 +704,11 @@ public class Main extends Application {
                 for (String line : lines) {
                     if (line.startsWith(prefix)) {
                         String[] parts = line.split(":");
-                        for(int i = 2; i < parts.length; i++){
+                        for (int i = 2; i < parts.length; i++) {
                             try {
                                 scores.add(Integer.parseInt(parts[i]));
                             } catch (NumberFormatException ignored) {
-    
+
                             }
                         }
                         break;
@@ -696,7 +719,7 @@ public class Main extends Application {
             System.out.println("Error reading blackjack high scores: " + e.getMessage());
         }
 
-        // sort high to low (just in case)
+        // Sort high to low (just in case)
         scores.sort(java.util.Comparator.reverseOrder());
 
         // ensure 5 entries exactly
