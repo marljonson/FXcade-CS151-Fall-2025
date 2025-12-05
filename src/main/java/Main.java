@@ -508,14 +508,11 @@ public class Main extends Application {
                 primaryStage.setTitle("FXcade Game Manager");
                 // updateTopScores(accountManager, snakeListBox, blackjackListBox);
                 updateBlackjackTopScores(accountManager, blackjackListBox);
-                // Restart main menu music when returning
-                if (mediaPlayer != null) {
-                    mediaPlayer.play();
-                    isMusicPlaying = true;
-                }
+                updateSnakeTopScores(accountManager, snakeListBox);
             }).start(accountManager.getActiveUser().getUsername());
 
             // Stop main menu music when entering Blackjack
+            // This matches above
             if (mediaPlayer != null && isMusicPlaying) {
                 mediaPlayer.pause();
                 isMusicPlaying = false;
@@ -524,22 +521,25 @@ public class Main extends Application {
 
         // 7 - Launch snake game
         snakeButton.setOnAction(e -> {
-            SnakeController controller = new SnakeController(primaryStage, accountManager.getActiveUser().getUsername(),
-                    () -> {
-                        // Snake Main Menu button
-                        primaryStage.setScene(mainMenuScene);
-                        primaryStage.setTitle("FXcade Game Manager");
-                        mainMenu.requestFocus();
-                    });
+            SnakeController controller = new SnakeController(primaryStage, accountManager.getActiveUser().getUsername(), () -> {
+                primaryStage.setScene(mainMenuScene);
+                primaryStage.setTitle("FXcade Game Manager");
+                mainMenu.requestFocus();
+                updateBlackjackTopScores(accountManager, blackjackListBox);
+                updateSnakeTopScores(accountManager, snakeListBox);
+            });
 
-            updateSnakeTopScores(accountManager, snakeListBox);
+            // Stop main menu music when entering Snake
+            if (mediaPlayer != null && isMusicPlaying) {
+                mediaPlayer.pause();
+                isMusicPlaying = false;
+            }
 
             HBox snakeToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
-            controller.getView().setToolbar(snakeToolBar);
+            controller.setToolbar(snakeToolBar);
 
             primaryStage.setScene(controller.getView().getScene());
             primaryStage.setTitle("Snake Game");
-            // primaryStage.getScene().getRoot().requestFocus();
             controller.getView().getCanvas().requestFocus();
         });
     }
@@ -585,6 +585,9 @@ public class Main extends Application {
             updateSnakeTopScores(accountManager, snakeListBox);
             primaryStage.setScene(mainMenuScene);
             primaryStage.setTitle("FXcade Game Manager");
+
+            // Force button to say "Play Music" when returning
+            musicToggleButton.setText("Play Music");
         });
 
         // Tool bar "Sign Out" button

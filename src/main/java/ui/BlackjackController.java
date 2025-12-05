@@ -164,16 +164,16 @@ public class BlackjackController {
         toolBar.getChildren().addAll(musicToggleButton, mainMenuButton, signOutButton);
         mainMenuButton.setOnAction(e -> {
             if (blackjackMusicPlayer != null) {
-                blackjackMusicPlayer.stop();
-                musicToggleButton.setText("Play Music");
+                blackjackMusicPlayer.stop(); // stop the game music
+                musicToggleButton.setText("Play Music"); // force button text to say "Play Music"
             }
             backToMenu.run();
         });
 
         signOutButton.setOnAction(e -> {
             if (blackjackMusicPlayer != null) {
-                blackjackMusicPlayer.stop();
-                musicToggleButton.setText("Play Music");
+                blackjackMusicPlayer.stop(); // stop the game music
+                musicToggleButton.setText("Play Music"); // force button text to say "Play Music"
             }
             backToMenu.run();
         });

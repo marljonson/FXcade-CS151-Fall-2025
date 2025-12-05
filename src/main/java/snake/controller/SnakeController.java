@@ -2,8 +2,12 @@ package snake.controller;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import snake.model.*;
@@ -36,6 +40,10 @@ public class SnakeController {
     private SnakeGameView view;
     private Stage stage;
     private Runnable onMainMenu;
+
+    // Added by Marl
+    private MediaPlayer snakeMusicPlayer;
+    private Button musicToggleButton; // to control the toolbar button; added by Marl
 
     public SnakeController(Stage stage, String username) {
         this.stage = stage;
@@ -333,5 +341,53 @@ public class SnakeController {
 
     public SnakeGameView getView() {
         return view;
+    }
+
+    // Added by Marl
+    public void setToolbar(HBox toolbar) {
+        // Find the "Play Music" button and hook up Snake music
+        for (var node : toolbar.getChildren()) {
+            if (node instanceof Button btn && ("Play Music".equals(btn.getText()) || "Pause Music".equals(btn.getText()))) {
+                musicToggleButton = btn;
+
+                // Snake music setup
+                try {
+                    var url = getClass().getResource("/audio/snake_game.mp3");
+                    if (url != null) {
+                        Media media = new Media(url.toExternalForm());
+                        snakeMusicPlayer = new MediaPlayer(media);
+                        snakeMusicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+
+                        // Button controls Snake music only
+                        musicToggleButton.setOnAction(e -> {
+                            if (snakeMusicPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                                snakeMusicPlayer.pause();
+                                musicToggleButton.setText("Play Music");
+                            } else {
+                                snakeMusicPlayer.play();
+                                musicToggleButton.setText("Pause Music");
+                            }
+                        });
+                    }
+                } catch (Exception ignored) {}
+
+                // Main Menu button — stop Snake music when leaving
+                for (var n : toolbar.getChildren()) {
+                    if (n instanceof Button b && "Main Menu".equals(b.getText())) {
+                        b.setOnAction(e -> {
+                            if (snakeMusicPlayer != null) {
+                                snakeMusicPlayer.stop();
+                                musicToggleButton.setText("Play Music");
+                            }
+                            if (onMainMenu != null) onMainMenu.run();
+                        });
+                        break;
+                    }
+                }
+
+                break;
+            }
+        }
+        view.setToolbar(toolbar);
     }
 }
