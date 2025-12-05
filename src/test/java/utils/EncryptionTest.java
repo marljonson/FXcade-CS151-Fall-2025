@@ -29,4 +29,12 @@ public class EncryptionTest {
         String actual = Encryption.encrypt(input);
         assertEquals(expected, actual, "The encryption result should handle spaces and special characters.");
     }
+
+    @Test 
+    void testEncryptMixedCase() {
+        String input = "Hello World!";
+        String expected = "Khoor#Zruog$";
+        String actual = Encryption.encrypt(input);
+        assertEquals(expected, actual, "The encryption result should handle uppercase letters.");
+    }
 }
