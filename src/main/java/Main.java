@@ -1,6 +1,8 @@
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,6 +19,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Line;
 import manager.AccountManager;
 import snake.controller.SnakeController;
+import ui.BlackjackController;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -501,6 +504,24 @@ public class Main extends Application {
             snakeListBox.getChildren().add(new Label("Error reading scores"));
         }
     }
+
+    blackjackButton.setOnAction(e -> {
+        try {
+            var loader = new FXMLLoader(getClass().getResource("/ui/blackjack.fxml"));
+            Parent root = loader.load();
+            BlackjackController controller = loader.getController();
+            controller.initializeGame(accountManager.getActiveUser().getUsername(), primaryStage, () -> {
+                primaryStage.setScene(mainMenuScene);
+                primaryStage.setTitle("FXcade Game Manager");
+            });
+
+            Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Blackjack");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    });
 
     public static void main(String[] args) {
         launch(args);
