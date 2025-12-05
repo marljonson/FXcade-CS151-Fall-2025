@@ -4,8 +4,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BlackjackGameTest {
+
     @Test
-    void newRoundDealsTwoCardsToEveryone(){
+    void newRoundDealsTwoCardsToEveryone() {
         BlackjackGame game = new BlackjackGame("Test");
 
         game.startNewRound(50, 50, 50);
@@ -25,8 +26,9 @@ public class BlackjackGameTest {
         assertFalse(game.isRoundOver(), "Round should not be over at start");
         assertEquals(0, game.getTurnIndex(), "Human should act first");
     }
+
     @Test
-    void saveAndLoadRoundPreservedState(){
+    void saveAndLoadRoundPreservedState() {
         BlackjackGame original = new BlackjackGame("Test");
         original.startNewRound(75, 50, 25);
 
@@ -58,7 +60,7 @@ public class BlackjackGameTest {
     }
 
     @Test
-    void humanBetIsClampedToNonNegative(){
+    void humanBetIsClampedToNonNegative() {
         BlackjackGame game = new BlackjackGame("Test");
 
         game.startNewRound(-100, 50, 25);
@@ -67,7 +69,7 @@ public class BlackjackGameTest {
     }
 
     @Test
-    void handAceHandlingSoftVsHard(){
+    void handAceHandlingSoftVsHard() {
         Hand hand = new Hand();
 
         hand.add(new Card(Rank.ACE, Suit.CLUBS)); // Ace = 1 or 11
@@ -107,7 +109,7 @@ public class BlackjackGameTest {
     }
 
     @Test 
-    void bustIsDetected(){
+    void bustIsDetected() {
         Hand hand = new Hand();
         hand.add(new Card(Rank.KING, Suit.CLUBS)); 
         hand.add(new Card(Rank.QUEEN, Suit.DIAMONDS)); 
@@ -117,7 +119,7 @@ public class BlackjackGameTest {
     }
 
     @Test
-    void saveLoadRestoresHandsAndTurn(){
+    void saveLoadRestoresHandsAndTurn() {
         BlackjackGame game1 = new BlackjackGame("Test");
         game1.startNewRound(50, 50, 50);
 
@@ -135,13 +137,13 @@ public class BlackjackGameTest {
     }
 
     // private helper pasted here to keep the game's helper private.
-    private void replaceHand(Hand target, Hand src){
+    private void replaceHand(Hand target, Hand src) {
         target.clear();
         for (Card card : src.getCards()) target.add(card);
     }
 
     @Test
-    void payoutWhenPlayerBeatsDealer(){
+    void payoutWhenPlayerBeatsDealer() {
         BlackjackGame game = new BlackjackGame("Test");
         game.startNewRound(100, 50, 50);
 
@@ -153,9 +155,4 @@ public class BlackjackGameTest {
         assertTrue(game.getHuman().getBankroll() > 1000);
         
     }
-
-
-
-
-
 }
