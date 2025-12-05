@@ -19,7 +19,7 @@ public class BlackjackGame {
     private final Participant dealer;
 
     private final Map<Participant, BotStrategy> botBrains = new HashMap<>();
-    public int turnIndex = 0;
+    private int turnIndex = 0;
     private boolean roundOver = false;
     private String resultBanner = "";
 

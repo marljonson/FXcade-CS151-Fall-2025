@@ -1,7 +1,6 @@
 package ui;
 
 import blackjack.*;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -242,59 +241,48 @@ public class BlackjackController {
         game.startNewRound(bet, 50, 50);
         refresh();
         statusLabel.setText("YOUR TURN");
-        hitButton.setDisable(false);
-        standButton.setDisable(false);
-        newRoundButton.setDisable(true);
+
+        // If the round ended immediately (natural blackjack, empty deck, etc)
+        if (game.isRoundOver()) {
+            endRoundUI();
+        } else {
+            statusLabel.setText("YOUR TURN");
+            hitButton.setDisable(false);
+            standButton.setDisable(false);
+            newRoundButton.setDisable(true);
+        }
     }
 
     private void hit() {
         if (!game.isHumansTurn()) return;
-        game.humanHit();
+
+        game.humanHit();   // model does all state changes
         refresh();
-        if (game.getHuman().getHand().getBestTotal() >= 21) endTurn();
+
+        if (game.isRoundOver()) {
+            endRoundUI();
+        }
     }
 
     private void stand() {
         if (!game.isHumansTurn()) return;
-        endTurn();
+
+        game.humanStand(); // model advances bots & dealer internally
+        refresh();
+
+        if (game.isRoundOver()) {
+            endRoundUI();
+        }
     }
 
-    private void endTurn() {
+
+    private void endRoundUI() {
         hitButton.setDisable(true);
         standButton.setDisable(true);
-
-        new Thread(() -> {
-            while (!game.isRoundOver()) {
-                if (game.getTurnIndex() < 3) {
-                    Participant p = game.getPlayers().get(game.getTurnIndex());
-                    BotStrategy brain = p == game.getBot1() ? BotStrategy.hitUnder(16)
-                                      : p == game.getBot2() ? BotStrategy.hitUnder(15) : null;
-
-                    while (brain != null && !p.getHand().isBust() &&
-                           brain.decide(p.getHand(), game.dealerUpCard()) == BotStrategy.Action.HIT) {
-                        game.tryDealUp(p.getHand());
-                        sleep(800);
-                        Platform.runLater(this::refresh);
-                    }
-                } else {
-                    game.revealDealerHole();
-                    Platform.runLater(this::refresh);
-                    sleep(1000);
-                    game.dealerTurn();
-                    game.finishRound();
-                }
-                game.turnIndex++;
-            }
-
-            Platform.runLater(() -> {
-                refresh();
-                statusLabel.setText(game.getResultBanner().replace("\n", " • "));
-                newRoundButton.setDisable(false);
-                hitButton.setDisable(false);
-                standButton.setDisable(false);
-            });
-        }).start();
+        newRoundButton.setDisable(false);
+        statusLabel.setText(game.getResultBanner().replace("\n", " • "));
     }
+
 
     private void showSaveDialog() {
         String saveCode = game.toJsonSave();
@@ -307,7 +295,7 @@ public class BlackjackController {
     }
 
     private void refresh() {
-        renderHand(dealerHandBox, game.getDealer().getHand(), true);
+        renderHand(dealerHandBox, game.getDealer().getHand(), game.hasDealerHoleHidden());
         renderHand(playerHandBox, game.getHuman().getHand(), false);
         renderHand(bot1HandBox, game.getBot1().getHand(), !game.isRoundOver());
         renderHand(bot2HandBox, game.getBot2().getHand(), !game.isRoundOver());
