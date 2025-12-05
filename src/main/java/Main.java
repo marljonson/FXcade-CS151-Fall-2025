@@ -14,8 +14,16 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.shape.Line;
 import manager.AccountManager;
 import snake.controller.SnakeController;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
@@ -26,6 +34,8 @@ public class Main extends Application {
     private MediaPlayer mediaPlayer; // Field for music
     private boolean isMusicPlaying = false; // Field for music
     private MediaPlayer sfxPlayer;
+    private VBox snakeListBox;
+    private Label welcomeLabel;
 
     public Main() {
         this.accountManager = new AccountManager();
@@ -228,19 +238,29 @@ public class Main extends Application {
 
         // Main menu scene
         BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color:  #f2f2f7;");
 
         // Left main menu
         Label topScore = new Label("Top Scores");
         topScore.setStyle("-fx-font-weight: bold");
         topScore.setFont(new Font("System", 24));
 
-        Label blackjackScores = new Label("Blackjack:");
+        Line underline = new Line(0, 0, 140, 0);
+        underline.setStroke(Color.rgb(0, 0, 0, 0.15));
+        underline.setStrokeWidth(2);
+
+        Label blackjackScores = new Label("Blackjack");
+        blackjackScores.setFont(new Font("System", 18));
+        blackjackScores.setStyle("-fx-text-fill: #1A3D7C; -fx-font-weight: bold;");
+
         Label snakeScores = new Label("Snake");
-        topScore.setFont(new Font("System", 18));
+        snakeScores.setFont(new Font("System", 18));
+        snakeScores.setStyle("-fx-text-fill: #1A3D7C; -fx-font-weight: bold;");
 
-        VBox snakeListBox = new VBox();
+        snakeListBox = new VBox();
+        snakeListBox.setSpacing(4);
 
-        VBox mainMenuLeft = new VBox(topScore, blackjackScores, snakeScores, snakeListBox);
+        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, snakeScores, snakeListBox);
         mainMenuLeft.setSpacing(10);
         mainMenuLeft.setPadding(new Insets(20));
 
@@ -291,9 +311,13 @@ public class Main extends Application {
         Scene mainMenuScene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         HBox toolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
-        borderPane.setTop(toolBar);
 
-        // updateSnakeTopScores(accountManager, VBox snakeListBox);
+        welcomeLabel = new Label();
+        welcomeLabel.setStyle("-fx-font-style: italic; -fx-font-size: 16px;");
+        welcomeLabel.setPadding(new Insets(10, 0, 10, 20));
+
+        VBox topArea = new VBox(toolBar, welcomeLabel);
+        borderPane.setTop(topArea);
 
         // Button actions
         // 1 - Login Scene: Sign in button clicked
@@ -312,6 +336,8 @@ public class Main extends Application {
                             sfxPlayer.stop();
                             sfxPlayer.play();
                         }
+                        updateSnakeTopScores(accountManager, snakeListBox);
+                        welcomeLabel.setText("Welcome to FXcade, " + accountManager.getActiveUser().getUsername() + "!");
                         primaryStage.setScene(mainMenuScene);
                         break;
                     case USER_NOT_FOUND:
@@ -377,6 +403,8 @@ public class Main extends Application {
                 mainMenu.requestFocus();
             });
 
+            updateSnakeTopScores(accountManager, snakeListBox);
+
             HBox snakeToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
             controller.getView().setToolbar(snakeToolBar);
 
@@ -423,6 +451,7 @@ public class Main extends Application {
 
         // Tool bar "Main Menu" button
         mainMenuButton.setOnAction(e -> {
+            updateSnakeTopScores(accountManager, snakeListBox);
             primaryStage.setScene(mainMenuScene);
             primaryStage.setTitle("FXcade Game Manager");
         });
@@ -441,6 +470,36 @@ public class Main extends Application {
         });
 
         return toolBar;
+    }
+
+    private void updateSnakeTopScores(AccountManager accountManager, VBox snakeListBox) {
+        snakeListBox.getChildren().clear();
+
+        String username = accountManager.getActiveUser().getUsername();
+        Path filePath = Paths.get("data/high_scores.txt");
+
+        try {
+            List<String> lines = Files.readAllLines(filePath);
+            String start = username + ":snake:";
+
+            List<Integer> scores = new ArrayList<>();
+
+            for (String line : lines) {
+                if (line.startsWith(start)) {
+                    String[] parts = line.split(":");
+                    for (int i = 2; i < parts.length; i++) {
+                        scores.add(Integer.parseInt(parts[i]));
+                    }
+                    break;
+                }
+            }
+
+            for (int i = 0; i < scores.size(); i++) {
+                snakeListBox.getChildren().add(new Label((i + 1) + ". " + scores.get(i)));
+            }
+        } catch (IOException e) {
+            snakeListBox.getChildren().add(new Label("Error reading scores"));
+        }
     }
 
     public static void main(String[] args) {
