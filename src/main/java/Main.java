@@ -293,7 +293,7 @@ public class Main extends Application {
             controller.getView().getCanvas().requestFocus();
         });
 
-        // BLACKJACK BUTTON — FIXED AND WORKING
+        // Working blackjack button
         blackjackButton.setOnAction(e -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/blackjack.fxml"));
