@@ -36,6 +36,7 @@ public class Main extends Application {
     private boolean isMusicPlaying = false; // Field for music
     private MediaPlayer sfxPlayer;
     private VBox snakeListBox;
+    private VBox blackjackListBox;
     private Label welcomeLabel;
 
     public Main() {
@@ -280,10 +281,13 @@ public class Main extends Application {
         snakeScores.setFont(new Font("System", 18));
         snakeScores.setStyle("-fx-text-fill: #2E7D32; -fx-font-weight: bold;");
 
+        blackjackListBox = new VBox();
+        blackjackListBox.setSpacing(4);
+
         snakeListBox = new VBox();
         snakeListBox.setSpacing(4);
 
-        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, snakeScores, snakeListBox);
+        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, blackjackListBox, snakeScores, snakeListBox);
         mainMenuLeft.setSpacing(10);
         mainMenuLeft.setPadding(new Insets(20));
 
