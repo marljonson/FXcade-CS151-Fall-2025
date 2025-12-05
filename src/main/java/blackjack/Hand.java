@@ -3,23 +3,24 @@ package blackjack;
 import java.util.*;
 
 public class Hand {
+    
     private final List<Card> cards = new ArrayList<>();
 
     public List<Card> getCards() {
         return Collections.unmodifiableList(cards);
-    }// cards in hand
+    } // cards in hand
 
     public void clear() {
         cards.clear();
-    }                                       // clear cards from hand
+    } // clear cards from hand
 
     public void add(Card card) {
         cards.add(Objects.requireNonNull(card));
-    }      // add card to hand
+    } // add card to hand
 
     public int size() {
         return cards.size();
-    }                                   // Number of cards in hand
+    } // number of cards in hand
 
     /*
      * Calculate total for hand, Ace may be 1 or 11
