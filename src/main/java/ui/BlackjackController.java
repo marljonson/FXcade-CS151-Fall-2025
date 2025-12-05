@@ -21,7 +21,7 @@ public class BlackjackController {
     private Label playerBankroll, bot1Bankroll, bot2Bankroll;
     private Label statusLabel;
     private TextField betField;
-    private Button newRoundButton;
+    private Button hitButton, standButton, newRoundButton;
 
     public BlackjackController(Stage stage, Runnable backToMenu) {
         this.stage = stage;
@@ -32,53 +32,74 @@ public class BlackjackController {
         game = new BlackjackGame(username);
         game.getHuman().setBankroll(1000);
 
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #1a1a2e; -fx-text-fill: white;");
-        root.setAlignment(Pos.TOP_CENTER);
+        VBox root = new VBox();
+        root.setStyle("-fx-background-color: #f8f9fa;");
+
+        // === EXACT SAME TOOLBAR AS MAIN MENU ===
+        HBox toolBar = new HBox(15);
+        toolBar.setPadding(new Insets(10));
+        toolBar.setStyle("-fx-background-color: #555555;");
+        toolBar.setAlignment(Pos.CENTER_RIGHT);
+
+        Button musicToggleButton = new Button("Play Music");
+        Button mainMenuButton = new Button("Main Menu");
+        Button signOutButton = new Button("Sign Out");
+
+        toolBar.getChildren().addAll(musicToggleButton, mainMenuButton, signOutButton);
+        mainMenuButton.setOnAction(e -> backToMenu.run());
+        signOutButton.setOnAction(e -> backToMenu.run());
+
+        // === GAME AREA ===
+        VBox gameArea = new VBox(20);
+        gameArea.setPadding(new Insets(20));
+        gameArea.setAlignment(Pos.TOP_CENTER);
 
         Label title = new Label("BLACKJACK");
-        title.setStyle("-fx-font-size: 40; -fx-font-weight: bold; -fx-text-fill: #00ff88;");
+        title.setStyle("-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #212529;"); // Smaller title
 
         VBox dealerArea = new VBox(10);
         dealerArea.setAlignment(Pos.CENTER);
         dealerArea.getChildren().addAll(
-            new Label("DEALER") {{ setStyle("-fx-font-size: 20; -fx-text-fill: #ff4444;"); }},
-            dealerHandBox = new HBox(10),
-            dealerTotal = new Label("??") {{ setStyle("-fx-font-size: 18;"); }}
+            new Label("DEALER") {{ setStyle("-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #dc3545;"); }},
+            dealerHandBox = new HBox(12) {{ setAlignment(Pos.CENTER); }}, // Centered cards
+            dealerTotal = new Label("??") {{ setStyle("-fx-font-size: 20;"); }}
         );
 
         HBox playersRow = new HBox(50);
         playersRow.setAlignment(Pos.CENTER);
         playersRow.getChildren().addAll(
-            createPlayerArea("YOU", "#00ff88"),
-            createPlayerArea("BOT 1", "#44ccff"),
-            createPlayerArea("BOT 2", "#ff88cc")
+            createPlayerArea("YOU", "#28a745"),
+            createPlayerArea("BOT 1", "#17a2b8"),
+            createPlayerArea("BOT 2", "#6f42c1")
         );
 
         betField = new TextField("50");
         betField.setPrefWidth(80);
-        betField.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
 
-        Button hitBtn = new Button("HIT");
-        Button standBtn = new Button("STAND");
+        hitButton = new Button("HIT");
+        standButton = new Button("STAND");
         newRoundButton = new Button("NEW ROUND");
 
-        HBox controls = new HBox(20, new Label("Bet:"), betField, hitBtn, standBtn, newRoundButton);
+        hitButton.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;");
+        standButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;");
+        newRoundButton.setStyle("-fx-background-color: #ffc107; -fx-text-fill: black; -fx-font-weight: bold; -fx-font-size: 16;");
+
+        HBox controls = new HBox(20, new Label("Bet:"), betField, hitButton, standButton, newRoundButton);
         controls.setAlignment(Pos.CENTER);
 
         statusLabel = new Label("Click NEW ROUND to start");
-        statusLabel.setStyle("-fx-font-size: 24; -fx-text-fill: #00ff88;");
+        statusLabel.setStyle("-fx-font-size: 22; -fx-text-fill: #007bff; -fx-font-weight: bold;");
 
-        root.getChildren().addAll(title, dealerArea, playersRow, controls, statusLabel);
+        gameArea.getChildren().addAll(title, dealerArea, playersRow, controls, statusLabel);
+        root.getChildren().addAll(toolBar, gameArea);
 
-        hitBtn.setOnAction(e -> hit());
-        standBtn.setOnAction(e -> stand());
+        hitButton.setOnAction(e -> hit());
+        standButton.setOnAction(e -> stand());
         newRoundButton.setOnAction(e -> newRound());
 
-        newRound(); // auto-start first round
+        newRound(); // start first round
 
-        Scene scene = new Scene(root, 1300, 900);
+        Scene scene = new Scene(root, 1200, 800); // Smaller window
         stage.setScene(scene);
         stage.setTitle("FXcade - Blackjack");
         stage.show();
@@ -101,11 +122,12 @@ public class BlackjackController {
             bot2Bankroll = bankroll;
         }
 
-        VBox area = new VBox(10, 
-            new Label(name) {{ setStyle("-fx-font-size: 20; -fx-text-fill: " + color + "; -fx-font-weight: bold;"); }},
+        VBox area = new VBox(10,
+            new Label(name) {{ setStyle("-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: " + color + ";"); }},
             handBox, total, bankroll
         );
         area.setAlignment(Pos.CENTER);
+        area.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);");
         return area;
     }
 
@@ -119,7 +141,9 @@ public class BlackjackController {
         game.startNewRound(bet, 50, 50);
         refresh();
         statusLabel.setText("YOUR TURN");
-        newRoundButton.setDisable(true);  // disable until round ends
+        hitButton.setDisable(false);
+        standButton.setDisable(false);
+        newRoundButton.setDisable(true);
     }
 
     private void hit() {
@@ -135,6 +159,9 @@ public class BlackjackController {
     }
 
     private void endTurn() {
+        hitButton.setDisable(true);
+        standButton.setDisable(true);
+
         new Thread(() -> {
             while (!game.isRoundOver()) {
                 if (game.getTurnIndex() < 3) {
@@ -161,7 +188,9 @@ public class BlackjackController {
             runLater(() -> {
                 refresh();
                 statusLabel.setText(game.getResultBanner().replace("\n", " • "));
-                newRoundButton.setDisable(false);  // RE-ENABLE NEW ROUND
+                newRoundButton.setDisable(false);
+                hitButton.setDisable(false);
+                standButton.setDisable(false);
             });
         }).start();
     }

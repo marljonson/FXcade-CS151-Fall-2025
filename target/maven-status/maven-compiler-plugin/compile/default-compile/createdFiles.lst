@@ -1,6 +1,7 @@
 snake\controller\SnakeController$1.class
 ui\BlackjackController$2.class
 blackjack\BlackjackGame.class
+ui\BlackjackController$5.class
 blackjack\Suit.class
 snake\ui\SnakeGameView$1.class
 blackjack\Participant.class
