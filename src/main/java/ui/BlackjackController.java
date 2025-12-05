@@ -8,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
 public class BlackjackController {
@@ -23,6 +25,9 @@ public class BlackjackController {
     private Label statusLabel;
     private TextField betField;
     private Button hitButton, standButton, newRoundButton;
+
+    private MediaPlayer blackjackMusicPlayer;
+    private Button musicToggleButton;
 
     public BlackjackController(Stage stage, Runnable backToMenu) {
         this.stage = stage;
@@ -152,13 +157,46 @@ public class BlackjackController {
         toolBar.setStyle("-fx-background-color: #555555;");
         toolBar.setAlignment(Pos.CENTER_RIGHT);
 
-        Button musicToggleButton = new Button("Play Music");
+        musicToggleButton = new Button("Play Music");
         Button mainMenuButton = new Button("Main Menu");
         Button signOutButton = new Button("Sign Out");
 
         toolBar.getChildren().addAll(musicToggleButton, mainMenuButton, signOutButton);
-        mainMenuButton.setOnAction(e -> backToMenu.run());
-        signOutButton.setOnAction(e -> backToMenu.run());
+        mainMenuButton.setOnAction(e -> {
+            if (blackjackMusicPlayer != null) {
+                blackjackMusicPlayer.stop();
+                musicToggleButton.setText("Play Music");
+            }
+            backToMenu.run();
+        });
+
+        signOutButton.setOnAction(e -> {
+            if (blackjackMusicPlayer != null) {
+                blackjackMusicPlayer.stop();
+                musicToggleButton.setText("Play Music");
+            }
+            backToMenu.run();
+        });
+
+        // Blackjack music
+        try {
+            var url = getClass().getResource("/audio/stray_sheep.mp3");
+            if (url != null) {
+                Media media = new Media(url.toExternalForm());
+                blackjackMusicPlayer = new MediaPlayer(media);
+                blackjackMusicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+
+                musicToggleButton.setOnAction(e -> {
+                    if (blackjackMusicPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                        blackjackMusicPlayer.pause();
+                        musicToggleButton.setText("Play Music");
+                    } else {
+                        blackjackMusicPlayer.play();
+                        musicToggleButton.setText("Pause Music");
+                    }
+                });
+            }
+        } catch (Exception ignored) {}
 
         root.getChildren().add(0, toolBar);
     }
