@@ -122,7 +122,7 @@ public class BlackjackController {
     private int parseBetOrDefault(int fallback) {
         try {
             String s = (betField == null) ? null : betField.getText();
-            int n = Integer.parseInt(betField.getText().trim());
+            int n = Integer.parseInt(s);
             return Math.max(0, n);
         } catch (Exception e) {
             return fallback;
