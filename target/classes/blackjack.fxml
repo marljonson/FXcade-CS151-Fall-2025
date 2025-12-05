@@ -2,9 +2,15 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="root" xmlns:fx="http://javafx.com/fxml" spacing="20" style="-fx-background-color: #0d1b2a; -fx-padding: 20;">
+<VBox fx:id="root"
+      xmlns="http://javafx.com/javafx/23" 
+      xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="ui.BlackjackController"
+      spacing="20" 
+      style="-fx-background-color: #0d1b2a; -fx-padding: 20;">
     <children>
 
         <Label text="BLACKJACK" style="-fx-text-fill: white; -fx-font-size: 32;" alignment="CENTER" />

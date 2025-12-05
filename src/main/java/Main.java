@@ -296,15 +296,15 @@ public class Main extends Application {
         // BLACKJACK BUTTON — FIXED AND WORKING
         blackjackButton.setOnAction(e -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/blackjack.fxml")); // ← correct path
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/blackjack.fxml"));
                 Parent blackjackRoot = loader.load();
 
                 BlackjackController controller = loader.getController();
                 String username = accountManager.getActiveUser().getUsername();
-                controller.init(username);
+                controller.init(username);  // This now starts the game + refreshes
 
+                // Add toolbar above the root
                 HBox bjToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
-
                 BorderPane fullScreen = new BorderPane();
                 fullScreen.setTop(bjToolBar);
                 fullScreen.setCenter(blackjackRoot);
@@ -314,7 +314,6 @@ public class Main extends Application {
                 primaryStage.setTitle("FXcade - Blackjack");
             } catch (Exception ex) {
                 ex.printStackTrace();
-                System.out.println("Failed to load Blackjack — check /blackjack.fxml path");
             }
         });
 
