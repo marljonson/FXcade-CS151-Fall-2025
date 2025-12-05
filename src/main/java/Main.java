@@ -19,6 +19,7 @@ import javafx.scene.layout.Priority;
 import manager.AccountManager;
 import snake.controller.SnakeController;
 
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +37,7 @@ public class Main extends Application {
     private boolean isMusicPlaying = false; // Field for music
     private MediaPlayer sfxPlayer;
     private VBox snakeListBox;
+    private VBox blackjackListBox;
     private Label welcomeLabel;
 
     public Main() {
@@ -280,10 +282,13 @@ public class Main extends Application {
         snakeScores.setFont(new Font("System", 18));
         snakeScores.setStyle("-fx-text-fill: #2E7D32; -fx-font-weight: bold;");
 
+        blackjackListBox = new VBox();
+        blackjackListBox.setSpacing(4);
+
         snakeListBox = new VBox();
         snakeListBox.setSpacing(4);
 
-        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, snakeScores, snakeListBox);
+        VBox mainMenuLeft = new VBox(topScore, underline, blackjackScores, blackjackListBox, snakeScores, snakeListBox);
         mainMenuLeft.setSpacing(10);
         mainMenuLeft.setPadding(new Insets(20));
 
@@ -436,6 +441,7 @@ public class Main extends Application {
                             sfxPlayer.stop();
                             sfxPlayer.play();
                         }
+                        updateBlackjackTopScores(accountManager, blackjackListBox);
                         updateSnakeTopScores(accountManager, snakeListBox);
                         welcomeLabel.setText("Welcome to FXcade, " + accountManager.getActiveUser().getUsername() + "!");
                         primaryStage.setScene(mainMenuScene);
@@ -551,6 +557,7 @@ public class Main extends Application {
 
         // Tool bar "Main Menu" button
         mainMenuButton.setOnAction(e -> {
+            updateBlackjackTopScores(accountManager, blackjackListBox);
             updateSnakeTopScores(accountManager, snakeListBox);
             primaryStage.setScene(mainMenuScene);
             primaryStage.setTitle("FXcade Game Manager");
@@ -622,6 +629,72 @@ public class Main extends Application {
             }
         } catch (IOException e) {
 
+        }
+    }
+
+    private void updateBlackjackTopScores(AccountManager accountManager, VBox blackjackListBox){
+        blackjackListBox.getChildren().clear();
+
+        String username = accountManager.getActiveUser().getUsername();
+        Path filePath = Paths.get("data/blackjack_high_scores.txt");
+
+        if (!Files.exists(filePath)){
+            return; // nothing to show yet
+        }
+
+        try {
+            List<String> lines = Files.readAllLines(filePath);
+            String prefix = username + ":";
+
+
+            Integer best = null;
+
+            // Find this user's line
+            for (String line : lines){
+                if (line.startsWith(prefix)) {
+                    String[] parts = line.split(":");
+                    if (parts.length >= 2) {
+                        best = Integer.parseInt(parts[1]);
+                    }
+                    break;
+                }
+            }
+
+            // If we have a score, display as 1. <score> and pad with 0 until 5
+            List<Integer> scores = new ArrayList<>();
+            if (best != null) { scores.add(best); }
+            while (scores.size() < 5) {
+                scores.add(0);
+            }
+
+            for(int i = 0; i < scores.size(); i++){
+                String text = (i + 1) + ". " + scores.get(i);
+
+                Label scoreLabel = new Label(text);
+                scoreLabel.setFont(Font.font("Consolas", 14));
+                scoreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1B5E20;");
+
+                HBox row = new HBox(scoreLabel);
+                row.setSpacing(8);
+                row.setAlignment(Pos.CENTER_LEFT);
+                row.setPadding(new Insets(4, 10, 4, 10));
+
+                String backgroundColor = (i % 2 == 0) ? "#C8E6C9" : "#A5D6A7";
+                row.setStyle(
+                        "-fx-background-color: " + backgroundColor + ";" +
+                                "-fx-background-radius: 6;"
+                );
+
+                row.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(scoreLabel, Priority.ALWAYS);
+                VBox.setMargin(row, new Insets(2, 0, 2, 0));
+
+                blackjackListBox.getChildren().add(row);
+            }
+
+
+        } catch (Exception e) {
+            System.out.println("Error reading blackjack high scores: " + e.getMessage());
         }
     }
 

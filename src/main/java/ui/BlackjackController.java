@@ -8,9 +8,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /*
@@ -19,6 +21,8 @@ import java.util.*;
  */
 public class BlackjackController {
     private static final int DEFAULT_BET = 50;
+    private static final Path HIGH_SCORE_PATH = Paths.get("data", "blackjack_high_scores.txt");
+
 
     // wire these fx ids in blackjack.fxml
     @FXML
@@ -65,6 +69,12 @@ public class BlackjackController {
         game.humanStand();
         refresh();
         endIfOver();
+    }
+
+    
+    private void onNewGame() {
+        game.resetForNewGame();
+        startRound();
     }
 
     @FXML
@@ -118,7 +128,7 @@ public class BlackjackController {
     private int parseBetOrDefault(int fallback) {
         try {
             String s = (betField == null) ? null : betField.getText();
-            int n = Integer.parseInt(betField.getText().trim());
+            int n = Integer.parseInt(s);
             return Math.max(0, n);
         } catch (Exception e) {
             return fallback;
@@ -132,7 +142,7 @@ public class BlackjackController {
             hitButton.setDisable(true);
             standButton.setDisable(true);
             newRoundButton.setDisable(false);
-            // Possible TODO: submit high score here
+            saveHighScore(game.getHuman().getBankroll());
         }
     }
 
@@ -234,6 +244,42 @@ public class BlackjackController {
                     "Missing card image: " + CARD_DIR + f);
             return new Image(in);
         });
+    }
+    private void saveHighScore(int bankroll){
+        try {
+            List<String> lines;
+            if (Files.exists(HIGH_SCORE_PATH)){
+                lines = new ArrayList<>(Files.readAllLines(HIGH_SCORE_PATH));
+            } else {
+                lines = new ArrayList<>();
+            }
+
+            String prefix = username + ":";
+
+            boolean found = false;
+            for(int i = 0; i < lines.size(); i++){
+                String line = lines.get(i);
+                if (line.startsWith(prefix)) {
+                    // Existing entry = keep bigger value between old/new
+                    String[] split = line.split(":");
+                    int oldScore = Integer.parseInt(split[1]);
+                    int best = Math.max(oldScore, bankroll);
+                    lines.set(i, prefix + best);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                // new user in the high score file
+                lines.add(prefix + bankroll);
+            }
+
+            Files.createDirectories(HIGH_SCORE_PATH.getParent());
+            Files.write(HIGH_SCORE_PATH, lines);
+            
+        } catch (Exception e) {
+            System.out.println("Error writing blackjack high scores: " + e.getMessage() + "for user: " + username);
+        }
     }
 
     private Path savePath() {
