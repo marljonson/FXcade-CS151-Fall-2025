@@ -46,7 +46,7 @@ public class BlackjackController {
     }
 
     @FXML
-    private void onHit() {
+    private void onhit() {
         if (!game.isHumansTurn()) return;
         game.humanHit();
         refresh();
@@ -56,7 +56,7 @@ public class BlackjackController {
     }
 
     @FXML
-    private void onStand() {
+    private void onstand() {
         if (!game.isHumansTurn()) return;
         playBotsAndDealer();
     }
@@ -73,6 +73,7 @@ public class BlackjackController {
         refresh();
         statusLabel.setText("Your turn!");
         turnLabel.setText("YOUR TURN");
+        refresh();
     }
 
     private void playBotsAndDealer() {
