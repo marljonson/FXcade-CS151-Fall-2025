@@ -197,19 +197,30 @@ public class BlackjackController {
     }
 
     private void newRound() {
-        int bet = 50;
+        int bet;
         try {
             bet = Integer.parseInt(betField.getText().trim());
-            if (bet < 1 || bet > game.getHuman().getBankroll()) bet = 50;
-        } catch (Exception ignored) {}
+            if (bet < 1 || bet > game.getHuman().getBankroll()) bet = Math.min(50, game.getHuman().getBankroll());
+        } catch (Exception e) {
+            bet = Math.min(50, game.getHuman().getBankroll());
+        }
 
         game.startNewRound(bet, 50, 50);
         refresh();
-        statusLabel.setText("Your turn!");
-        turnLabel.setText("YOUR TURN");
-        hitButton.setDisable(false);
-        standButton.setDisable(false);
+        statusLabel.setText("Place your bet and wait...");
+        turnLabel.setText("BETTING");
+        hitButton.setDisable(true);
+        standButton.setDisable(true);
         newRoundButton.setDisable(true);
+
+        // Auto-start after deal
+        Platform.runLater(() -> {
+            sleep(800);
+            statusLabel.setText("Your turn!");
+            turnLabel.setText("YOUR TURN");
+            hitButton.setDisable(false);
+            standButton.setDisable(false);
+        });
     }
 
     private void hit() {
@@ -257,6 +268,17 @@ public class BlackjackController {
                 standButton.setDisable(true);
             });
         }).start();
+    }
+
+    // new method
+    private void playBot(Participant bot, BotStrategy strategy) {
+        while (!bot.getHand().isBust()) {
+            BotStrategy.Action action = strategy.decide(bot.getHand(), game.dealerUpCard());
+            if (action == BotStrategy.Action.STAND) break;
+            game.tryDealUp(bot.getHand());
+            sleep(600);
+            Platform.runLater(this::refresh);
+        }
     }
 
     private void showSaveDialog() {
