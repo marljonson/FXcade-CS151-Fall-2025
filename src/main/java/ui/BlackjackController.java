@@ -98,32 +98,39 @@ public class BlackjackController {
         });
     }
 
+    public void init(String username) {
+        if (username != null && !username.isBlank()) {
+            this.username = username;
+        }
+        this.game = new BlackjackGame(this.username);
+        game.startNewRound(50, 50, 50);  // start first round automatically
+    }
+
     private void advanceToNextPlayer() {
-        // Let the game engine handle bot turns and dealer
         new Thread(() -> {
             javafx.application.Platform.runLater(this::refreshUI);
-            try { Thread.sleep(800); } catch (Exception ignored) {}
+            try { Thread.sleep(800); } catch (InterruptedException ignored) {}
 
             while (!game.isRoundOver() && game.getTurnIndex() < 3) {
                 Participant current = game.getPlayers().get(game.getTurnIndex());
-                BotStrategy brain = game.getBot1() == current ? Strategies.hitUnder(16) :
-                                  game.getBot2() == current ? Strategies.hitUnder(15) : null;
+                BotStrategy brain = game.getBot1() == current ? BotStrategy.hitUnder(16) :
+                                    game.getBot2() == current ? BotStrategy.hitUnder(15) : null;
 
                 while (!current.getHand().isBust() && brain != null &&
-                       brain.decide(current.getHand(), game.getDealer().getHand().getCards().get(0)) == BotStrategy.Action.HIT) {
+                    brain.decide(current.getHand(), game.getDealer().getHand().getCards().get(0)) == BotStrategy.Action.HIT) {
                     game.tryDealUp(current.getHand());
                     javafx.application.Platform.runLater(this::refreshUI);
-                    Thread.sleep(1000);
+                    try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
                 }
                 game.turnIndex++;
                 javafx.application.Platform.runLater(this::refreshUI);
-                Thread.sleep(800);
+                try { Thread.sleep(800); } catch (InterruptedException ignored) {}
             }
 
             if (!game.isRoundOver()) {
                 game.revealDealerHole();
                 javafx.application.Platform.runLater(this::refreshUI);
-                Thread.sleep(1000);
+                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
                 game.dealerTurn();
                 game.finishRound();
                 javafx.application.Platform.runLater(() -> {

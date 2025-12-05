@@ -15,7 +15,7 @@ public class BlackjackGame {
     private final Participant dealer;
 
     private final Map<Participant, BotStrategy> botBrains = new HashMap<>();
-    private int turnIndex = 0;
+    public int turnIndex = 0;
     private boolean roundOver = false;
     private String resultBanner = "";
 
@@ -32,8 +32,8 @@ public class BlackjackGame {
         players.add(bot2);
 
         // each bot has a different 'personality'
-        botBrains.put(bot1, Strategies.hitUnder(16)); // hit under 16
-        botBrains.put(bot2, Strategies.hitUnder(15)); // tighter than bot 1 threshold
+        botBrains.put(bot1, BotStrategy.hitUnder(16));
+        botBrains.put(bot2, BotStrategy.hitUnder(15));
 
         dealer = new Participant("Dealer", false, true);
     }
@@ -130,7 +130,7 @@ public class BlackjackGame {
         return dealerCards.get(0);
     }
 
-    private void revealDealerHole() {
+    public void revealDealerHole() {
         // reveal (flip) the first face-down dealer card
         Hand src = dealer.getHand();
         Hand temp = new Hand();
@@ -148,7 +148,7 @@ public class BlackjackGame {
 
     }
 
-    private void dealerTurn() {
+    public void dealerTurn() {
         Hand hand = dealer.getHand();
         while (true) {
             int best = hand.getBestTotal();
@@ -167,7 +167,7 @@ public class BlackjackGame {
         }
     }
 
-    private void finishRound() {
+    public void finishRound() {
         roundOver = true;
 
         // Simple banner summary with stringbuilder
@@ -210,7 +210,7 @@ public class BlackjackGame {
 
     // These helpers encase deal() calls in a try-catch block for more error proofing
     // Deal one face-up card into a hand. If deck is empty, end the round gracefully. 
-    private boolean tryDealUp(Hand hand) {
+    public boolean tryDealUp(Hand hand) {
         try {
             hand.add(deck.deal());
             return true;
@@ -323,7 +323,7 @@ public class BlackjackGame {
     }
 
     // True if the dealer currently has a hidden (face-down) hole card.
-    private boolean hasDealerHoleHidden() {
+    public boolean hasDealerHoleHidden() {
         List<Card> dealerCards = dealer.getHand().getCards();
         // If the dealer has at least two cards and the second one is face-down
         return dealerCards.size() >= 2 && !dealerCards.get(1).isFaceUp();

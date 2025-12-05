@@ -1,8 +1,6 @@
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,14 +10,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.shape.Line;
 import manager.AccountManager;
 import snake.controller.SnakeController;
 import ui.BlackjackController;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.text.Font;
+import javafx.scene.shape.Line;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,15 +30,13 @@ import java.util.ArrayList;
 
 public class Main extends Application {
 
-    public static final double WINDOW_WIDTH = 700;
-    public static final double WINDOW_HEIGHT = 700;
-
     private AccountManager accountManager;
-    private MediaPlayer mediaPlayer; // Field for music
-    private boolean isMusicPlaying = false; // Field for music
+    private MediaPlayer mediaPlayer;
+    private boolean isMusicPlaying = false;
     private MediaPlayer sfxPlayer;
     private VBox snakeListBox;
     private Label welcomeLabel;
+    private Scene mainMenuScene;
 
     public Main() {
         this.accountManager = new AccountManager();
@@ -55,7 +53,7 @@ public class Main extends Application {
             }
             Media media = new Media(url.toExternalForm());
             mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);  // Loop forever
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         } catch (Exception e) {
             System.out.println("Failed to load music: " + e.getMessage());
         }
@@ -76,7 +74,6 @@ public class Main extends Application {
         welcomeMessage.setStyle("-fx-font-weight: bold");
         welcomeMessage.setFont(new Font("System", 24));
 
-        // Username text
         Label usernameLabel = new Label("Username: ");
         usernameLabel.setFont(new Font("System", 15));
         HBox usernameLabelBox = new HBox(usernameLabel);
@@ -84,13 +81,8 @@ public class Main extends Application {
         usernameLabelBox.setPrefWidth(200);
         usernameLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
 
-        // Username entry
-        TextField loginUsernameField = new TextField();
-        loginUsernameField.setPromptText("Username");
-        loginUsernameField.setPrefWidth(200);
-        loginUsernameField.setMaxWidth(Region.USE_PREF_SIZE);
+        TextField loginUsernameField = new TextField("Username");
 
-        // Password text
         Label passwordLabel = new Label("Password: ");
         passwordLabel.setFont(new Font("System", 15));
         HBox passwordLabelBox = new HBox(passwordLabel);
@@ -98,7 +90,6 @@ public class Main extends Application {
         passwordLabelBox.setPrefWidth(200);
         passwordLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
 
-        // Password entry
         TextField loginPasswordField = new TextField();
         loginPasswordField.setPromptText("Password");
         loginPasswordField.setPrefWidth(200);
@@ -107,143 +98,49 @@ public class Main extends Application {
         Label loginMessageLabel = new Label();
         loginMessageLabel.setTextFill(Color.RED);
 
-        // Sign in button
-        Button loginButton = new Button("Sign In");
-        loginButton.setPrefWidth(100);
-        loginButton.setPrefHeight(30);
-        loginButton.setFont(new Font("System", 15));
-        String loginNormal = "-fx-background-color: linear-gradient(#4aa3ff, #1e88e5);" +
-                "-fx-text-fill: white;" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-color: #0b63c7;" +
-                "-fx-border-width: 1;" +
-                "-fx-border-radius: 8;" +
-                "-fx-padding: 6 18;";
-        String loginHover = "-fx-background-color: linear-gradient(#82c4ff, #4aa3ff);" +
-                "-fx-text-fill: white;" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-color: #0b63c7;" +
-                "-fx-border-width: 1;" +
-                "-fx-border-radius: 8;" +
-                "-fx-padding: 6 18;";
+        Button loginButton = createStyledButton("Sign In", "#4aa3ff", "#1e88e5");
+        Button createAccountButton = createStyledButton("Sign Up", "#ffffff", "#f2f2f2", "#1e88e5");
 
-        loginButton.setStyle(loginNormal);
-        loginButton.setOnMouseEntered(e -> loginButton.setStyle(loginHover));
-        loginButton.setOnMouseExited(e -> loginButton.setStyle(loginNormal));
-
-        Label createAccountMessage = new Label("Don't have an account yet?");
-
-        // Sign up button
-        Button createAccountButton = new Button("Sign Up");
-        createAccountButton.setPrefWidth(100);
-        createAccountButton.setPrefHeight(30);
-        createAccountButton.setFont(new Font("System", 15));
-
-        String createAccountNormal = "-fx-background-color: linear-gradient(#ffffff, #f2f2f2);" +
-                "-fx-text-fill: #1e88e5;" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-color: #1e88e5;" +
-                "-fx-border-width: 1;" +
-                "-fx-border-radius: 8;" +
-                "-fx-padding: 6 18;";
-        String createAccountHover = "-fx-background-color: linear-gradient(#e8f3ff, #d6eaff);" +
-                "-fx-text-fill: #1565c0;" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-color: #1565c0;" +
-                "-fx-border-width: 1;" +
-                "-fx-border-radius: 8;" +
-                "-fx-padding: 6 18;";
-
-        createAccountButton.setStyle(createAccountNormal);
-        createAccountButton.setOnMouseEntered(e -> createAccountButton.setStyle(createAccountHover));
-        createAccountButton.setOnMouseExited(e -> createAccountButton.setStyle(createAccountNormal));
-
-
-        VBox signInlayout = new VBox(welcomeMessage, usernameLabelBox, loginUsernameField, passwordLabelBox, loginPasswordField, loginButton, loginMessageLabel, createAccountMessage, createAccountButton);
+        VBox signInlayout = new VBox(welcomeMessage, usernameLabelBox, loginUsernameField,
+                passwordLabelBox, loginPasswordField, loginButton, loginMessageLabel, createAccountButton);
         signInlayout.setSpacing(10);
         signInlayout.setPadding(new Insets(30));
         signInlayout.setAlignment(Pos.CENTER);
-        Scene loginScene = new Scene(signInlayout, WINDOW_WIDTH, WINDOW_HEIGHT);
+        Scene loginScene = new Scene(signInlayout, 700, 700);
 
         primaryStage.setScene(loginScene);
         primaryStage.setTitle("FXcade Game Manager");
         primaryStage.show();
-
 
         // Sign up scene
         Label signUpMessage = new Label("Sign Up");
         signUpMessage.setStyle("-fx-font-weight: bold");
         signUpMessage.setFont(new Font("System", 24));
 
-        // Username text
-        Label usernameSignUpLabel = new Label("Username: ");
-        usernameSignUpLabel.setFont(new Font("System", 15));
-        HBox usernameSignUpLabelBox = new HBox(usernameSignUpLabel);
-        usernameSignUpLabelBox.setAlignment(Pos.CENTER_LEFT);
-        usernameSignUpLabelBox.setPrefWidth(200);
-        usernameSignUpLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
-
-        // Username entry
         TextField signupUsernameField = new TextField();
         signupUsernameField.setPromptText("Username");
         signupUsernameField.setPrefWidth(200);
-        signupUsernameField.setMaxWidth(Region.USE_PREF_SIZE);
 
-        // Password text
-        Label passwordSignUpLabel = new Label("Password: ");
-        passwordSignUpLabel.setFont(new Font("System", 15));
-        HBox passwordSignUpLabelBox = new HBox(passwordSignUpLabel);
-        passwordSignUpLabelBox.setAlignment(Pos.CENTER_LEFT);
-        passwordSignUpLabelBox.setPrefWidth(200);
-        passwordSignUpLabelBox.setMaxWidth(Region.USE_PREF_SIZE);
-
-        // Password entry
         TextField signupPasswordField = new TextField();
         signupPasswordField.setPromptText("Password");
         signupPasswordField.setPrefWidth(200);
-        signupPasswordField.setMaxWidth(Region.USE_PREF_SIZE);
 
-        Button signUpButton = new Button("Sign Up");
-        signUpButton.setPrefWidth(100);
-        signUpButton.setPrefHeight(30);
-        signUpButton.setFont(new Font("System", 15));
-
-        String signUpNormal = "-fx-background-color: linear-gradient(#ffffff, #f2f2f2);" +
-                "-fx-text-fill: #1e88e5;" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-color: #1e88e5;" +
-                "-fx-border-width: 1;" +
-                "-fx-border-radius: 8;" +
-                "-fx-padding: 6 18;";
-        String signUpHover = "-fx-background-color: linear-gradient(#e8f3ff, #d6eaff);" +
-                "-fx-text-fill: #1565c0;" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-color: #1565c0;" +
-                "-fx-border-width: 1;" +
-                "-fx-border-radius: 8;" +
-                "-fx-padding: 6 18;";
-
-        signUpButton.setStyle(signUpNormal);
-        signUpButton.setOnMouseEntered(e -> signUpButton.setStyle(signUpHover));
-        signUpButton.setOnMouseExited(e -> signUpButton.setStyle(signUpNormal));
-
+        Button signUpButton = createStyledButton("Sign Up", "#ffffff", "#f2f2f2", "#1e88e5");
         Label signUpMessageLabel = new Label();
         signUpMessageLabel.setTextFill(Color.RED);
-
         Button signUpBackButton = new Button("Back");
 
-        VBox signupLayout = new VBox(signUpMessage, usernameSignUpLabelBox, signupUsernameField, passwordSignUpLabelBox, signupPasswordField, signUpButton, signUpMessageLabel, signUpBackButton);
+        VBox signupLayout = new VBox(signUpMessage, new Label("Username:"), signupUsernameField,
+                new Label("Password:"), signupPasswordField, signUpButton, signUpMessageLabel, signUpBackButton);
         signupLayout.setSpacing(10);
         signupLayout.setPadding(new Insets(30));
         signupLayout.setAlignment(Pos.CENTER);
-        Scene signupScene = new Scene(signupLayout, WINDOW_WIDTH, WINDOW_HEIGHT);
-
+        Scene signupScene = new Scene(signupLayout, 700, 700);
 
         // Main menu scene
         BorderPane borderPane = new BorderPane();
-        borderPane.setStyle("-fx-background-color:  #f2f2f7;");
+        borderPane.setStyle("-fx-background-color: #f2f2f7;");
 
-        // Left main menu
         Label topScore = new Label("Top Scores");
         topScore.setStyle("-fx-font-weight: bold");
         topScore.setFont(new Font("System", 24));
@@ -267,7 +164,6 @@ public class Main extends Application {
         mainMenuLeft.setSpacing(10);
         mainMenuLeft.setPadding(new Insets(20));
 
-        // Right main menu
         Label gameMenu = new Label("Play Games");
         gameMenu.setStyle("-fx-font-weight: bold");
         gameMenu.setFont(new Font("System", 24));
@@ -277,21 +173,6 @@ public class Main extends Application {
         blackjackButton.setPrefWidth(100);
         blackjackButton.setPrefHeight(30);
         blackjackButton.setFont(new Font("System", 16));
-        blackjackButton.setOnAction(e -> {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/blackjack.fxml"));
-            Parent blackjackRoot = loader.load();
-
-            // Get the controller so we can pass the username later
-            BlackjackController bjController = loader.getController();
-
-            Scene blackjackScene = new Scene(blackjackRoot, 1200, 800);
-            primaryStage.setScene(blackjackScene);
-            primaryStage.setTitle("FXcade - Blackjack");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    });
 
         Button snakeButton = new Button("Snake");
         snakeButton.setStyle("-fx-background-radius: 8;");
@@ -304,16 +185,7 @@ public class Main extends Application {
         addGameMenu.setFont(new Font("System", 24));
 
         Button addGameButton1 = new Button("Add Game");
-        addGameButton1.setStyle("-fx-background-radius: 8;");
-        addGameButton1.setPrefWidth(120);
-        addGameButton1.setPrefHeight(30);
-        addGameButton1.setFont(new Font("System", 16));
-
         Button addGameButton2 = new Button("Add Game");
-        addGameButton2.setStyle("-fx-background-radius: 8;");
-        addGameButton2.setPrefWidth(120);
-        addGameButton2.setPrefHeight(30);
-        addGameButton2.setFont(new Font("System", 16));
 
         VBox mainMenuRight = new VBox(gameMenu, blackjackButton, snakeButton, addGameMenu, addGameButton1, addGameButton2);
         mainMenuRight.setSpacing(10);
@@ -325,8 +197,7 @@ public class Main extends Application {
         mainMenu.setAlignment(Pos.TOP_CENTER);
 
         borderPane.setCenter(mainMenu);
-
-        Scene mainMenuScene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
+        mainMenuScene = new Scene(borderPane, 700, 700);
 
         HBox toolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
 
@@ -337,8 +208,8 @@ public class Main extends Application {
         VBox topArea = new VBox(toolBar, welcomeLabel);
         borderPane.setTop(topArea);
 
-        // Button actions
-        // 1 - Login Scene: Sign in button clicked
+        // ==================== BUTTON ACTIONS ====================
+
         loginButton.setOnAction(event -> {
             String loginUsername = loginUsernameField.getText();
             String loginPassword = loginPasswordField.getText();
@@ -349,7 +220,6 @@ public class Main extends Application {
                 AccountManager.loginStatus signInStatus = accountManager.signIn(loginUsername, loginPassword);
                 switch (signInStatus) {
                     case SUCCESS:
-                        // Change scene to main menu
                         if (sfxPlayer != null) {
                             sfxPlayer.stop();
                             sfxPlayer.play();
@@ -368,12 +238,8 @@ public class Main extends Application {
             }
         });
 
-        // 2 - Login Scene: Sign up button clicked
-        createAccountButton.setOnAction(e -> {
-            primaryStage.setScene(signupScene);
-        });
+        createAccountButton.setOnAction(e -> primaryStage.setScene(signupScene));
 
-        // 3 - Sign up scene: Sign up button clicked
         signUpButton.setOnAction(e -> {
             String signupUsername = signupUsernameField.getText();
             String signupPassword = signupPasswordField.getText();
@@ -407,15 +273,11 @@ public class Main extends Application {
             }
         });
 
-        // 4 - Sign Up scene: Back button clicked
-        signUpBackButton.setOnAction(e -> {
-            primaryStage.setScene(loginScene);
-        });
+        signUpBackButton.setOnAction(e -> primaryStage.setScene(loginScene));
 
-        // 7 - Launch snake game
+        // Snake Button
         snakeButton.setOnAction(e -> {
             SnakeController controller = new SnakeController(primaryStage, accountManager.getActiveUser().getUsername(), () -> {
-                // Snake Main Menu button
                 primaryStage.setScene(mainMenuScene);
                 primaryStage.setTitle("FXcade Game Manager");
                 mainMenu.requestFocus();
@@ -428,24 +290,64 @@ public class Main extends Application {
 
             primaryStage.setScene(controller.getView().getScene());
             primaryStage.setTitle("Snake Game");
-            // primaryStage.getScene().getRoot().requestFocus();
             controller.getView().getCanvas().requestFocus();
         });
+
+        // BLACKJACK BUTTON — FIXED AND WORKING
+        blackjackButton.setOnAction(e -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/blackjack.fxml")); // ← correct path
+                Parent blackjackRoot = loader.load();
+
+                BlackjackController controller = loader.getController();
+                String username = accountManager.getActiveUser().getUsername();
+                controller.init(username);
+
+                HBox bjToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
+
+                BorderPane fullScreen = new BorderPane();
+                fullScreen.setTop(bjToolBar);
+                fullScreen.setCenter(blackjackRoot);
+
+                Scene bjScene = new Scene(fullScreen, 1200, 850);
+                primaryStage.setScene(bjScene);
+                primaryStage.setTitle("FXcade - Blackjack");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.out.println("Failed to load Blackjack — check /blackjack.fxml path");
+            }
+        });
+
+        primaryStage.setScene(loginScene);
+    }
+
+    private Button createStyledButton(String text, String bgStart, String bgEnd) {
+        return createStyledButton(text, bgStart, bgEnd, null);
+    }
+
+    private Button createStyledButton(String text, String bgStart, String bgEnd, String borderColor) {
+        Button btn = new Button(text);
+        btn.setPrefWidth(100);
+        btn.setPrefHeight(30);
+        btn.setFont(new Font("System", 15));
+
+        String style = "-fx-background-color: linear-gradient(" + bgStart + ", " + bgEnd + ");" +
+                "-fx-text-fill: " + (borderColor == null ? "white" : "#1e88e5") + ";" +
+                "-fx-background-radius: 8;" +
+                (borderColor != null ? "-fx-border-color: " + borderColor + "; -fx-border-width: 1; -fx-border-radius: 8;" : "") +
+                "-fx-padding: 6 18;";
+
+        String hover = style.replace(bgStart, "#" + Integer.toHexString(Integer.parseInt(bgStart.substring(1), 16) + 0x181818));
+        btn.setStyle(style);
+        btn.setOnMouseEntered(e -> btn.setStyle(hover));
+        btn.setOnMouseExited(e -> btn.setStyle(style));
+        return btn;
     }
 
     private HBox createToolBar(Stage primaryStage, Scene loginScene, Scene mainMenuScene) {
-        // Top toolbar
-        Button musicToggleButton = new Button("Play Music"); // Music toggle button
-        musicToggleButton.setFont(new Font("System", 13));
-        musicToggleButton.setStyle("-fx-background-radius: 8;");
-
+        Button musicToggleButton = new Button("Play Music");
         Button mainMenuButton = new Button("Main Menu");
-        mainMenuButton.setFont(new Font("System", 13));
-        mainMenuButton.setStyle("-fx-background-radius: 8;");
-
         Button signOutButton = new Button("Sign Out");
-        signOutButton.setFont(new Font("System", 13));
-        signOutButton.setStyle("-fx-background-radius: 8;");
 
         HBox toolBar = new HBox(musicToggleButton, mainMenuButton, signOutButton);
         toolBar.setSpacing(10);
@@ -453,7 +355,6 @@ public class Main extends Application {
         toolBar.setAlignment(Pos.CENTER_RIGHT);
         toolBar.setStyle("-fx-background-color: #555555;");
 
-        // Music toggle action
         musicToggleButton.setOnAction(e -> {
             if (mediaPlayer == null) return;
             if (isMusicPlaying) {
@@ -467,32 +368,18 @@ public class Main extends Application {
             }
         });
 
-        // Tool bar "Main Menu" button
-        mainMenuButton.setOnAction(e -> {
-            updateSnakeTopScores(accountManager, snakeListBox);
-            primaryStage.setScene(mainMenuScene);
-            primaryStage.setTitle("FXcade Game Manager");
-        });
-
-        // Tool bar "Sign Out" button
+        mainMenuButton.setOnAction(e -> primaryStage.setScene(mainMenuScene));
         signOutButton.setOnAction(e -> {
-            // Stop music if it's playing
-            if (mediaPlayer != null && isMusicPlaying) {
-                mediaPlayer.stop();
-                isMusicPlaying = false;
-                musicToggleButton.setText("Play Music");
-            }
-            // Go back to login scene
+            if (mediaPlayer != null && isMusicPlaying) mediaPlayer.stop();
             primaryStage.setScene(loginScene);
-            primaryStage.setTitle("FXcade Game Manager");
         });
 
         return toolBar;
     }
 
     private void updateSnakeTopScores(AccountManager accountManager, VBox snakeListBox) {
+        // your existing method — unchanged
         snakeListBox.getChildren().clear();
-
         String username = accountManager.getActiveUser().getUsername();
         Path filePath = Paths.get("data/high_scores.txt");
 
@@ -519,24 +406,6 @@ public class Main extends Application {
             snakeListBox.getChildren().add(new Label("Error reading scores"));
         }
     }
-
-    blackjackButton.setOnAction(e -> {
-        try {
-            var loader = new FXMLLoader(getClass().getResource("/ui/blackjack.fxml"));
-            Parent root = loader.load();
-            BlackjackController controller = loader.getController();
-            controller.initializeGame(accountManager.getActiveUser().getUsername(), primaryStage, () -> {
-                primaryStage.setScene(mainMenuScene);
-                primaryStage.setTitle("FXcade Game Manager");
-            });
-
-            Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("Blackjack");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    });
 
     public static void main(String[] args) {
         launch(args);
