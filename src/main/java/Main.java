@@ -68,7 +68,7 @@ public class Main extends Application {
             Media chimeMedia = new Media(chimeUrl.toExternalForm());
             sfxPlayer = new MediaPlayer(chimeMedia);
         } catch (Exception e) {
-            System.out.println("Failed to load chime SFX: ");
+            System.out.println("Failed to load chime SFX: " + e.getMessage());
         }
 
         // Login scene
@@ -651,7 +651,7 @@ public class Main extends Application {
                 snakeListBox.getChildren().add(row);
             }
         } catch (IOException e) {
-
+            System.out.println("Failed to read snake high scores: " + e.getMessage());
         }
     }
 
