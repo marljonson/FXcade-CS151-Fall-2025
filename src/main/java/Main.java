@@ -49,7 +49,7 @@ public class Main extends Application {
 
         // Music setup
         try {
-            var url = getClass().getResource("/audio/lamb_game.mp3");
+            var url = getClass().getResource("/audio/snake_game.mp3");
             if (url == null) {
                 throw new RuntimeException("MP3 file not found in resources!");
             }
