@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -49,26 +50,26 @@ public class Main extends Application {
 
         // Music setup
         try {
-            var url = getClass().getResource("/audio/lamb_game.mp3");
+            var url = getClass().getResource("/audio/menu.mp3");
             if (url == null) {
                 throw new RuntimeException("MP3 file not found in resources!");
             }
             Media media = new Media(url.toExternalForm());
             mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);  // Loop forever
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Loop forever
         } catch (Exception e) {
             System.out.println("Failed to load music: " + e.getMessage());
         }
 
         try {
-            var popUrl = getClass().getResource("/audio/chime.mp3");
-            if (popUrl == null) {
+            var chimeUrl = getClass().getResource("/audio/chime.mp3");
+            if (chimeUrl == null) {
                 throw new RuntimeException("MP3 file not found in resources!");
             }
-            Media popMedia = new Media(popUrl.toExternalForm());
-            sfxPlayer = new MediaPlayer(popMedia);
+            Media chimeMedia = new Media(chimeUrl.toExternalForm());
+            sfxPlayer = new MediaPlayer(chimeMedia);
         } catch (Exception e) {
-            System.out.println("Failed to load pop SFX: ");
+            System.out.println("Failed to load chime SFX: " + e.getMessage());
         }
 
         // Login scene
@@ -158,8 +159,8 @@ public class Main extends Application {
         createAccountButton.setOnMouseEntered(e -> createAccountButton.setStyle(createAccountHover));
         createAccountButton.setOnMouseExited(e -> createAccountButton.setStyle(createAccountNormal));
 
-
-        VBox signInlayout = new VBox(welcomeMessage, usernameLabelBox, loginUsernameField, passwordLabelBox, loginPasswordField, loginButton, loginMessageLabel, createAccountMessage, createAccountButton);
+        VBox signInlayout = new VBox(welcomeMessage, usernameLabelBox, loginUsernameField, passwordLabelBox,
+                loginPasswordField, loginButton, loginMessageLabel, createAccountMessage, createAccountButton);
         signInlayout.setSpacing(10);
         signInlayout.setPadding(new Insets(30));
         signInlayout.setAlignment(Pos.CENTER);
@@ -168,7 +169,6 @@ public class Main extends Application {
         primaryStage.setScene(loginScene);
         primaryStage.setTitle("FXcade Game Manager");
         primaryStage.show();
-
 
         // Sign up scene
         Label signUpMessage = new Label("Sign Up");
@@ -254,12 +254,12 @@ public class Main extends Application {
         signUpBackButton.setOnMouseEntered(e -> signUpBackButton.setStyle(signUpBackHover));
         signUpBackButton.setOnMouseExited(e -> signUpBackButton.setStyle(signUpBackNormal));
 
-        VBox signupLayout = new VBox(signUpMessage, usernameSignUpLabelBox, signupUsernameField, passwordSignUpLabelBox, signupPasswordField, signUpButton, signUpMessageLabel, signUpBackButton);
+        VBox signupLayout = new VBox(signUpMessage, usernameSignUpLabelBox, signupUsernameField, passwordSignUpLabelBox,
+                signupPasswordField, signUpButton, signUpMessageLabel, signUpBackButton);
         signupLayout.setSpacing(10);
         signupLayout.setPadding(new Insets(30));
         signupLayout.setAlignment(Pos.CENTER);
         Scene signupScene = new Scene(signupLayout, WINDOW_WIDTH, WINDOW_HEIGHT);
-
 
         // Main menu scene
         BorderPane borderPane = new BorderPane();
@@ -402,7 +402,8 @@ public class Main extends Application {
         addGameButton2.setOnMouseEntered(e -> addGameButton2.setStyle(addGameButton2Hover));
         addGameButton2.setOnMouseExited(e -> addGameButton2.setStyle(addGameButton2Normal));
 
-        VBox mainMenuRight = new VBox(gameMenu, blackjackButton, snakeButton, addGameMenu, addGameButton1, addGameButton2);
+        VBox mainMenuRight = new VBox(gameMenu, blackjackButton, snakeButton, addGameMenu, addGameButton1,
+                addGameButton2);
         mainMenuRight.setSpacing(10);
         mainMenuRight.setPadding(new Insets(20));
 
@@ -443,7 +444,8 @@ public class Main extends Application {
                         }
                         updateBlackjackTopScores(accountManager, blackjackListBox);
                         updateSnakeTopScores(accountManager, snakeListBox);
-                        welcomeLabel.setText("Welcome to FXcade, " + accountManager.getActiveUser().getUsername() + "!");
+                        welcomeLabel
+                                .setText("Welcome to FXcade, " + accountManager.getActiveUser().getUsername() + "!");
                         primaryStage.setScene(mainMenuScene);
                         break;
                     case USER_NOT_FOUND:
@@ -507,14 +509,11 @@ public class Main extends Application {
                 primaryStage.setTitle("FXcade Game Manager");
                 // updateTopScores(accountManager, snakeListBox, blackjackListBox);
                 updateBlackjackTopScores(accountManager, blackjackListBox);
-                // Restart main menu music when returning
-                if (mediaPlayer != null) {
-                    mediaPlayer.play();
-                    isMusicPlaying = true;
-                }
+                updateSnakeTopScores(accountManager, snakeListBox);
             }).start(accountManager.getActiveUser().getUsername());
 
             // Stop main menu music when entering Blackjack
+            // This matches above
             if (mediaPlayer != null && isMusicPlaying) {
                 mediaPlayer.pause();
                 isMusicPlaying = false;
@@ -524,20 +523,24 @@ public class Main extends Application {
         // 7 - Launch snake game
         snakeButton.setOnAction(e -> {
             SnakeController controller = new SnakeController(primaryStage, accountManager.getActiveUser().getUsername(), () -> {
-                // Snake Main Menu button
                 primaryStage.setScene(mainMenuScene);
                 primaryStage.setTitle("FXcade Game Manager");
                 mainMenu.requestFocus();
+                updateBlackjackTopScores(accountManager, blackjackListBox);
+                updateSnakeTopScores(accountManager, snakeListBox);
             });
 
-            updateSnakeTopScores(accountManager, snakeListBox);
+            // Stop main menu music when entering Snake
+            if (mediaPlayer != null && isMusicPlaying) {
+                mediaPlayer.pause();
+                isMusicPlaying = false;
+            }
 
             HBox snakeToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
-            controller.getView().setToolbar(snakeToolBar);
+            controller.setToolbar(snakeToolBar);
 
             primaryStage.setScene(controller.getView().getScene());
             primaryStage.setTitle("Snake Game");
-            // primaryStage.getScene().getRoot().requestFocus();
             controller.getView().getCanvas().requestFocus();
         });
     }
@@ -564,7 +567,8 @@ public class Main extends Application {
 
         // Music toggle action
         musicToggleButton.setOnAction(e -> {
-            if (mediaPlayer == null) return;
+            if (mediaPlayer == null)
+                return;
             if (isMusicPlaying) {
                 mediaPlayer.pause();
                 musicToggleButton.setText("Play Music");
@@ -582,6 +586,13 @@ public class Main extends Application {
             updateSnakeTopScores(accountManager, snakeListBox);
             primaryStage.setScene(mainMenuScene);
             primaryStage.setTitle("FXcade Game Manager");
+
+            // When returning to main menu — sync button with real state
+            if (isMusicPlaying) {
+                musicToggleButton.setText("Pause Music");
+            } else {
+                musicToggleButton.setText("Play Music");
+            }
         });
 
         // Tool bar "Sign Out" button
@@ -639,8 +650,7 @@ public class Main extends Application {
                 String backgroundColor = (i % 2 == 0) ? "#C8E6C9" : "#A5D6A7";
                 row.setStyle(
                         "-fx-background-color: " + backgroundColor + ";" +
-                                "-fx-background-radius: 6;"
-                );
+                                "-fx-background-radius: 6;");
 
                 row.setMaxWidth(Double.MAX_VALUE);
                 HBox.setHgrow(scoreLabel, Priority.ALWAYS);
@@ -649,35 +659,29 @@ public class Main extends Application {
                 snakeListBox.getChildren().add(row);
             }
         } catch (IOException e) {
-
+            System.out.println("Failed to read snake high scores: " + e.getMessage());
         }
     }
 
-  private void updateBlackjackTopScores(AccountManager accountManager, VBox blackjackListBox) {
+    private void updateBlackjackTopScores(AccountManager accountManager, VBox blackjackListBox) {
         blackjackListBox.getChildren().clear();
 
         String username = accountManager.getActiveUser().getUsername();
-        Path filePath = Paths.get("data/high_scores.txt");
+        Path filePath = Paths.get("data/blackjack_high_scores.txt");
 
-        // we'll store ALL parsed scores here
-        List<Integer> scores = new ArrayList<>();
+        Integer best = null;
 
         try {
             if (Files.exists(filePath)) {
                 List<String> lines = Files.readAllLines(filePath);
-                String prefix = username + ":blackjack:";
+                String prefix = username + ":";
 
+                // Find this user's line
                 for (String line : lines) {
                     if (line.startsWith(prefix)) {
                         String[] parts = line.split(":");
-                        // parts[0] = username
-                        // parts[1] = "blackjack"
-                        // parts[2..] = scores
-                        for (int i = 2; i < parts.length; i++) {
-                            try {
-                                scores.add(Integer.parseInt(parts[i]));
-                            } catch (NumberFormatException ignored) {
-                            }
+                        if (parts.length >= 2) {
+                            best = Integer.parseInt(parts[1]);
                         }
                         break;
                     }
@@ -687,18 +691,15 @@ public class Main extends Application {
             System.out.println("Error reading blackjack high scores: " + e.getMessage());
         }
 
-        // sort high to low (just in case)
-        scores.sort(java.util.Comparator.reverseOrder());
-
-        // ensure exactly 5 entries
+        // Always build 5 entries
+        List<Integer> scores = new ArrayList<>();
+        if (best != null) {
+            scores.add(best);
+        }
         while (scores.size() < 5) {
             scores.add(0);
         }
-        if (scores.size() > 5) {
-            scores = scores.subList(0, 5);
-        }
 
-        // render rows
         for (int i = 0; i < scores.size(); i++) {
             String text = (i + 1) + ". " + scores.get(i);
 
@@ -714,8 +715,7 @@ public class Main extends Application {
             String backgroundColor = (i % 2 == 0) ? "#C8E6C9" : "#A5D6A7";
             row.setStyle(
                     "-fx-background-color: " + backgroundColor + ";" +
-                            "-fx-background-radius: 6;"
-            );
+                            "-fx-background-radius: 6;");
 
             row.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(scoreLabel, Priority.ALWAYS);
@@ -724,6 +724,7 @@ public class Main extends Application {
             blackjackListBox.getChildren().add(row);
         }
     }
+
     public static void main(String[] args) {
         launch(args);
     }

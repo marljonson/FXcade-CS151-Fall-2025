@@ -163,23 +163,23 @@ public class BlackjackController {
         toolBar.getChildren().addAll(musicToggleButton, mainMenuButton, signOutButton);
         mainMenuButton.setOnAction(e -> {
             if (blackjackMusicPlayer != null) {
-                blackjackMusicPlayer.stop();
-                musicToggleButton.setText("Play Music");
+                blackjackMusicPlayer.stop(); // stop the game music
+                musicToggleButton.setText("Play Music"); // force button text to say "Play Music"
             }
             backToMenu.run();
         });
 
         signOutButton.setOnAction(e -> {
             if (blackjackMusicPlayer != null) {
-                blackjackMusicPlayer.stop();
-                musicToggleButton.setText("Play Music");
+                blackjackMusicPlayer.stop(); // stop the game music
+                musicToggleButton.setText("Play Music"); // force button text to say "Play Music"
             }
             backToMenu.run();
         });
 
         // Blackjack music
         try {
-            var url = getClass().getResource("/audio/stray_sheep.mp3");
+            var url = getClass().getResource("/audio/blackjack.mp3");
             if (url != null) {
                 Media media = new Media(url.toExternalForm());
                 blackjackMusicPlayer = new MediaPlayer(media);
@@ -326,15 +326,24 @@ public class BlackjackController {
 
     private String cardName(Rank r, Suit s) {
         String rank = switch (r) {
-            case ACE -> "ace"; case KING -> "king"; case QUEEN -> "queen"; case JACK -> "jack";
-            case TEN -> "10"; default -> String.valueOf(r.getValue());
+            case ACE -> "ace";
+            case KING -> "king";
+            case QUEEN -> "queen";
+            case JACK -> "jack";
+            case TEN -> "10";
+            default -> String.valueOf(r.getValue());
         };
         String suit = switch (s) {
-            case CLUBS -> "clubs"; case DIAMONDS -> "diamonds";
-            case HEARTS -> "hearts"; case SPADES -> "spades";
+            case CLUBS -> "clubs";
+            case DIAMONDS -> "diamonds";
+            case HEARTS -> "hearts";
+            case SPADES -> "spades";
         };
         return rank + "_of_" + suit + ".png";
     }
 
-    // private void sleep(long ms) { try { Thread.sleep(ms); } catch (Exception ignored) {} }
+    private void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (Exception ignored) {} }
 }
