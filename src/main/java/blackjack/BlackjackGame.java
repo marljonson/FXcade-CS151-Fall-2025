@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.*;
 
 public class BlackjackGame {
@@ -337,7 +338,7 @@ public class BlackjackGame {
 
     // method needed to save high score for new saving system
     public static void saveHighScore(String username, int score) {
-        Path path = Paths.get("data/high_scores.txt");
+        Path path = Paths.get("data", "high_scores.txt");
         List<String> lines = new ArrayList<>();
         boolean found = false;
 
@@ -371,7 +372,7 @@ public class BlackjackGame {
 
             Files.write(path, newLines);
         } catch (IOException e) {
-            System.out.println("Failed to save BJ score: " + e);
+            System.out.println("Failed to save blackjack score: " + e);
         }
     }
 

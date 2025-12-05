@@ -288,7 +288,7 @@ public class Main extends Application {
                 mainMenu.requestFocus();
             });
 
-            updateSnakeTopScores(accountManager, snakeListBox);
+            // updateSnakeTopScores(accountManager, snakeListBox);
 
             HBox snakeToolBar = createToolBar(primaryStage, loginScene, mainMenuScene);
             controller.getView().setToolbar(snakeToolBar);

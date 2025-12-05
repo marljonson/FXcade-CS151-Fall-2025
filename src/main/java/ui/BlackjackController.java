@@ -20,7 +20,7 @@ public class BlackjackController {
     private HBox playerHandBox, bot1HandBox, bot2HandBox;
     private Label playerTotal, dealerTotal;
     private Label playerBankroll, bot1Bankroll, bot2Bankroll;
-    private Label statusLabel, turnLabel;
+    private Label statusLabel;
     private TextField betField;
     private Button hitButton, standButton, newRoundButton;
 
@@ -34,8 +34,8 @@ public class BlackjackController {
     }
 
     private void showMainMenu(String username) {
-        VBox root = new VBox(30);
-        root.setPadding(new Insets(40));
+        VBox root = new VBox(40);
+        root.setPadding(new Insets(50));
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #f8f9fa;");
 
@@ -45,17 +45,16 @@ public class BlackjackController {
         Button newGameBtn = new Button("NEW GAME");
         Button loadGameBtn = new Button("LOAD GAME");
 
-        newGameBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 20; -fx-padding: 15 40;");
-        loadGameBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 20; -fx-padding: 15 40;");
+        newGameBtn.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 22; -fx-padding: 20 60; -fx-font-weight: bold;");
+        loadGameBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 22; -fx-padding: 20 60; -fx-font-weight: bold;");
 
         newGameBtn.setOnAction(e -> startNewGame(username));
         loadGameBtn.setOnAction(e -> loadGame(username));
 
         root.getChildren().addAll(title, newGameBtn, loadGameBtn);
-
         addToolbar(root);
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 900, 700);
         stage.setScene(scene);
         stage.setTitle("FXcade - Blackjack");
         stage.show();
@@ -88,7 +87,6 @@ public class BlackjackController {
         VBox root = new VBox();
         root.setStyle("-fx-background-color: #f8f9fa;");
 
-        // Toolbar
         addToolbar(root);
 
         VBox gameArea = new VBox(20);
@@ -98,7 +96,6 @@ public class BlackjackController {
         Label title = new Label("BLACKJACK");
         title.setStyle("-fx-font-size: 36; -fx-font-weight: bold; -fx-text-fill: #212529;");
 
-        // Dealer
         VBox dealerArea = new VBox(10);
         dealerArea.setAlignment(Pos.CENTER);
         dealerArea.getChildren().addAll(
@@ -107,8 +104,7 @@ public class BlackjackController {
             dealerTotal = new Label("??") {{ setStyle("-fx-font-size: 20;"); }}
         );
 
-        // Players
-        HBox playersRow = new HBox(50);
+        HBox playersRow = new HBox(60);
         playersRow.setAlignment(Pos.CENTER);
         playersRow.getChildren().addAll(
             createPlayerArea("YOU", "#28a745"),
@@ -116,7 +112,6 @@ public class BlackjackController {
             createPlayerArea("BOT 2", "#6f42c1")
         );
 
-        // Controls
         betField = new TextField("50");
         betField.setPrefWidth(80);
 
@@ -136,10 +131,7 @@ public class BlackjackController {
         statusLabel = new Label("Click NEW ROUND to start");
         statusLabel.setStyle("-fx-font-size: 22; -fx-text-fill: #007bff; -fx-font-weight: bold;");
 
-        turnLabel = new Label("");
-        turnLabel.setStyle("-fx-font-size: 24; -fx-text-fill: #28a745; -fx-font-weight: bold;");
-
-        gameArea.getChildren().addAll(title, dealerArea, playersRow, controls, statusLabel, turnLabel);
+        gameArea.getChildren().addAll(title, dealerArea, playersRow, controls, statusLabel);
         root.getChildren().add(gameArea);
 
         hitButton.setOnAction(e -> hit());
@@ -147,7 +139,7 @@ public class BlackjackController {
         newRoundButton.setOnAction(e -> newRound());
         saveButton.setOnAction(e -> showSaveDialog());
 
-        newRound(); // start first round
+        newRound();
 
         Scene scene = new Scene(root, 1200, 800);
         stage.setScene(scene);
@@ -197,30 +189,18 @@ public class BlackjackController {
     }
 
     private void newRound() {
-        int bet;
+        int bet = 50;
         try {
             bet = Integer.parseInt(betField.getText().trim());
-            if (bet < 1 || bet > game.getHuman().getBankroll()) bet = Math.min(50, game.getHuman().getBankroll());
-        } catch (Exception e) {
-            bet = Math.min(50, game.getHuman().getBankroll());
-        }
+            if (bet < 1 || bet > game.getHuman().getBankroll()) bet = 50;
+        } catch (Exception ignored) {}
 
         game.startNewRound(bet, 50, 50);
         refresh();
-        statusLabel.setText("Place your bet and wait...");
-        turnLabel.setText("BETTING");
-        hitButton.setDisable(true);
-        standButton.setDisable(true);
+        statusLabel.setText("YOUR TURN");
+        hitButton.setDisable(false);
+        standButton.setDisable(false);
         newRoundButton.setDisable(true);
-
-        // Auto-start after deal
-        Platform.runLater(() -> {
-            sleep(800);
-            statusLabel.setText("Your turn!");
-            turnLabel.setText("YOUR TURN");
-            hitButton.setDisable(false);
-            standButton.setDisable(false);
-        });
     }
 
     private void hit() {
@@ -240,52 +220,43 @@ public class BlackjackController {
         standButton.setDisable(true);
 
         new Thread(() -> {
-            // Play Bot 1
-            if (game.getTurnIndex() == 0) {
-                playBot(game.getBot1(), BotStrategy.hitUnder(16));
-                game.turnIndex = 1;
-            }
-            // Play Bot 2
-            if (game.getTurnIndex() == 1) {
-                playBot(game.getBot2(), BotStrategy.hitUnder(15));
-                game.turnIndex = 2;
-            }
-            // Dealer turn
-            if (game.getTurnIndex() == 2) {
-                game.revealDealerHole();
-                Platform.runLater(this::refresh);
-                sleep(1000);
-                game.dealerTurn();
-                game.finishRound();
-                game.turnIndex = 3;
+            while (!game.isRoundOver()) {
+                if (game.getTurnIndex() < 3) {
+                    Participant p = game.getPlayers().get(game.getTurnIndex());
+                    BotStrategy brain = p == game.getBot1() ? BotStrategy.hitUnder(16)
+                                      : p == game.getBot2() ? BotStrategy.hitUnder(15) : null;
+
+                    while (brain != null && !p.getHand().isBust() &&
+                           brain.decide(p.getHand(), game.dealerUpCard()) == BotStrategy.Action.HIT) {
+                        game.tryDealUp(p.getHand());
+                        sleep(800);
+                        Platform.runLater(this::refresh);
+                    }
+                } else {
+                    game.revealDealerHole();
+                    Platform.runLater(this::refresh);
+                    sleep(1000);
+                    game.dealerTurn();
+                    game.finishRound();
+                }
+                game.turnIndex++;
             }
 
             Platform.runLater(() -> {
                 refresh();
                 statusLabel.setText(game.getResultBanner().replace("\n", " • "));
                 newRoundButton.setDisable(false);
-                hitButton.setDisable(true);
-                standButton.setDisable(true);
+                hitButton.setDisable(false);
+                standButton.setDisable(false);
             });
         }).start();
-    }
-
-    // new method
-    private void playBot(Participant bot, BotStrategy strategy) {
-        while (!bot.getHand().isBust()) {
-            BotStrategy.Action action = strategy.decide(bot.getHand(), game.dealerUpCard());
-            if (action == BotStrategy.Action.STAND) break;
-            game.tryDealUp(bot.getHand());
-            sleep(600);
-            Platform.runLater(this::refresh);
-        }
     }
 
     private void showSaveDialog() {
         String saveCode = game.toJsonSave();
         TextInputDialog dialog = new TextInputDialog(saveCode);
         dialog.setTitle("Save Game");
-        dialog.setHeaderText("Your Save Code (Copy this):");
+        dialog.setHeaderText("Your Save Code — Copy It!");
         dialog.getEditor().setEditable(false);
         dialog.getEditor().selectAll();
         dialog.showAndWait();
@@ -312,7 +283,7 @@ public class BlackjackController {
         box.getChildren().clear();
         for (int i = 0; i < hand.getCards().size(); i++) {
             Card c = hand.getCards().get(i);
-            boolean show = hideFirst && i == 0 ? false : c.isFaceUp();
+            boolean show = hideFirst && i == 1 ? false : c.isFaceUp();
             String name = show ? cardName(c.getRank(), c.getSuit()) : "back.png";
             Image img = new Image(getClass().getResourceAsStream("/cards/" + name));
             ImageView iv = new ImageView(img);
@@ -324,22 +295,15 @@ public class BlackjackController {
 
     private String cardName(Rank r, Suit s) {
         String rank = switch (r) {
-            case ACE -> "ace";
-            case KING -> "king";
-            case QUEEN -> "queen";
-            case JACK -> "jack";
-            case TEN -> "10";
-            default -> String.valueOf(r.getValue());
+            case ACE -> "ace"; case KING -> "king"; case QUEEN -> "queen"; case JACK -> "jack";
+            case TEN -> "10"; default -> String.valueOf(r.getValue());
         };
         String suit = switch (s) {
-            case CLUBS -> "clubs";
-            case DIAMONDS -> "diamonds";
-            case HEARTS -> "hearts";
-            case SPADES -> "spades";
+            case CLUBS -> "clubs"; case DIAMONDS -> "diamonds";
+            case HEARTS -> "hearts"; case SPADES -> "spades";
         };
         return rank + "_of_" + suit + ".png";
     }
 
     private void sleep(long ms) { try { Thread.sleep(ms); } catch (Exception ignored) {} }
-    private void runLater(Runnable r) { javafx.application.Platform.runLater(r); }
 }
