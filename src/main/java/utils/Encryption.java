@@ -7,7 +7,7 @@ public class Encryption {
     public static String encrypt(String text) {
         String encrypted = "";
         for (char ch : text.toCharArray()) {
-            encrypted += (char) (ch + 3);
+            encrypted += (char) (ch + SHIFT);
         }
         return encrypted;
     }
