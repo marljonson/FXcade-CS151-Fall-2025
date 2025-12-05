@@ -11,6 +11,9 @@
 ## Design
 Our code is largely split into 3 categories: (1) manager, (2) blackjack, and (3) snake.
 
+## Video Presentation Demo
+https://drive.google.com/file/d/14qtYK6k2X9I7o4A-IBEsIcQ_bLMQGDHE/view
+
 ## Installation instructions
 Prerequisites:
 - Java
