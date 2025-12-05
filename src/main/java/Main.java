@@ -229,6 +229,28 @@ public class Main extends Application {
         signUpMessageLabel.setTextFill(Color.RED);
 
         Button signUpBackButton = new Button("Back");
+        signUpBackButton.setPrefWidth(70);
+        signUpBackButton.setPrefHeight(20);
+        signUpBackButton.setFont(new Font("System", 13));
+
+        String signUpBackNormal = "-fx-background-color: #555555;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #333333;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+        String signUpBackHover = "-fx-background-color: #666666;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #333333;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+
+        signUpBackButton.setStyle(signUpBackNormal);
+        signUpBackButton.setOnMouseEntered(e -> signUpBackButton.setStyle(signUpBackHover));
+        signUpBackButton.setOnMouseExited(e -> signUpBackButton.setStyle(signUpBackNormal));
 
         VBox signupLayout = new VBox(signUpMessage, usernameSignUpLabelBox, signupUsernameField, passwordSignUpLabelBox, signupPasswordField, signUpButton, signUpMessageLabel, signUpBackButton);
         signupLayout.setSpacing(10);
@@ -327,15 +349,53 @@ public class Main extends Application {
 
         Button addGameButton1 = new Button("Add Game");
         addGameButton1.setStyle("-fx-background-radius: 8;");
-        addGameButton1.setPrefWidth(120);
+        addGameButton1.setPrefWidth(130);
         addGameButton1.setPrefHeight(30);
         addGameButton1.setFont(new Font("System", 16));
 
+        String addGameButton1Normal = "-fx-background-color: #555555;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #333333;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+        String addGameButton1Hover = "-fx-background-color: #666666;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #333333;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+
+        addGameButton1.setStyle(addGameButton1Normal);
+        addGameButton1.setOnMouseEntered(e -> addGameButton1.setStyle(addGameButton1Hover));
+        addGameButton1.setOnMouseExited(e -> addGameButton1.setStyle(addGameButton1Normal));
+
         Button addGameButton2 = new Button("Add Game");
         addGameButton2.setStyle("-fx-background-radius: 8;");
-        addGameButton2.setPrefWidth(120);
+        addGameButton2.setPrefWidth(130);
         addGameButton2.setPrefHeight(30);
         addGameButton2.setFont(new Font("System", 16));
+
+        String addGameButton2Normal = "-fx-background-color: #555555;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #333333;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+        String addGameButton2Hover = "-fx-background-color: #666666;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #333333;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+
+        addGameButton2.setStyle(addGameButton2Normal);
+        addGameButton2.setOnMouseEntered(e -> addGameButton2.setStyle(addGameButton2Hover));
+        addGameButton2.setOnMouseExited(e -> addGameButton2.setStyle(addGameButton2Normal));
 
         VBox mainMenuRight = new VBox(gameMenu, blackjackButton, snakeButton, addGameMenu, addGameButton1, addGameButton2);
         mainMenuRight.setSpacing(10);
