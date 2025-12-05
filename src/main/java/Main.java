@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Line;
+import javafx.scene.layout.Priority;
 import manager.AccountManager;
 import snake.controller.SnakeController;
 
@@ -255,7 +256,7 @@ public class Main extends Application {
 
         Label snakeScores = new Label("Snake");
         snakeScores.setFont(new Font("System", 18));
-        snakeScores.setStyle("-fx-text-fill: #1A3D7C; -fx-font-weight: bold;");
+        snakeScores.setStyle("-fx-text-fill: #2E7D32; -fx-font-weight: bold;");
 
         snakeListBox = new VBox();
         snakeListBox.setSpacing(4);
@@ -271,15 +272,54 @@ public class Main extends Application {
 
         Button blackjackButton = new Button("Blackjack");
         blackjackButton.setStyle("-fx-background-radius: 8;");
-        blackjackButton.setPrefWidth(100);
+        blackjackButton.setPrefWidth(115);
         blackjackButton.setPrefHeight(30);
         blackjackButton.setFont(new Font("System", 16));
+
+        String blackjackNormal = "-fx-background-color: #1E88E5;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #0D47A1;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+
+        String blackjackHover = "-fx-background-color: #2196F3;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #0D47A1;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+
+        blackjackButton.setStyle(blackjackNormal);
+        blackjackButton.setOnMouseEntered(e -> blackjackButton.setStyle(blackjackHover));
+        blackjackButton.setOnMouseExited(e -> blackjackButton.setStyle(blackjackNormal));
 
         Button snakeButton = new Button("Snake");
         snakeButton.setStyle("-fx-background-radius: 8;");
         snakeButton.setPrefWidth(100);
         snakeButton.setPrefHeight(30);
         snakeButton.setFont(new Font("System", 16));
+
+        String snakeNormal = "-fx-background-color: #2E7D32;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #1B5E20;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+        String snakeHover = "-fx-background-color: #388E3C;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-color: #1B5E20;" +
+                "-fx-border-width: 1;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 6 18;";
+
+        snakeButton.setStyle(snakeNormal);
+        snakeButton.setOnMouseEntered(e -> snakeButton.setStyle(snakeHover));
+        snakeButton.setOnMouseExited(e -> snakeButton.setStyle(snakeNormal));
 
         Label addGameMenu = new Label("Add Games");
         addGameMenu.setStyle("-fx-font-weight: bold");
@@ -484,6 +524,7 @@ public class Main extends Application {
 
             List<Integer> scores = new ArrayList<>();
 
+            // Read snake top scores
             for (String line : lines) {
                 if (line.startsWith(start)) {
                     String[] parts = line.split(":");
@@ -494,11 +535,33 @@ public class Main extends Application {
                 }
             }
 
+            // Display snake top scores
             for (int i = 0; i < scores.size(); i++) {
-                snakeListBox.getChildren().add(new Label((i + 1) + ". " + scores.get(i)));
+                String text = (i + 1) + ". " + scores.get(i);
+
+                Label scoreLabel = new Label(text);
+                scoreLabel.setFont(Font.font("Consolas", 14));
+                scoreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1B5E20;");
+
+                HBox row = new HBox(scoreLabel);
+                row.setSpacing(8);
+                row.setAlignment(Pos.CENTER_LEFT);
+                row.setPadding(new Insets(4, 10, 4, 10));
+
+                String backgroundColor = (i % 2 == 0) ? "#C8E6C9" : "#A5D6A7";
+                row.setStyle(
+                        "-fx-background-color: " + backgroundColor + ";" +
+                                "-fx-background-radius: 6;"
+                );
+
+                row.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(scoreLabel, Priority.ALWAYS);
+                VBox.setMargin(row, new Insets(2, 0, 2, 0));
+
+                snakeListBox.getChildren().add(row);
             }
         } catch (IOException e) {
-            snakeListBox.getChildren().add(new Label("Error reading scores"));
+
         }
     }
 
