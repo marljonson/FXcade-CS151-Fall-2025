@@ -277,6 +277,21 @@ public class Main extends Application {
         blackjackButton.setPrefWidth(100);
         blackjackButton.setPrefHeight(30);
         blackjackButton.setFont(new Font("System", 16));
+        blackjackButton.setOnAction(e -> {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/blackjack.fxml"));
+            Parent blackjackRoot = loader.load();
+
+            // Get the controller so we can pass the username later
+            BlackjackController bjController = loader.getController();
+
+            Scene blackjackScene = new Scene(blackjackRoot, 1200, 800);
+            primaryStage.setScene(blackjackScene);
+            primaryStage.setTitle("FXcade - Blackjack");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    });
 
         Button snakeButton = new Button("Snake");
         snakeButton.setStyle("-fx-background-radius: 8;");
