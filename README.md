@@ -7,10 +7,18 @@
 - **Video presentation demo:** https://drive.google.com/file/d/14qtYK6k2X9I7o4A-IBEsIcQ_bLMQGDHE/view
 
 ## Overview
-**FXcade** is a game manager application featuring the popular games blackjack and snake. It is an offline console application built on a JavaFX frontend and a Java backend using Maven. Our game manager uses a Caesar shift for log-in password encryption.
+FXcade is a game manager application built for CS 151 that integrates two classic games (blackjack and snake) into a unified JavaFX desktop interface. FXcade combines a JavaFX frontend, a Java backend, and Maven for dependency management and project organization. Users can create personal accounts, log in securely through a Caesar cipher–based password encryption system, and access a responsive main menu serving as the hub for game selection.
+
+Blackjack and snake offer their own experiences. Blackjack includes persistent game-state saving so players can resume their session later. Both blackjack and snake maintain high score–tracking tied to user accounts. To ensure stable performance, FXcade is designed as an offline application.
 
 ## Design
-Our code is largely split into 3 categories: (1) manager, (2) blackjack, and (3) snake. The two games are organized in a model–view–controller fashion such that the logic and UI are separated for each game; this enabled us to work on such components separately. The main menu UI incorporates a user system and account manager in the `manager` folder; the blackjack UI incorporates a controller and game logic backend; the snake UI incorporates another controller and game logic backend. We incorporated several JUnit tests in the `test` folder.
+The FXcade codebase is organized into three primary modules: manager, blackjack, and snake.
+
+The manager module handles user account creation, login authentication, main menu navigation, and coordination between the other components. Passwords are encrypted using a Caesar shift before storage. The manager connects the UI elements of the main menu with the blackjack and snake game modules.
+
+Both blackjack and snake follow a model–view–controller design pattern. This separation allowed us to work independently on UI and game logic without creating significant merge conflicts. Blackjack includes UI screens, player/dealer logic, card management, gameplay rules, a state-saving system for not-yet-finished games. Snake contains grid logic, movement and collision detection, and scoring. Both blackjack and snake maintain persistent high scores.
+
+We incorporated JUnit tests in the test folder to verify aspects of the login, blackjack game, and snake game logic.
 
 ## Installation instructions
 Prerequisites:
